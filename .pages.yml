@@ -1,6 +1,8 @@
 media:
   input: public/images/uploads
   output: /images/uploads
+  extensions: [jpg, jpeg, png, gif, svg, mov, mp4]
+  categories: [image, video]
 
 content:
   - name: projects
@@ -36,8 +38,12 @@ content:
         list: true
         fields:
           - name: image
-            label: Image
-            type: image
+            label: Image or video
+            type: file
+            description: Upload or pick a jpg, jpeg, png, gif, mov or mp4 file.
+            options:
+              categories: [image, video]
+              extensions: [jpg, jpeg, png, gif, svg, mov, mp4]
           - name: size
             label: Size
             type: select

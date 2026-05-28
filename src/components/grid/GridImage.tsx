@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
-import { imageHeight, IMAGE_WIDTH } from "../../utils/imageSize";
+import { imageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
+import { isVideo } from "../../utils/media";
 import styles from "./GridImage.module.css";
 
 interface GridImageProps {
@@ -14,15 +15,36 @@ interface GridImageProps {
 }
 
 export function GridImage({ slug, index, src, alt, size, onActivate }: GridImageProps) {
+  const layoutId = imageLayoutId(slug, index);
+  const style = { width: "auto", height: imageHeight(size) };
+
+  if (isVideo(src)) {
+    return (
+      <motion.video
+        layoutId={layoutId}
+        className={styles.image}
+        src={src}
+        aria-label={alt}
+        muted
+        loop
+        autoPlay
+        playsInline
+        onClick={onActivate}
+        style={style}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      />
+    );
+  }
+
   return (
     <motion.img
-      layoutId={imageLayoutId(slug, index)}
+      layoutId={layoutId}
       className={styles.image}
       src={src}
       alt={alt}
       draggable={false}
       onClick={onActivate}
-      style={{ width: IMAGE_WIDTH, height: imageHeight(size) }}
+      style={style}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     />
   );

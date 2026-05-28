@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { imageLayoutId } from "../../utils/layoutId";
+import { isVideo } from "../../utils/media";
 import type { ProjectImage } from "../../types/project";
 import styles from "./Lightbox.module.css";
 
@@ -28,6 +29,8 @@ export function Lightbox({
 
   const hasMultiple = images.length > 1;
   const stop = (e: React.MouseEvent) => e.stopPropagation();
+  const current = images[index];
+  const caption = current.alt || `${title} — ${index + 1}`;
 
   return createPortal(
     <motion.div
@@ -55,15 +58,30 @@ export function Lightbox({
         </button>
       )}
 
-      <motion.img
-        layoutId={imageLayoutId(slug, index)}
-        className={styles.image}
-        src={images[index].src}
-        alt={images[index].alt || `${title} — ${index + 1}`}
-        onClick={stop}
-        draggable={false}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      />
+      {isVideo(current.src) ? (
+        <motion.video
+          layoutId={imageLayoutId(slug, index)}
+          className={styles.image}
+          src={current.src}
+          aria-label={caption}
+          controls
+          autoPlay
+          loop
+          playsInline
+          onClick={stop}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        />
+      ) : (
+        <motion.img
+          layoutId={imageLayoutId(slug, index)}
+          className={styles.image}
+          src={current.src}
+          alt={caption}
+          onClick={stop}
+          draggable={false}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        />
+      )}
 
       {hasMultiple && (
         <button

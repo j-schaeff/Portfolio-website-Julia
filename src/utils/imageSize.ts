@@ -1,7 +1,6 @@
 import type { ImageSize } from "../types/project";
 
-// Fixed width for every image; height scales with imageSize.
-export const IMAGE_WIDTH = 220;
+// Height scales with imageSize; width follows the image's natural aspect ratio.
 export const BASE_HEIGHT = 90;
 
 const MULTIPLIER: Record<ImageSize, number> = {
