@@ -30,13 +30,27 @@ content:
         label: Order
         type: number
         description: Controls position in the grid and lists (ascending).
-      - name: imageSize
-        label: Image size
-        type: select
-        description: Image height multiplier (width stays constant).
-        options:
-          values: ["1", "2", "3", "4", "5"]
       - name: images
         label: Images
-        type: image
+        type: object
         list: true
+        fields:
+          - name: image
+            label: Image
+            type: image
+          - name: size
+            label: Size
+            type: select
+            description: Image height multiplier (width stays constant).
+            default: "2"
+            options:
+              values: ["1", "2", "3", "4", "5"]
+          - name: hideInGrid
+            label: Hide in grid
+            type: boolean
+            default: false
+            description: Hide this image in the grid overview, but still show it in the detail view.
+          - name: alt
+            label: Alt text
+            type: string
+            description: Optional description for screen readers and accessibility.

@@ -1,13 +1,19 @@
 export type ImageSize = 1 | 2 | 3 | 4 | 5;
 
+export interface ProjectImage {
+  src: string;
+  size: ImageSize;
+  hideInGrid: boolean;
+  alt: string;
+}
+
 export interface Frontmatter {
   title: string;
   type: string;
   description: string;
   year: number;
   order: number;
-  imageSize: ImageSize;
-  images: string[];
+  images: ProjectImage[];
 }
 
 export interface Project extends Frontmatter {

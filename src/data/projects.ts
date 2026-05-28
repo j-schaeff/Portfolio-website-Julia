@@ -1,5 +1,5 @@
 import matter from "gray-matter";
-import type { Project } from "../types/project";
+import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize } from "../utils/imageSize";
 
@@ -8,6 +8,25 @@ const files = import.meta.glob("/content/projects/*.md", {
   import: "default",
   eager: true,
 }) as Record<string, string>;
+
+function toImage(entry: unknown): ProjectImage | null {
+  // Legacy entries were plain path strings; current entries are objects.
+  if (typeof entry === "string") {
+    return { src: entry, size: clampImageSize(undefined), hideInGrid: false, alt: "" };
+  }
+  if (entry && typeof entry === "object") {
+    const e = entry as Record<string, unknown>;
+    const src = e.image ?? e.src;
+    if (!src) return null;
+    return {
+      src: String(src),
+      size: clampImageSize(e.size),
+      hideInGrid: Boolean(e.hideInGrid),
+      alt: String(e.alt ?? ""),
+    };
+  }
+  return null;
+}
 
 function toProject(path: string, raw: string): Project {
   const { data } = matter(raw);
@@ -20,8 +39,9 @@ function toProject(path: string, raw: string): Project {
     description: String(fm.description ?? ""),
     year: Number(fm.year ?? 0),
     order: Number(fm.order ?? 0),
-    imageSize: clampImageSize(fm.imageSize),
-    images: Array.isArray(fm.images) ? fm.images.map(String) : [],
+    images: Array.isArray(fm.images)
+      ? fm.images.map(toImage).filter((img): img is ProjectImage => img !== null)
+      : [],
   };
 }
 

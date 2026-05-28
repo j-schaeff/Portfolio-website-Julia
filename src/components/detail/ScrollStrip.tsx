@@ -27,14 +27,14 @@ export function ScrollStrip({
     >
       {projects.map((project) => (
         <div key={project.slug} className={styles.group} data-project-slug={project.slug}>
-          {project.images.map((src, i) => (
+          {project.images.map((img, i) => (
             <StripImage
-              key={src + i}
+              key={img.src + i}
               slug={project.slug}
               index={i}
-              src={src}
-              alt={`${project.title} — ${i + 1}`}
-              size={project.imageSize}
+              src={img.src}
+              alt={img.alt || `${project.title} — ${i + 1}`}
+              size={img.size}
               onClick={(e) => onImageClick(project, i, e)}
             />
           ))}

@@ -33,17 +33,19 @@ export function GridItem({ project }: { project: Project }) {
       </div>
 
       <div className={styles.images}>
-        {project.images.map((src, i) => (
-          <GridImage
-            key={src + i}
-            slug={project.slug}
-            index={i}
-            src={src}
-            alt={`${project.title} — ${i + 1}`}
-            size={project.imageSize}
-            onActivate={(e) => go(i, e)}
-          />
-        ))}
+        {project.images.map((img, i) => ({ img, i }))
+          .filter(({ img }) => !img.hideInGrid)
+          .map(({ img, i }) => (
+            <GridImage
+              key={img.src + i}
+              slug={project.slug}
+              index={i}
+              src={img.src}
+              alt={img.alt || `${project.title} — ${i + 1}`}
+              size={img.size}
+              onActivate={(e) => go(i, e)}
+            />
+          ))}
       </div>
     </div>
   );

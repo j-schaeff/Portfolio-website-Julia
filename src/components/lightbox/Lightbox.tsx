@@ -2,12 +2,13 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { imageLayoutId } from "../../utils/layoutId";
+import type { ProjectImage } from "../../types/project";
 import styles from "./Lightbox.module.css";
 
 interface LightboxProps {
   slug: string;
   title: string;
-  images: string[];
+  images: ProjectImage[];
   index: number;
   onClose: () => void;
   onNext: () => void;
@@ -57,8 +58,8 @@ export function Lightbox({
       <motion.img
         layoutId={imageLayoutId(slug, index)}
         className={styles.image}
-        src={images[index]}
-        alt={`${title} — ${index + 1}`}
+        src={images[index].src}
+        alt={images[index].alt || `${title} — ${index + 1}`}
         onClick={stop}
         draggable={false}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
