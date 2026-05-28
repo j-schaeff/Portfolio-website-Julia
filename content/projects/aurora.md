@@ -5,7 +5,7 @@ description: A printed editorial series exploring light and atmosphere through
   layered gradients and long-exposure photography.
 year: 2024
 order: 1
-imageSize: "5"
+imageSize: "1"
 images:
   - /images/uploads/p1-a.svg
   - /images/uploads/p1-b.svg
