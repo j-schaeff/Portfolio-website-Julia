@@ -1,0 +1,29 @@
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  transition: padding-left var(--transition);
+}
+
+.active {
+  font-weight: 700;
+  padding-left: var(--indent);
+}
+
+.year {
+  font-variant-numeric: tabular-nums;
+}

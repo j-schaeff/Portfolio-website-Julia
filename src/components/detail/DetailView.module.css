@@ -1,0 +1,33 @@
+.detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 56px;
+}
+
+.back {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--gap);
+  padding: 32px 24px 48px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

@@ -1,0 +1,42 @@
+media:
+  input: public/images/uploads
+  output: /images/uploads
+
+content:
+  - name: projects
+    label: Projects
+    type: collection
+    path: content/projects
+    filename: "{fields.title}.md"
+    format: yaml-frontmatter
+    view:
+      fields: [title, type, year, order]
+      primary: title
+      sort: [order, year, title]
+    fields:
+      - name: title
+        label: Title
+        type: string
+      - name: type
+        label: Type
+        type: string
+      - name: description
+        label: Description
+        type: text
+      - name: year
+        label: Year
+        type: number
+      - name: order
+        label: Order
+        type: number
+        description: Controls position in the grid and lists (ascending).
+      - name: imageSize
+        label: Image size
+        type: select
+        description: Image height multiplier (width stays constant).
+        options:
+          values: ["1", "2", "3", "4", "5"]
+      - name: images
+        label: Images
+        type: image
+        list: true
