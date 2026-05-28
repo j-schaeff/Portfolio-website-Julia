@@ -1,11 +1,11 @@
 ---
-title: Aurora
-type: Editorial
+title: Language of Fragments
+type: Poster
 description: A printed editorial series exploring light and atmosphere through
   layered gradients and long-exposure photography.
-year: 2024
+year: 2026
 order: 1
-imageSize: "1"
+imageSize: "5"
 images:
   - /images/uploads/p1-a.svg
   - /images/uploads/p1-c.svg
