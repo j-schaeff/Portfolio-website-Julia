@@ -18,35 +18,44 @@ export function GridItem({ project }: { project: Project }) {
     navigate(`/project/${project.slug}`);
   };
 
+  const visibleImages = project.images
+    .map((img, i) => ({ img, i }))
+    .filter(({ img }) => !img.hideInGrid);
+  const [lead, ...rest] = visibleImages;
+
+  const info = (
+    <div
+      className={styles.infoButton}
+      role="link"
+      tabIndex={0}
+      onClick={(e) => go(0, e)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") go(0, e);
+      }}
+    >
+      <InfoBlock title={project.title} type={project.type} />
+    </div>
+  );
+
+  const renderImage = ({ img, i }: (typeof visibleImages)[number]) => (
+    <GridImage
+      key={img.src + i}
+      slug={project.slug}
+      index={i}
+      src={img.src}
+      alt={img.alt || `${project.title} — ${i + 1}`}
+      size={img.size}
+      onActivate={(e) => go(i, e)}
+    />
+  );
+
   return (
     <div className={styles.row}>
-      <div
-        className={styles.infoButton}
-        role="link"
-        tabIndex={0}
-        onClick={(e) => go(0, e)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") go(0, e);
-        }}
-      >
-        <InfoBlock title={project.title} type={project.type} />
+      <div className={styles.lead}>
+        {info}
+        {lead && renderImage(lead)}
       </div>
-
-      <div className={styles.images}>
-        {project.images.map((img, i) => ({ img, i }))
-          .filter(({ img }) => !img.hideInGrid)
-          .map(({ img, i }) => (
-            <GridImage
-              key={img.src + i}
-              slug={project.slug}
-              index={i}
-              src={img.src}
-              alt={img.alt || `${project.title} — ${i + 1}`}
-              size={img.size}
-              onActivate={(e) => go(i, e)}
-            />
-          ))}
-      </div>
+      {rest.map(renderImage)}
     </div>
   );
 }

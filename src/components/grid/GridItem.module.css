@@ -1,16 +1,14 @@
 .row {
+  display: contents;
+}
+
+.lead {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--gap);
 }
 
 .infoButton {
   cursor: pointer;
   padding-right: 4px;
-}
-
-.images {
-  display: flex;
-  align-items: center;
-  gap: var(--gap);
 }

@@ -1,7 +1,7 @@
 :root {
   /* Image sizing — keep in sync with src/utils/imageSize.ts */
   --img-width: 220px;
-  --img-base-height: 90px;
+  --img-base-height: 81px;
 
   /* Lightbox */
   --lightbox-margin: 100px;
@@ -13,9 +13,9 @@
   --muted: #8a8a8a;
   --hairline: #e6e6e6;
 
-  --font-serif: Georgia, "Times New Roman", Times, serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
-    sans-serif;
+  --font-serif: "Montagu Slab", Georgia, "Times New Roman", Times, serif;
+  --font-sans: "A2Z Faucet", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, sans-serif;
 
   --indent: 40px;
   --gap: 16px;

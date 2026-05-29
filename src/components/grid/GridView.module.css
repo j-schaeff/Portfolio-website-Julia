@@ -2,8 +2,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  gap: calc(var(--gap) * 2.5) var(--gap);
+  align-items: flex-end;
+  gap: calc(var(--gap) * 2.5) 12px;
   min-height: 100vh;
-  padding: 48px 24px;
+  padding: 43px 19px;
 }

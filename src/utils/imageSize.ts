@@ -1,14 +1,14 @@
 import type { ImageSize } from "../types/project";
 
 // Height scales with imageSize; width follows the image's natural aspect ratio.
-export const BASE_HEIGHT = 90;
+export const BASE_HEIGHT = 81;
 
 const MULTIPLIER: Record<ImageSize, number> = {
   1: 1,
-  2: 1.6,
-  3: 2.2,
-  4: 2.9,
-  5: 3.7,
+  2: 1.54,
+  3: 2.08,
+  4: 2.71,
+  5: 3.43,
 };
 
 export function clampImageSize(value: unknown): ImageSize {
