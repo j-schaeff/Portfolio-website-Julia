@@ -35,6 +35,7 @@ export function ScrollStrip({
               src={img.src}
               alt={img.alt || `${project.title} — ${i + 1}`}
               size={img.size}
+              isVideo={img.isVideo}
               onClick={(e) => onImageClick(project, i, e)}
             />
           ))}

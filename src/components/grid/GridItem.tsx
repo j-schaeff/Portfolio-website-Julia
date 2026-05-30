@@ -47,6 +47,7 @@ export function GridItem({ project }: { project: Project }) {
         src={img.src}
         alt={img.alt || `${project.title} — ${i + 1}`}
         size={img.size}
+        isVideo={img.isVideo}
         onActivate={(e) => go(i, e)}
       />
       {/* Reserved label band keeps every image on a shared baseline. */}

@@ -2,6 +2,7 @@ import matter from "gray-matter";
 import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize } from "../utils/imageSize";
+import { dropboxDirect, isVideo } from "../utils/media";
 
 const files = import.meta.glob("/content/projects/*.md", {
   query: "?raw",
@@ -22,17 +23,24 @@ function normalizeSrc(src: string): string {
 function toImage(entry: unknown): ProjectImage | null {
   // Legacy entries were plain path strings; current entries are objects.
   if (typeof entry === "string") {
-    return { src: normalizeSrc(entry), size: clampImageSize(undefined), hideInGrid: false, alt: "" };
+    const src = normalizeSrc(entry);
+    return { src, size: clampImageSize(undefined), hideInGrid: false, alt: "", isVideo: isVideo(src) };
   }
   if (entry && typeof entry === "object") {
     const e = entry as Record<string, unknown>;
-    const src = e.image ?? e.src;
+    // A pasted video link (e.g. a Dropbox share URL) overrides the uploaded
+    // file, so large videos can stream from external hosting instead of being
+    // uploaded through the CMS. Such an entry is always treated as a video.
+    const videoUrl = e.videoUrl ? dropboxDirect(String(e.videoUrl)) : "";
+    const fileSrc = e.image ?? e.src;
+    const src = videoUrl || (fileSrc ? normalizeSrc(String(fileSrc)) : "");
     if (!src) return null;
     return {
-      src: normalizeSrc(String(src)),
+      src,
       size: clampImageSize(e.size),
       hideInGrid: Boolean(e.hideInGrid),
       alt: String(e.alt ?? ""),
+      isVideo: Boolean(videoUrl) || isVideo(src),
     };
   }
   return null;

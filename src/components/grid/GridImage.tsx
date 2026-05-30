@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { imageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
-import { isVideo } from "../../utils/media";
 import { useAnimation } from "../../context/AnimationContext";
 import styles from "./GridImage.module.css";
 
@@ -12,10 +11,11 @@ interface GridImageProps {
   src: string;
   alt: string;
   size: ImageSize;
+  isVideo: boolean;
   onActivate: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export function GridImage({ slug, index, src, alt, size, onActivate }: GridImageProps) {
+export function GridImage({ slug, index, src, alt, size, isVideo, onActivate }: GridImageProps) {
   const { origin } = useAnimation();
   // Only the clicked image shares a layoutId, so a single element morphs into
   // the detail strip instead of every grid image fighting for a match.
@@ -23,7 +23,7 @@ export function GridImage({ slug, index, src, alt, size, onActivate }: GridImage
   const layoutId = isShared ? imageLayoutId(slug, index) : undefined;
   const style = { width: "auto", height: imageHeight(size) };
 
-  if (isVideo(src)) {
+  if (isVideo) {
     return (
       <motion.video
         layoutId={layoutId}

@@ -5,6 +5,7 @@ export interface ProjectImage {
   size: ImageSize;
   hideInGrid: boolean;
   alt: string;
+  isVideo: boolean;
 }
 
 export interface Frontmatter {

@@ -40,10 +40,14 @@ content:
           - name: image
             label: Image or video
             type: file
-            description: Upload or pick a jpg, jpeg, png, gif, mov or mp4 file.
+            description: Upload or pick a jpg, jpeg, png, gif, mov or mp4 file. Leave empty if you paste a video link below instead.
             options:
               categories: [image, video]
               extensions: [jpg, jpeg, png, gif, svg, mov, mp4]
+          - name: videoUrl
+            label: Video link
+            type: string
+            description: Optional. Paste a link to a video (e.g. a Dropbox share link or any direct video URL) to play it from there instead of uploading. When set, it overrides the file above.
           - name: size
             label: Size
             type: select

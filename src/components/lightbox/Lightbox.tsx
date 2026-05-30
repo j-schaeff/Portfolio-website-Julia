@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { imageLayoutId } from "../../utils/layoutId";
-import { isVideo } from "../../utils/media";
 import type { ProjectImage } from "../../types/project";
 import styles from "./Lightbox.module.css";
 
@@ -65,7 +64,7 @@ export function Lightbox({
       transition={{ duration: 0.3 }}
     >
       <AnimatePresence initial={false}>
-        {isVideo(image.src) ? (
+        {image.isVideo ? (
           <motion.video
             key={key}
             {...motionProps}
