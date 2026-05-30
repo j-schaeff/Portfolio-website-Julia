@@ -21,7 +21,7 @@ description: Visual identity for a late-night concert series.
 year: 2021
 order: 5                 # controls position; ascending
 images:
-  - image: public/images/5_spring/cover-2.jpg
+  - image: public/images/uploads/5_spring/cover-2.jpg
     size: "5"            # height multiplier, 1–5 (width follows aspect ratio)
     hideInGrid: false    # hide in grid but still show in detail view
     alt: ""              # screen-reader description

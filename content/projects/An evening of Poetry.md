@@ -5,23 +5,23 @@ description: An intimate event created by friends, for friends, centered around 
 year: 2023
 order: 3
 images:
-  - image: public/images/3_poetry/Booklet4.png
+  - image: public/images/uploads/3_poetry/Booklet4.png
     size: "5"
     hideInGrid: false
     alt: ""
-  - image: public/images/3_poetry/bookletmockup.png
+  - image: public/images/uploads/3_poetry/bookletmockup.png
     size: "2"
     hideInGrid: false
     alt: ""
-  - image: public/images/3_poetry/chair.jpg
+  - image: public/images/uploads/3_poetry/chair.jpg
     size: "4"
     hideInGrid: false
     alt: ""
-  - image: public/images/3_poetry/Poetry_black.jpg
+  - image: public/images/uploads/3_poetry/Poetry_black.jpg
     size: "3"
     hideInGrid: false
     alt: ""
-  - image: public/images/3_poetry/spreads.jpg
+  - image: public/images/uploads/3_poetry/spreads.jpg
     size: "2"
     hideInGrid: false
     alt: ""

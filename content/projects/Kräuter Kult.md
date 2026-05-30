@@ -5,19 +5,19 @@ description: A typographic poster for a fictional creative culinary experience c
 year: 2025
 order: 2
 images:
-  - image: public/images/2_kraueterkult/Krauter_kult_1.jpg
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_1.jpg
     size: "4"
     hideInGrid: false
     alt: ""
-  - image: public/images/2_kraueterkult/Krauter_kult_5.jpg
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_5.jpg
     size: "2"
     hideInGrid: false
     alt: ""
-  - image: public/images/2_kraueterkult/Krauter_kult_9.jpg
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_9.jpg
     size: "5"
     hideInGrid: false
     alt: ""
-  - image: public/images/2_kraueterkult/Krauter_kult_11.jpg
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_11.jpg
     size: "3"
     hideInGrid: false
     alt: ""
