@@ -8,6 +8,6 @@ year: 2024
 order: 6
 images:
   - image: /images/uploads/IMG_6677.jpeg
-    size: "3"
+    size: "4"
     hideInGrid: false
 ---
