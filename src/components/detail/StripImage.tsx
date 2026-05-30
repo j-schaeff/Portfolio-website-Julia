@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
-import { imageHeight } from "../../utils/imageSize";
+import { detailImageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
 import { isVideo } from "../../utils/media";
 import styles from "./StripImage.module.css";
@@ -19,7 +19,7 @@ export function StripImage({ slug, index, src, alt, size, onClick }: StripImageP
   // The grid restricts layoutId to the clicked image, so the route transition
   // still only ever matches one element.
   const layoutId = imageLayoutId(slug, index);
-  const style = { width: "auto", height: imageHeight(size) };
+  const style = { width: "auto", height: detailImageHeight(size) };
 
   if (isVideo(src)) {
     return (

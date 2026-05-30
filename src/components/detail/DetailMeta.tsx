@@ -17,16 +17,18 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
     <div className={styles.meta}>
       <p className={styles.description}>{active.description}</p>
 
-      <ul className={styles.names}>
-        {projects.map((p) => (
-          <li
-            key={p.slug}
-            className={p.slug === active.slug ? styles.active : undefined}
-          >
-            {p.title}
-          </li>
-        ))}
-      </ul>
+      <div className={styles.namesCol}>
+        <ul className={styles.names}>
+          {projects.map((p) => (
+            <li
+              key={p.slug}
+              className={p.slug === active.slug ? styles.active : undefined}
+            >
+              {p.title}
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className={styles.specs}>
         {projects.map((p) => {

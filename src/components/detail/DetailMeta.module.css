@@ -1,24 +1,34 @@
 .meta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: flex-start;
-  /* Wide min-gap gives the centered names column whitespace on both sides. */
-  column-gap: 64px;
-  row-gap: 28px;
+  column-gap: 128px;
+  /* Larger vertical gap so the blocks breathe once they wrap onto their own lines. */
+  row-gap: 48px;
   padding: 32px 32px 64px 24px;
 }
 
 .description {
-  /* Stays in the top row; can shrink but not grow past a readable measure. */
+  /* Sits at the left, up to a readable measure; shrinks but never grows past it. */
   flex: 0 1 32ch;
   margin: 0;
   /* Only the first line is indented, echoing the active-row indent. */
   text-indent: 24px;
 }
 
+.namesCol {
+  /* Soaks up the row's free space (pushing the specs block to the right edge
+     and keeping it content-width) and centers the title list within that
+     stretched span — so the left-aligned titles sit near the page center. */
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+}
+
 .names {
-  flex: 0 1 auto;
+  text-align: left;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -36,13 +46,18 @@
 }
 
 .specs {
-  /* Sized to content so type + date stay close together, and wraps beneath the
-     names as one whole block when it no longer fits. */
-  flex: 0 1 auto;
+  /* The near-zero flex-grow is the whole mechanism: while it shares a line with
+     the names its growth is swamped by their grow:1, so it stays a tight
+     type + date pair; the moment it wraps to a line of its own it becomes the
+     only growable item and fills the full width. So the block spans exactly
+     when it wraps — no viewport breakpoint to guess, robust to any title/type
+     length the CMS throws at it. The 1fr column then pins type left, date right
+     when spanning, and collapses to the content-width pair when it doesn't. */
+  flex: 0.0001 1 auto;
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr auto;
   align-items: baseline;
-  column-gap: 20px;
+  column-gap: 48px;
   row-gap: 2px;
   line-height: 1.25;
 }
@@ -58,14 +73,28 @@
 }
 
 .active {
-  font-weight: 700;
   transform: translateX(24px);
+}
+
+/* Below this width the three blocks no longer sit comfortably across, so each
+   takes its own full-width line and everything left-aligns — including the
+   names, which drop their centered placement. */
+@media (max-width: 768px) {
+  .description,
+  .namesCol,
+  .specs {
+    flex-basis: 100%;
+  }
+
+  .namesCol {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 560px) {
   .meta {
     column-gap: 32px;
-    row-gap: 20px;
+    row-gap: 36px;
     padding: 28px 20px 48px 20px;
   }
 
