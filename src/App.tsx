@@ -5,7 +5,7 @@ import { AnimatedRoutes } from "./AnimatedRoutes";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ProjectsProvider>
         <AnimationProvider>
           <AnimatedRoutes />
