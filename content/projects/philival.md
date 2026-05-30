@@ -10,4 +10,7 @@ images:
   - image: /images/uploads/IMG_6677.jpeg
     size: "4"
     hideInGrid: false
+  - image: /images/uploads/Stickers-book.jpg
+    size: "2"
+    hideInGrid: false
 ---
