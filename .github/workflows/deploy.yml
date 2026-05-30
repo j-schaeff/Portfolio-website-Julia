@@ -37,6 +37,8 @@ jobs:
         # Project page: served from j-schaeff.github.io/Portfolio-website-Julia/
         env:
           DEPLOY_BASE: /Portfolio-website-Julia/
+          # For user/organization pages and custom domains, use 
+          # DEPLOY_BASE: /
 
       # SPA fallback so client-side (BrowserRouter) routes work on Pages
       - name: Add SPA fallback
