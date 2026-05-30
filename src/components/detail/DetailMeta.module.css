@@ -1,0 +1,75 @@
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* Wide min-gap gives the centered names column whitespace on both sides. */
+  column-gap: 64px;
+  row-gap: 28px;
+  padding: 32px 32px 64px 24px;
+}
+
+.description {
+  /* Stays in the top row; can shrink but not grow past a readable measure. */
+  flex: 0 1 32ch;
+  margin: 0;
+  /* Only the first line is indented, echoing the active-row indent. */
+  text-indent: 24px;
+}
+
+.names {
+  flex: 0 1 auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  /* Tighter leading; kept identical to .specs so the rows stay aligned. */
+  row-gap: 2px;
+  line-height: 1.25;
+}
+
+.names li {
+  /* Never wrap — a two-line name would break row alignment with the specs. */
+  white-space: nowrap;
+  transition: transform var(--transition);
+}
+
+.specs {
+  /* Sized to content so type + date stay close together, and wraps beneath the
+     names as one whole block when it no longer fits. */
+  flex: 0 1 auto;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  column-gap: 20px;
+  row-gap: 2px;
+  line-height: 1.25;
+}
+
+.type {
+  text-transform: capitalize;
+  transition: transform var(--transition);
+}
+
+.date {
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--transition);
+}
+
+.active {
+  font-weight: 700;
+  transform: translateX(24px);
+}
+
+@media (max-width: 560px) {
+  .meta {
+    column-gap: 32px;
+    row-gap: 20px;
+    padding: 28px 20px 48px 20px;
+  }
+
+  .active {
+    transform: translateX(16px);
+  }
+}

@@ -1,9 +1,0 @@
-.column {
-  display: flex;
-  flex-direction: column;
-}
-
-.description {
-  margin: 0;
-  max-width: 30ch;
-}

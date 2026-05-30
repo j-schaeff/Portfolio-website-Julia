@@ -1,7 +1,7 @@
 :root {
   /* Image sizing — keep in sync with src/utils/imageSize.ts */
   --img-width: 220px;
-  --img-base-height: 81px;
+  --img-base-height: 69px;
 
   /* Lightbox */
   --lightbox-margin: 100px;

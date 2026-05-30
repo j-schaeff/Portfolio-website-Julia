@@ -15,6 +15,9 @@ interface StripImageProps {
 }
 
 export function StripImage({ slug, index, src, alt, size, onClick }: StripImageProps) {
+  // Every strip image keeps its layoutId so the lightbox can morph to/from it.
+  // The grid restricts layoutId to the clicked image, so the route transition
+  // still only ever matches one element.
   const layoutId = imageLayoutId(slug, index);
   const style = { width: "auto", height: imageHeight(size) };
 

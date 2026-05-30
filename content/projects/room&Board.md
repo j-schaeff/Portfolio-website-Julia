@@ -6,11 +6,11 @@ year: 2022
 order: 4
 images:
   - image: public/images/4_room_board/Test_green_House.mov
-    size: "2"
+    size: "4"
     hideInGrid: false
     alt: ""
   - image: public/images/4_room_board/food_yellow.mp4
-    size: "4"
+    size: "3"
     hideInGrid: false
     alt: ""
 

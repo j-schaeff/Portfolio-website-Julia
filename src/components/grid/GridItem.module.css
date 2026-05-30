@@ -1,14 +1,27 @@
-.row {
+/* Each project flattens into the grid so all images flow back-to-back. */
+.project {
   display: contents;
 }
 
-.lead {
+/* Image + reserved label band, so info stays in flow and rows align. */
+.cell {
   display: flex;
-  align-items: flex-end;
-  gap: var(--gap);
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Fixed-height band below every image: holds the info for the first
+   image of a project and reserves matching space for the rest, keeping
+   all images on a common baseline. Tune the gap between image and label
+   with margin-top. */
+.label {
+  height: 40px;
+  margin-top: 14px;
+  /* Don't let a wide title stretch the cell and push the next image. */
+  width: 0;
+  overflow: visible;
 }
 
 .infoButton {
   cursor: pointer;
-  padding-right: 4px;
 }

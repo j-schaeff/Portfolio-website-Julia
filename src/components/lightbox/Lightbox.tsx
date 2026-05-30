@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { imageLayoutId } from "../../utils/layoutId";
 import { isVideo } from "../../utils/media";
@@ -9,8 +10,9 @@ import styles from "./Lightbox.module.css";
 interface LightboxProps {
   slug: string;
   title: string;
-  images: ProjectImage[];
-  index: number;
+  image: ProjectImage;
+  indexInProject: number;
+  total: number;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -19,18 +21,39 @@ interface LightboxProps {
 export function Lightbox({
   slug,
   title,
-  images,
-  index,
+  image,
+  indexInProject,
+  total,
   onClose,
   onNext,
   onPrev,
 }: LightboxProps) {
   useBodyScrollLock(true);
 
-  const hasMultiple = images.length > 1;
+  // The image clicked to open morphs in from the strip via its shared layoutId.
+  // Once that intro finishes we drop the layoutId, so paging between images is a
+  // plain opacity crossfade with no layout animation to distort differing
+  // aspect ratios.
+  const openedKey = useRef(`${slug}-${indexInProject}`);
+  const [introDone, setIntroDone] = useState(false);
+  const key = `${slug}-${indexInProject}`;
+  const isHero = !introDone && key === openedKey.current;
+
+  const hasMultiple = total > 1;
   const stop = (e: React.MouseEvent) => e.stopPropagation();
-  const current = images[index];
-  const caption = current.alt || `${title} — ${index + 1}`;
+  const caption = image.alt || `${title} — ${indexInProject + 1}`;
+
+  const motionProps = {
+    layoutId: isHero ? imageLayoutId(slug, indexInProject) : undefined,
+    className: styles.image,
+    onClick: stop,
+    // The hero relies on the layout morph; everything else just crossfades.
+    initial: isHero ? false : { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const },
+    onLayoutAnimationComplete: isHero ? () => setIntroDone(true) : undefined,
+  };
 
   return createPortal(
     <motion.div
@@ -41,6 +64,29 @@ export function Lightbox({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      <AnimatePresence initial={false}>
+        {isVideo(image.src) ? (
+          <motion.video
+            key={key}
+            {...motionProps}
+            src={image.src}
+            aria-label={caption}
+            controls
+            autoPlay
+            loop
+            playsInline
+          />
+        ) : (
+          <motion.img
+            key={key}
+            {...motionProps}
+            src={image.src}
+            alt={caption}
+            draggable={false}
+          />
+        )}
+      </AnimatePresence>
+
       <button className={styles.close} onClick={onClose} aria-label="Close">
         &times;
       </button>
@@ -56,31 +102,6 @@ export function Lightbox({
         >
           &#8249;
         </button>
-      )}
-
-      {isVideo(current.src) ? (
-        <motion.video
-          layoutId={imageLayoutId(slug, index)}
-          className={styles.image}
-          src={current.src}
-          aria-label={caption}
-          controls
-          autoPlay
-          loop
-          playsInline
-          onClick={stop}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        />
-      ) : (
-        <motion.img
-          layoutId={imageLayoutId(slug, index)}
-          className={styles.image}
-          src={current.src}
-          alt={caption}
-          onClick={stop}
-          draggable={false}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        />
       )}
 
       {hasMultiple && (

@@ -1,9 +1,10 @@
 .grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
-  gap: calc(var(--gap) * 2.5) 12px;
+  /* Row gap is now the true space between rows; info is in flow. */
+  gap: 40px 12px;
   min-height: 100vh;
   padding: 43px 19px;
 }

@@ -21,7 +21,6 @@ export function GridItem({ project }: { project: Project }) {
   const visibleImages = project.images
     .map((img, i) => ({ img, i }))
     .filter(({ img }) => !img.hideInGrid);
-  const [lead, ...rest] = visibleImages;
 
   const info = (
     <div
@@ -37,25 +36,27 @@ export function GridItem({ project }: { project: Project }) {
     </div>
   );
 
-  const renderImage = ({ img, i }: (typeof visibleImages)[number]) => (
-    <GridImage
-      key={img.src + i}
-      slug={project.slug}
-      index={i}
-      src={img.src}
-      alt={img.alt || `${project.title} — ${i + 1}`}
-      size={img.size}
-      onActivate={(e) => go(i, e)}
-    />
+  const renderCell = (
+    { img, i }: (typeof visibleImages)[number],
+    isLead: boolean,
+  ) => (
+    <div className={styles.cell} key={img.src + i}>
+      <GridImage
+        slug={project.slug}
+        index={i}
+        src={img.src}
+        alt={img.alt || `${project.title} — ${i + 1}`}
+        size={img.size}
+        onActivate={(e) => go(i, e)}
+      />
+      {/* Reserved label band keeps every image on a shared baseline. */}
+      <div className={styles.label}>{isLead ? info : null}</div>
+    </div>
   );
 
   return (
-    <div className={styles.row}>
-      <div className={styles.lead}>
-        {info}
-        {lead && renderImage(lead)}
-      </div>
-      {rest.map(renderImage)}
+    <div className={styles.project}>
+      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}
     </div>
   );
 }

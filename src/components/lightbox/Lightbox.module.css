@@ -9,6 +9,12 @@
 }
 
 .image {
+  /* Absolutely centered so consecutive images overlap and can crossfade. */
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
   max-width: calc(100vw - 160px);
   max-height: calc(100vh - var(--lightbox-margin) * 2);
   object-fit: contain;

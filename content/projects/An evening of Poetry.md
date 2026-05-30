@@ -6,7 +6,7 @@ year: 2023
 order: 3
 images:
   - image: public/images/3_poetry/Booklet4.png
-    size: "4"
+    size: "5"
     hideInGrid: false
     alt: ""
   - image: public/images/3_poetry/bookletmockup.png

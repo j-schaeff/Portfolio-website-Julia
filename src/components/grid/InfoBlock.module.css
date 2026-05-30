@@ -2,11 +2,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
   white-space: nowrap;
   user-select: none;
-  text-align: center;
+  text-align: left;
 }
 
 .title {

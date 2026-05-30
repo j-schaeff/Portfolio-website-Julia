@@ -18,17 +18,3 @@
   text-transform: uppercase;
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--gap);
-  padding: 32px 24px 48px;
-  align-items: start;
-}
-
-@media (max-width: 720px) {
-  .columns {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-}
