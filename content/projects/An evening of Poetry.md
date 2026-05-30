@@ -1,7 +1,10 @@
 ---
 title: An evening of Poetry
 type: Identity
-description: An intimate event created by friends, for friends, centered around sharing poetry and personal experiences. Inspired by hole-punched tickets, the invitation and booklet put a modern spin on a familiar event symbol, blending nostalgia with a fresh, contemporary design.
+description: An intimate event created by friends, for friends, centered around
+  sharing poetry and personal experiences. Inspired by hole-punched tickets, the
+  invitation and booklet put a modern spin on a familiar event symbol, blending
+  nostalgia with a fresh, contemporary design.
 year: 2023
 order: 3
 images:
@@ -24,7 +27,4 @@ images:
   - image: public/images/uploads/3_poetry/spreads.jpg
     size: "2"
     hideInGrid: false
-    alt: ""
 ---
-
-Marble pairs a humanist typeface with stone-inspired textures.
