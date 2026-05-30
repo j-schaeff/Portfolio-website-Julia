@@ -9,12 +9,14 @@ const files = import.meta.glob("/content/projects/*.md", {
   eager: true,
 }) as Record<string, string>;
 
-// Vite serves everything under public/ from the site root, so stored paths like
-// "public/images/x.jpg" must become root-absolute ("/images/x.jpg"). Relative
-// paths break on the detail route, where they resolve against "/project/:slug".
+// Vite serves everything under public/ from the base URL, so stored paths like
+// "public/images/x.jpg" must be prefixed with BASE_URL ("/images/x.jpg" locally,
+// "/Portfolio-website-Julia/images/x.jpg" on a GitHub Pages project subpath).
+// Relative paths break on the detail route, where they resolve against
+// "/project/:slug". BASE_URL always ends with a trailing slash.
 function normalizeSrc(src: string): string {
   if (/^(https?:)?\/\//.test(src) || src.startsWith("data:")) return src;
-  return "/" + src.replace(/^\/+/, "").replace(/^public\//, "");
+  return import.meta.env.BASE_URL + src.replace(/^\/+/, "").replace(/^public\//, "");
 }
 
 function toImage(entry: unknown): ProjectImage | null {
