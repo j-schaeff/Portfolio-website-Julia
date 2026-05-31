@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { imageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import { useAnimation } from "../../context/AnimationContext";
 import styles from "./GridImage.module.css";
 
@@ -36,7 +37,7 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate }: 
         playsInline
         onClick={onActivate}
         style={style}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={ZOOM_TRANSITION}
       />
     );
   }
@@ -50,7 +51,7 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate }: 
       draggable={false}
       onClick={onActivate}
       style={style}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={ZOOM_TRANSITION}
     />
   );
 }

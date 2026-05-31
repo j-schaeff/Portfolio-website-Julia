@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { detailImageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import styles from "./StripImage.module.css";
 
 interface StripImageProps {
@@ -34,7 +35,7 @@ export function StripImage({ slug, index, src, alt, size, isVideo, onClick }: St
         playsInline
         onClick={onClick}
         style={style}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={ZOOM_TRANSITION}
       />
     );
   }
@@ -48,7 +49,7 @@ export function StripImage({ slug, index, src, alt, size, isVideo, onClick }: St
       draggable={false}
       onClick={onClick}
       style={style}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={ZOOM_TRANSITION}
     />
   );
 }

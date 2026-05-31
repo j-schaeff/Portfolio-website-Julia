@@ -6,20 +6,18 @@ import { useDragScroll } from "../../hooks/useDragScroll";
 import { useActiveProject } from "../../hooks/useActiveProject";
 import { useLightbox } from "../../hooks/useLightbox";
 import { useAnimation } from "../../context/AnimationContext";
-import { focalOrigin } from "../../utils/layoutId";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import type { Project } from "../../types/project";
 import { ScrollStrip } from "./ScrollStrip";
 import { DetailMeta } from "./DetailMeta";
 import { Lightbox } from "../lightbox/Lightbox";
 import styles from "./DetailView.module.css";
 
-const ZOOM = { duration: 0.5, ease: [0.22, 1, 0.36, 1] } as const;
-
 export function DetailView() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { projects, allImages, globalImageIndex, getProjectBySlug } = useProjects();
-  const { origin, clearOrigin } = useAnimation();
+  const { clearOrigin } = useAnimation();
 
   const { ref: stripRef, isDragging, draggedRef } = useDragScroll<HTMLDivElement>();
   const activeSlug = useActiveProject(stripRef, slug ?? projects[0]?.slug ?? null);
@@ -57,12 +55,14 @@ export function DetailView() {
   return (
     <motion.div
       className={styles.detail}
-      style={{ transformOrigin: focalOrigin(origin?.rect) }}
-      // Zoom out from the clicked tile as the shared image morphs into the strip.
-      initial={{ opacity: 0, scale: 1.04 }}
-      animate={{ opacity: 1, scale: 1 }}
+      // Don't scale the detail container: it holds the shared strip image, and a
+      // parent transform fights that image's layout morph (dragging it toward the
+      // bottom). Just fade the surrounding detail in and let the shared image
+      // zoom straight to its final strip position on its own.
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={ZOOM}
+      transition={ZOOM_TRANSITION}
       // Reset the shared-element origin once the entry settles so later
       // navigations (e.g. the Index button) start from a clean state.
       onAnimationComplete={clearOrigin}

@@ -40,7 +40,7 @@ export function GridItem({ project }: { project: Project }) {
     { img, i }: (typeof visibleImages)[number],
     isLead: boolean,
   ) => (
-    <div className={styles.cell} key={img.src + i}>
+    <div className={styles.cell} data-grid-cell key={img.src + i}>
       <GridImage
         slug={project.slug}
         index={i}
