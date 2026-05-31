@@ -22,6 +22,7 @@ year: 2021
 order: 5                 # controls position; ascending
 images:
   - image: public/images/uploads/5_spring/cover-2.jpg
+    videoUrl: ""         # optional: link to an externally-hosted video instead
     size: "5"            # height multiplier, 1–5 (width follows aspect ratio)
     hideInGrid: false    # hide in grid but still show in detail view
     alt: ""              # screen-reader description
@@ -30,6 +31,8 @@ Optional body text (currently not rendered on the page).
 ```
 
 Images are uploaded to [public/images/](public/images/). The site supports images **and** video (`.mp4`, `.mov`, `.webm`, etc.).
+
+For large videos you can skip the upload and paste a link into `videoUrl` instead — any direct video URL works, and Dropbox share links are converted to a playable form automatically. When set, `videoUrl` overrides the uploaded `image`.
 
 ### Editing content
 
@@ -46,7 +49,13 @@ npm run preview  # preview the production build locally
 
 ## Deployment
 
-- **Hosting:** [Netlify](https://reliable-caramel-55ff44.netlify.app/) — auto-deploys on every push to `main`. Build config is in [netlify.toml](netlify.toml) (`npm run build` → `dist`, with an SPA catch-all redirect).
+Every push to `main` deploys automatically, through two paths:
+
+- **Netlify** ([live site](https://reliable-caramel-55ff44.netlify.app/)) — build config in [netlify.toml](netlify.toml) (`npm run build` → `dist`, with an SPA catch-all redirect).
+- **GitHub Pages** — via the [Deploy to GitHub Pages](.github/workflows/) Actions workflow. Because the project page is served from a subpath (`/Portfolio-website-Julia/`), the workflow sets `DEPLOY_BASE` so Vite builds with the right base URL and copies `index.html` to `404.html` as an SPA fallback.
+
+Other facts:
+
 - **Repo:** `j-schaeff/Portfolio-website-Julia` (default branch `main`).
 - **CMS:** Pages CMS, connected to the repo.
 

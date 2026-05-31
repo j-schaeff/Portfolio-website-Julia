@@ -12,9 +12,12 @@ content:
     filename: "{fields.title}.md"
     format: yaml-frontmatter
     view:
-      fields: [title, type, year, order]
+      fields: [order, title, type, year]
       primary: title
       sort: [order, year, title]
+      default:
+        sort: order
+        order: asc
     fields:
       - name: title
         label: Title
