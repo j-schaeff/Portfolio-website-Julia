@@ -15,7 +15,7 @@ import { useLayoutEffect, useState, type RefObject } from "react";
 export type SnakeState = "pending" | "run" | null;
 
 // Milliseconds between each image lighting up as the snake travels.
-const STEP_MS = 90;
+const STEP_MS = 120;
 // Rows are detected by a shared bottom edge; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
 // Don't let one slow-loading image hold the whole reveal hostage.

@@ -13,9 +13,10 @@ images:
     size: "5"
     hideInGrid: false
     alt: ""
-  - image: public/images/uploads/1_fragments/Fragments_type_only.jpg
-    size: "2"
+  - image: public/images/uploads/1_fragments/Poster.mp4
+    size: "4"
     hideInGrid: false
     alt: ""
+
  
 ---

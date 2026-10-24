@@ -6,7 +6,7 @@ year: 2025
 order: 2
 images:
   - image: public/images/uploads/2_kraueterkult/Krauter_kult_1.jpg
-    size: "4"
+    size: "3"
     hideInGrid: false
     alt: ""
   - image: public/images/uploads/2_kraueterkult/Krauter_kult_5.jpg

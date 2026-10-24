@@ -9,12 +9,8 @@ export function GridItem({ project }: { project: Project }) {
   const navigate = useNavigate();
   const { setOrigin } = useAnimation();
 
-  const go = (
-    imageIndex: number,
-    event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
-  ) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setOrigin({ slug: project.slug, imageIndex, rect });
+  const go = (imageIndex: number) => {
+    setOrigin({ slug: project.slug, imageIndex });
     navigate(`/project/${project.slug}`);
   };
 
@@ -27,9 +23,9 @@ export function GridItem({ project }: { project: Project }) {
       className={styles.infoButton}
       role="link"
       tabIndex={0}
-      onClick={(e) => go(0, e)}
+      onClick={() => go(0)}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") go(0, e);
+        if (e.key === "Enter" || e.key === " ") go(0);
       }}
     >
       <InfoBlock title={project.title} type={project.type} />
@@ -48,16 +44,12 @@ export function GridItem({ project }: { project: Project }) {
         alt={img.alt || `${project.title} — ${i + 1}`}
         size={img.size}
         isVideo={img.isVideo}
-        onActivate={(e) => go(i, e)}
+        onActivate={() => go(i)}
       />
       {/* Reserved label band keeps every image on a shared baseline. */}
       <div className={styles.label}>{isLead ? info : null}</div>
     </div>
   );
 
-  return (
-    <div className={styles.project}>
-      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}
-    </div>
-  );
+  return <>{visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}</>;
 }

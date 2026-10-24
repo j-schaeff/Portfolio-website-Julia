@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 export interface AnimationOrigin {
   slug: string;
   imageIndex: number;
-  rect: DOMRect;
 }
 
 interface AnimationContextValue {

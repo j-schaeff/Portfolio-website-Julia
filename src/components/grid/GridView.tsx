@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
 import { useAnimation } from "../../context/AnimationContext";
 import { useSnakeReveal } from "../../hooks/useSnakeReveal";
-import { focalOrigin } from "../../utils/layoutId";
-import { GRID_EXIT_SCALE, ZOOM_TRANSITION } from "../../utils/motion";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import { GridItem } from "./GridItem";
 import styles from "./GridView.module.css";
 
@@ -23,14 +22,13 @@ export function GridView() {
       ref={gridRef}
       className={styles.grid}
       data-snake={snake ?? undefined}
-      style={{ transformOrigin: focalOrigin(origin?.rect) }}
       // While the snake plays, the per-cell reveal is the entrance, so the
       // container must be visible immediately instead of fading in as a block.
       initial={{ opacity: snake ? 1 : 0 }}
-      animate={{ opacity: 1, scale: 1 }}
-      // Dive into the clicked tile: scale up hard around it and fade so the
-      // surrounding tiles sweep past the camera as we hand off to the detail page.
-      exit={{ opacity: 0, scale: GRID_EXIT_SCALE }}
+      animate={{ opacity: 1 }}
+      // Fade out as we hand off to the detail page. The clicked image keeps its
+      // shared layoutId and morphs into its detail strip slot on its own.
+      exit={{ opacity: 0 }}
       transition={ZOOM_TRANSITION}
     >
       {projects.map((project) => (
