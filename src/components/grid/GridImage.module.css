@@ -3,7 +3,6 @@
   height: var(--img-h);
   object-fit: contain;
   cursor: pointer;
-  border-radius: 2px;
   background: var(--hairline);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
 }
