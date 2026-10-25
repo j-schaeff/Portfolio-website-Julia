@@ -10,7 +10,7 @@ export function AnimatedRoutes() {
     <AnimatePresence mode="sync">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<GridView />} />
-        <Route path="/project/:slug" element={<DetailView />} />
+        <Route path="/project" element={<DetailView />} />
         <Route path="*" element={<GridView />} />
       </Routes>
     </AnimatePresence>

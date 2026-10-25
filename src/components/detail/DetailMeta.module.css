@@ -1,19 +1,33 @@
 .meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 3;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
   column-gap: 128px;
-  /* Larger vertical gap so the blocks breathe once they wrap onto their own lines. */
-  row-gap: 48px;
-  padding: 32px 32px 64px 24px;
+  row-gap: 0;
+  min-height: 112px;
+  padding: 0 14px 0 14px;
+  box-sizing: border-box;
+  color: var(--bg);
+  mix-blend-mode: difference;
+  pointer-events: none;
 }
 
 .description {
-  /* Sits at the left, up to a readable measure; shrinks but never grows past it. */
   flex: 0 1 32ch;
   margin: 0;
-  /* Only the first line is indented, echoing the active-row indent. */
+  font-size: 14px;
+  line-height: 1.35;
   text-indent: 24px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: inherit;
+  pointer-events: auto;
+  align-self: stretch;
 }
 
 .namesCol {
@@ -25,6 +39,7 @@
   justify-content: center;
   align-items: flex-start;
   min-width: 0;
+  pointer-events: auto;
 }
 
 .names {
@@ -37,68 +52,148 @@
   /* Tighter leading; kept identical to .specs so the rows stay aligned. */
   row-gap: 2px;
   line-height: 1.25;
+  font-size: 14px;
 }
 
 .names li {
-  /* Never wrap — a two-line name would break row alignment with the specs. */
   white-space: nowrap;
   transition: transform var(--transition);
 }
 
+.linkButton {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: transform var(--transition);
+}
+
 .specs {
-  /* The near-zero flex-grow is the whole mechanism: while it shares a line with
-     the names its growth is swamped by their grow:1, so it stays a tight
-     type + date pair; the moment it wraps to a line of its own it becomes the
-     only growable item and fills the full width. So the block spans exactly
-     when it wraps — no viewport breakpoint to guess, robust to any title/type
-     length the CMS throws at it. The 1fr column then pins type left, date right
-     when spanning, and collapses to the content-width pair when it doesn't. */
   flex: 0.0001 1 auto;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
   column-gap: 48px;
-  row-gap: 2px;
+  row-gap: 8px;
   line-height: 1.25;
+  white-space: nowrap;
+  padding-right: 20px;
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .type {
-  text-transform: capitalize;
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   transition: transform var(--transition);
+  white-space: nowrap;
 }
 
 .date {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
   transition: transform var(--transition);
+  white-space: nowrap;
 }
 
-.active {
-  transform: translateX(24px);
+.names li.hovered,
+.type.hovered,
+.date.hovered {
+  transform: translateX(10px);
 }
 
-/* Below this width the three blocks no longer sit comfortably across, so each
-   takes its own full-width line and everything left-aligns — including the
-   names, which drop their centered placement. */
-@media (max-width: 768px) {
-  .description,
-  .namesCol,
-  .specs {
+.names li.active,
+.type.active,
+.date.active {
+  transform: translateX(20px);
+}
+
+.mobileProjectList {
+  display: none;
+}
+
+@media (max-width: 880px) {
+  .meta {
+    flex-wrap: wrap;
+    row-gap: 12px;
+    column-gap: 24px;
+    padding: 0 14px 0 14px;
+  }
+
+  .description {
     flex-basis: 100%;
+    max-width: none;
+    text-indent: 20px;
   }
 
   .namesCol {
+    flex: 1 1 0;
     justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .specs {
+    flex: 0 1 auto;
+    display: grid;
+    grid-template-columns: minmax(80px, 1fr) auto;
+    column-gap: 16px;
+    justify-content: start;
+    white-space: nowrap;
+    padding-right: 20px;
+  }
+
+  .type,
+  .date {
+    justify-self: start;
+    text-align: left;
   }
 }
 
 @media (max-width: 560px) {
   .meta {
-    column-gap: 32px;
-    row-gap: 36px;
-    padding: 28px 20px 48px 20px;
+    position: absolute;
+    inset: auto 0 0 0;
+    display: block;
+    height: auto !important;
+    min-height: 0;
+    padding: 0 12px 18px 12px;
+    pointer-events: none;
   }
 
-  .active {
-    transform: translateX(16px);
+  .description {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.35;
+    text-indent: 24px;
+    text-align: justify;
+    color: inherit;
+    pointer-events: auto;
+  }
+
+  .namesCol,
+  .specs,
+  .mobileProjectList {
+    display: none !important;
   }
 }

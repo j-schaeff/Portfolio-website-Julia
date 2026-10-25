@@ -2,7 +2,10 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--scrim);
+  /* No tint: just blur whatever is behind the lightbox. */
+  background: transparent;
+  backdrop-filter: blur(var(--lightbox-blur));
+  -webkit-backdrop-filter: blur(var(--lightbox-blur));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,47 +18,62 @@
   margin: auto;
   width: auto;
   height: auto;
-  max-width: calc(100vw - 160px);
-  max-height: calc(100vh - var(--lightbox-margin) * 2);
+  /* Fallback until the aspect ratio is known; Lightbox.tsx then sets an exact
+     edge-to-edge contain-fit width/height inline. */
+  max-width: 100vw;
+  max-height: 100vh;
+  max-height: 100dvh;
   object-fit: contain;
-  border-radius: 2px;
   cursor: default;
 }
 
-.close {
-  position: absolute;
-  top: 24px;
-  right: 28px;
-  font-size: 32px;
-  line-height: 1;
-  color: #1a1a1a;
-  opacity: 0.75;
-}
-
-.close:hover {
-  opacity: 1;
-}
-
+/* Controls float over the image, so each sits on a small frosted disc that
+   stays legible on light and dark photos alike. */
+.close,
 .arrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 48px;
-  line-height: 1;
-  color: #1a1a1a;
-  opacity: 0.65;
-  padding: 16px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0.8;
+  transition: opacity 200ms ease, background 200ms ease;
   user-select: none;
 }
 
+.close:hover,
 .arrow:hover {
   opacity: 1;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.close svg,
+.arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+.close {
+  top: 20px;
+  right: 20px;
+}
+
+.arrow {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .left {
-  left: 16px;
+  left: 20px;
 }
 
 .right {
-  right: 16px;
+  right: 20px;
 }

@@ -21,11 +21,16 @@ export function imageHeight(size: ImageSize): number {
   return Math.round(BASE_HEIGHT * MULTIPLIER[size]);
 }
 
-// Detail view: the tallest images (size 5) fill 50% of the viewport height,
-// with the smaller sizes scaled down by the same ratios as the grid.
+// Detail view: desktop keeps the original 50vh cap, while mobile scales the
+// entire size spectrum upward without changing the relative proportions.
 const DETAIL_MAX_VH = 50;
+const DETAIL_MAX_VH_MOBILE = 78;
 
-export function detailImageHeight(size: ImageSize): string {
-  const vh = (DETAIL_MAX_VH / MULTIPLIER[5]) * MULTIPLIER[size];
+export function detailImageHeight(
+  size: ImageSize,
+  isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 560px)").matches,
+): string {
+  const maxVh = isMobile ? DETAIL_MAX_VH_MOBILE : DETAIL_MAX_VH;
+  const vh = (maxVh / MULTIPLIER[5]) * MULTIPLIER[size];
   return `${vh.toFixed(2)}vh`;
 }

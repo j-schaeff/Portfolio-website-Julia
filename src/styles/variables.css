@@ -4,8 +4,7 @@
   --img-base-height: 69px;
 
   /* Lightbox */
-  --lightbox-margin: 100px;
-  --scrim: rgba(128, 128, 128, 0.94);
+  --lightbox-blur: 24px;
 
   /* Color & type */
   --bg: #ffffff;

@@ -11,7 +11,7 @@ export function GridItem({ project }: { project: Project }) {
 
   const go = (imageIndex: number) => {
     setOrigin({ slug: project.slug, imageIndex });
-    navigate(`/project/${project.slug}`);
+    navigate(`/project?project=${encodeURIComponent(project.slug)}`);
   };
 
   const visibleImages = project.images

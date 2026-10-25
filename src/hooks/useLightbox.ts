@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-// The lightbox tracks a single index into the flat list of every image across
-// all projects, so next/prev can cross project boundaries.
+// The lightbox tracks a single index into the current project's images;
+// next/prev wrap around within that project.
 export function useLightbox(total: number) {
   const [index, setIndex] = useState<number | null>(null);
 
@@ -20,7 +20,7 @@ export function useLightbox(total: number) {
   );
 
   useEffect(() => {
-    if (index === null) return;
+    if (index === null || typeof window === "undefined") return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       else if (e.key === "ArrowRight") next();

@@ -3,10 +3,12 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-end;
-  /* Row gap is now the true space between rows; info is in flow. */
+  /* Tighter desktop/tablet framing to match the detail page's compact rhythm. */
+  /* Larger row gap so each label band clearly belongs to the image above it,
+     not the row below. */
   gap: 40px 12px;
   min-height: 100vh;
-  padding: 43px 19px;
+  padding: 24px 14px;
 }
 
 /* Snake-reveal on first load. The hook measures cell positions, orders them
@@ -28,6 +30,13 @@
   transition:
     opacity 0.9s ease var(--reveal-delay, 0ms),
     transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+@media (max-width: 560px) {
+  .grid {
+    gap: 28px 8px;
+    padding: 12px 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

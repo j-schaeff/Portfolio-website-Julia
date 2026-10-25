@@ -12,11 +12,11 @@
 
 /* Fixed-height band below every image: holds the info for the first
    image of a project and reserves matching space for the rest, keeping
-   all images on a common baseline. Tune the gap between image and label
-   with margin-top. */
+   all images on a common baseline. Keep this tighter so the grid rhythm
+   matches the detail strip. */
 .label {
-  height: 40px;
-  margin-top: 14px;
+  height: 32px;
+  margin-top: 8px;
   /* Don't let a wide title stretch the cell and push the next image. */
   width: 0;
   overflow: visible;

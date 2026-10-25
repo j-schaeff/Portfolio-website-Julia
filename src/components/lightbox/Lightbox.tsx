@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { imageLayoutId } from "../../utils/layoutId";
@@ -12,6 +12,8 @@ interface LightboxProps {
   image: ProjectImage;
   indexInProject: number;
   total: number;
+  /** Width / height of the clicked strip image, so the hero can be sized before it loads. */
+  openAspect?: number;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -23,6 +25,7 @@ export function Lightbox({
   image,
   indexInProject,
   total,
+  openAspect,
   onClose,
   onNext,
   onPrev,
@@ -38,13 +41,41 @@ export function Lightbox({
   const key = `${slug}-${indexInProject}`;
   const isHero = !introDone && key === openedKey.current;
 
+  // Size the element box to exactly the contain-fitted image, rather than a
+  // full-screen box with object-fit. That keeps clicks on the bars closing the
+  // lightbox and lets the layoutId morph scale without distorting the image.
+  const [aspects, setAspects] = useState<Record<string, number>>(() =>
+    openAspect ? { [openedKey.current]: openAspect } : {},
+  );
+  const [viewport, setViewport] = useState(() => ({
+    w: window.innerWidth,
+    h: window.innerHeight,
+  }));
+
+  useEffect(() => {
+    const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const recordAspect = (w: number, h: number) => {
+    if (!w || !h) return;
+    setAspects((prev) => (prev[key] ? prev : { ...prev, [key]: w / h }));
+  };
+
+  const aspect = aspects[key];
+  const fitWidth = aspect ? Math.min(viewport.w, viewport.h * aspect) : undefined;
+  const fitStyle =
+    aspect && fitWidth ? { width: fitWidth, height: fitWidth / aspect } : undefined;
+
   const hasMultiple = total > 1;
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
+  const stop = (e: React.MouseEvent<HTMLElement>) => e.stopPropagation();
   const caption = image.alt || `${title} — ${indexInProject + 1}`;
 
   const motionProps = {
     layoutId: isHero ? imageLayoutId(slug, indexInProject) : undefined,
     className: styles.image,
+    style: fitStyle,
     onClick: stop,
     // The hero relies on the layout morph; everything else just crossfades.
     initial: isHero ? false : { opacity: 0 },
@@ -53,6 +84,8 @@ export function Lightbox({
     transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const },
     onLayoutAnimationComplete: isHero ? () => setIntroDone(true) : undefined,
   };
+
+  if (typeof document === "undefined") return null;
 
   return createPortal(
     <motion.div
@@ -70,6 +103,9 @@ export function Lightbox({
             {...motionProps}
             src={image.src}
             aria-label={caption}
+            onLoadedMetadata={(e) =>
+              recordAspect(e.currentTarget.videoWidth, e.currentTarget.videoHeight)
+            }
             controls
             autoPlay
             loop
@@ -81,13 +117,16 @@ export function Lightbox({
             {...motionProps}
             src={image.src}
             alt={caption}
+            onLoad={(e) =>
+              recordAspect(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)
+            }
             draggable={false}
           />
         )}
       </AnimatePresence>
 
       <button className={styles.close} onClick={onClose} aria-label="Close">
-        &times;
+        <Icon d="M5 5l14 14M19 5L5 19" />
       </button>
 
       {hasMultiple && (
@@ -99,7 +138,7 @@ export function Lightbox({
           }}
           aria-label="Previous image"
         >
-          &#8249;
+          <Icon d="M15 4l-8 8 8 8" />
         </button>
       )}
 
@@ -112,10 +151,27 @@ export function Lightbox({
           }}
           aria-label="Next image"
         >
-          &#8250;
+          <Icon d="M9 4l8 8-8 8" />
         </button>
       )}
     </motion.div>,
     document.body,
+  );
+}
+
+// Thin-stroke line icon used for the close and arrow buttons.
+function Icon({ d }: { d: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
   );
 }

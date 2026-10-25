@@ -9,7 +9,7 @@ import styles from "./GridView.module.css";
 
 export function GridView() {
   const { projects } = useProjects();
-  const { origin } = useAnimation();
+  const { origin, clearOrigin } = useAnimation();
   const gridRef = useRef<HTMLElement>(null);
   // Snake-reveal only on a true page load. Returning from a project always
   // carries an origin (it drives the shared-element zoom back), so capture
@@ -29,6 +29,9 @@ export function GridView() {
       // Fade out as we hand off to the detail page. The clicked image keeps its
       // shared layoutId and morphs into its detail strip slot on its own.
       exit={{ opacity: 0 }}
+      onAnimationComplete={() => {
+        if (origin) clearOrigin();
+      }}
       transition={ZOOM_TRANSITION}
     >
       {projects.map((project) => (

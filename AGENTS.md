@@ -31,7 +31,7 @@ src/
     AnimationContext.tsx   stores the click origin (slug, image index, DOMRect) for zoom transitions
   hooks/
     useProjects.ts         read ProjectsContext
-    useLightbox.ts         index into the flat all-images list; ← → Esc keys; wraps around
+    useLightbox.ts         index into the current project's images; ← → Esc keys; wraps around
     useDragScroll.ts       click-and-drag horizontal scrolling for the detail strip
     useActiveProject.ts    tracks which project is centered in the strip
     useBodyScrollLock.ts   lock body scroll (lightbox open)
@@ -58,7 +58,7 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 - `normalizeSrc()` prefixes stored paths like `public/images/x.jpg` with `import.meta.env.BASE_URL`, producing `/images/x.jpg` locally and `/Portfolio-website-Julia/images/x.jpg` on the GitHub Pages subpath. **Keep this** — relative paths break on the `/project/:slug` route, and a hardcoded `/` base breaks the Pages build. Absolute (`http(s)://`, `//`, `data:`) sources pass through untouched.
 - `videoUrl` on an image entry overrides the uploaded `image`: it lets large videos stream from external hosting (e.g. Dropbox) instead of being committed through the CMS. `dropboxDirect()` rewrites Dropbox share links to a playable form (`raw=1`); such entries are always treated as video.
 - Legacy image entries may be plain strings instead of objects; `toImage()` handles both. Preserve that fallback.
-- `allImages` is a flat list of every image across all projects, in project order. The lightbox indexes into this so next/prev cross project boundaries. `globalImageIndex(slug, indexInProject)` maps back into it.
+- `allImages` is a flat list of every image across all projects, in project order; `globalImageIndex(slug, indexInProject)` maps back into it. The lightbox does **not** use it: it pages only through the clicked project's `images` and wraps within that project.
 
 ## Key conventions & gotchas
 
