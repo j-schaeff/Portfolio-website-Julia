@@ -7,7 +7,7 @@ import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { useAnimation } from "../../context/AnimationContext";
 import type { Project } from "../../types/project";
 import { ScrollStrip } from "./ScrollStrip";
-import { DetailMeta } from "./DetailMeta";
+import { DetailMeta, metaHeight } from "./DetailMeta";
 import { Lightbox } from "../lightbox/Lightbox";
 import styles from "./DetailView.module.css";
 
@@ -100,7 +100,11 @@ export function DetailView() {
   };
 
   return (
-    <div className={styles.detail}>
+    <div
+      className={styles.detail}
+      // Lets the strip CSS end its images just above the metadata block.
+      style={{ "--meta-h": `${metaHeight(projects)}px` } as React.CSSProperties}
+    >
       <button
         type="button"
         className={styles.back}

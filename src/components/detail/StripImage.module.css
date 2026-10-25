@@ -4,4 +4,7 @@
   background: var(--hairline);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
   flex: 0 0 auto;
+  /* Never taller than the strip, so a large image on a short window scales
+     down instead of being cropped at the top. */
+  max-height: 100%;
 }

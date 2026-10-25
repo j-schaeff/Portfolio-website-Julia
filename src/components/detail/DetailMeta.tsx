@@ -8,14 +8,10 @@ interface DetailMetaProps {
   onSelectProject: (slug: string) => void;
 }
 
-// Three independent blocks — description, project names, and type+date — laid
-// out in a row that wraps as whole units when the viewport narrows. While they
-// sit side by side the name and type/date rows line up; once the type+date
-// block wraps it drops beneath the names as a single column. The in-view
-// project's name and its type/date slide right together.
-export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProps) {
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-
+// Height of the metadata block: tall enough for the longest description so the
+// layout doesn't jump between projects. The detail strip also uses it to sit
+// its images just above the metadata.
+export function metaHeight(projects: Project[]): number {
   const longestDescription = projects.reduce(
     (max, project) =>
       project.description.length > max.length ? project.description : max,
@@ -27,7 +23,18 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
     Math.ceil((longestDescription.replace(/\s+/g, " ").trim().length || 1) / 32),
   );
 
-  const infoHeight = Math.max(112, longestDescriptionLines * 20 + 18);
+  return Math.max(112, longestDescriptionLines * 20 + 18);
+}
+
+// Three independent blocks — description, project names, and type+date — laid
+// out in a row that wraps as whole units when the viewport narrows. While they
+// sit side by side the name and type/date rows line up; once the type+date
+// block wraps it drops beneath the names as a single column. The in-view
+// project's name and its type/date slide right together.
+export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProps) {
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
+
+  const infoHeight = metaHeight(projects);
 
   return (
     <div className={styles.meta} style={{ height: `${infoHeight}px` }}>

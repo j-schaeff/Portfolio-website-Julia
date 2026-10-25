@@ -6,7 +6,7 @@ year: 2021
 order: 5
 images:
   - image: public/images/uploads/5_spring/cover-2.jpg
-    size: "5"
+    size: "4"
     hideInGrid: false
     alt: ""
   - image: public/images/uploads/5_spring/IMG_4423-3.jpg

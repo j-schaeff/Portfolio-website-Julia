@@ -6,8 +6,8 @@ description: A field guide reimagined — botanical illustration meets a modular
 year: 2022
 order: 4
 images:
-  - videoUrl: https://www.dropbox.com/scl/fi/w09ziaushffw467pglxp1/Test_green_House.mov?rlkey=ivp8diuvr71oa0j2bu1an68rm&dl=0
-    size: "4"
+  - image: /images/uploads/4_room_board/Test_green_House.mp4
+    size: "5"
     hideInGrid: false
   - image: /images/uploads/4_room_board/food_yellow.mp4
     size: "3"

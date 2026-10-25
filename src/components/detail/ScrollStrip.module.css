@@ -3,11 +3,16 @@
   z-index: 0;
   display: block;
   width: calc(100% + 28px);
-  height: calc(100vh - 160px);
+  /* Runs from 40px down to the top of the metadata: viewport minus the top
+     margin, the meta's 18px bottom offset and its height (--meta-h, set by
+     DetailView). The group's padding inside it keeps the images 56px from the
+     top and 32px above the metadata, and leaves room for their drop shadow —
+     a scrolling box clips anything that overflows it. */
+  height: calc(100vh - 40px - 18px - var(--meta-h, 112px));
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0;
-  margin-top: 56px;
+  margin-top: 40px;
   margin-left: -14px;
   margin-right: -14px;
   pointer-events: none;
@@ -26,15 +31,16 @@
   left: 0;
   top: 0;
   display: flex;
-  align-items: flex-start;
   justify-content: flex-start;
   gap: 12px;
+  align-items: flex-end;
   width: max-content;
   min-width: max-content;
   height: 100%;
   box-sizing: border-box;
-  padding-left: 14px;
-  padding-right: 14px;
+  /* Top: room for the shadow's upward spread; bottom: the 32px gap to the
+     metadata, which the shadow (8px offset + 22px blur) falls into. */
+  padding: 16px 14px 32px;
   pointer-events: auto;
   transform-origin: top center;
   transition: none;
@@ -49,8 +55,7 @@
   }
 
   .group {
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0;
     gap: 8px;
     align-items: flex-start;
     justify-content: flex-start;

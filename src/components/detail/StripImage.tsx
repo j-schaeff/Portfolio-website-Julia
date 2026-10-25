@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
-import { detailImageHeight } from "../../utils/imageSize";
+import { detailFillHeight, detailImageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
 import { ZOOM_TRANSITION } from "../../utils/motion";
 import styles from "./StripImage.module.css";
@@ -12,11 +12,13 @@ interface StripImageProps {
   src: string;
   alt: string;
   size: ImageSize;
+  // Largest size in the project; on tablet/desktop it fills the strip height.
+  largest: ImageSize;
   isVideo: boolean;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export function StripImage({ slug, index, src, alt, size, isVideo, onClick }: StripImageProps) {
+export function StripImage({ slug, index, src, alt, size, largest, isVideo, onClick }: StripImageProps) {
   // Every strip image keeps its layoutId so the lightbox can morph to/from it.
   // The grid restricts layoutId to the clicked image, so the route transition
   // still only ever matches one element.
@@ -43,7 +45,11 @@ export function StripImage({ slug, index, src, alt, size, isVideo, onClick }: St
   const isLeadingMobileImage = isMobile && index === 0;
   const style: CSSProperties = isLeadingMobileImage
     ? { width: "auto", height: "100dvh", objectFit: "contain" }
-    : { width: "auto", height: detailImageHeight(size, isMobile), objectFit: "contain" };
+    : {
+        width: "auto",
+        height: isMobile ? detailImageHeight(size, true) : detailFillHeight(size, largest),
+        objectFit: "contain",
+      };
 
   if (isVideo) {
     return (
