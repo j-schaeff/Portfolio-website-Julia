@@ -1,4 +1,6 @@
 .image {
+  width: auto;
+  height: var(--img-h);
   object-fit: contain;
   cursor: pointer;
   border-radius: 2px;

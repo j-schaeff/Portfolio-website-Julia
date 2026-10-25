@@ -25,3 +25,20 @@
 .infoButton {
   cursor: pointer;
 }
+
+/* Justified rows: useJustifiedRows picks the rows (2–4 images on mobile, up
+   to 8 wider; the last row keeps its authored size) and gives each cell an
+   explicit width (data-justify + --cell-w); a row's widths sum to the content
+   width, so the flat flex stream wraps exactly there. The image then fills its cell at its natural aspect
+   ratio. Gaps and padding stay as set in GridView.module.css. Until every
+   image has loaded, cells keep their natural size. */
+.cell[data-justify] {
+  flex: none;
+  width: var(--cell-w);
+  align-items: stretch;
+}
+
+.cell[data-justify] > :first-child {
+  width: 100%;
+  height: auto;
+}

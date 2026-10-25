@@ -1,11 +1,20 @@
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
 import { useAnimation } from "../../context/AnimationContext";
+import { cellKey } from "../../hooks/useJustifiedRows";
 import { InfoBlock } from "./InfoBlock";
 import { GridImage } from "./GridImage";
 import styles from "./GridItem.module.css";
 
-export function GridItem({ project }: { project: Project }) {
+interface GridItemProps {
+  project: Project;
+  // Mobile justified-row widths keyed by cellKey(); null on desktop.
+  cellWidths: Record<string, number> | null;
+  onAspect: (key: string, aspect: number) => void;
+}
+
+export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
   const navigate = useNavigate();
   const { setOrigin } = useAnimation();
 
@@ -35,21 +44,34 @@ export function GridItem({ project }: { project: Project }) {
   const renderCell = (
     { img, i }: (typeof visibleImages)[number],
     isLead: boolean,
-  ) => (
-    <div className={styles.cell} data-grid-cell key={img.src + i}>
-      <GridImage
-        slug={project.slug}
-        index={i}
-        src={img.src}
-        alt={img.alt || `${project.title} — ${i + 1}`}
-        size={img.size}
-        isVideo={img.isVideo}
-        onActivate={() => go(i)}
-      />
-      {/* Reserved label band keeps every image on a shared baseline. */}
-      <div className={styles.label}>{isLead ? info : null}</div>
-    </div>
-  );
+  ) => {
+    const key = cellKey(project.slug, i);
+    const width = cellWidths?.[key];
+    const justify = width ? ({ "--cell-w": `${width}px` } as CSSProperties) : undefined;
+
+    return (
+      <div
+        className={styles.cell}
+        data-grid-cell
+        data-justify={width ? "" : undefined}
+        style={justify}
+        key={img.src + i}
+      >
+        <GridImage
+          slug={project.slug}
+          index={i}
+          src={img.src}
+          alt={img.alt || `${project.title} — ${i + 1}`}
+          size={img.size}
+          isVideo={img.isVideo}
+          onActivate={() => go(i)}
+          onAspect={(aspect) => onAspect(key, aspect)}
+        />
+        {/* Reserved label band keeps every image on a shared baseline. */}
+        <div className={styles.label}>{isLead ? info : null}</div>
+      </div>
+    );
+  };
 
   return <>{visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}</>;
 }

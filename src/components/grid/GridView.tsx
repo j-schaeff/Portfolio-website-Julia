@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
 import { useAnimation } from "../../context/AnimationContext";
 import { useSnakeReveal } from "../../hooks/useSnakeReveal";
+import { useJustifiedRows } from "../../hooks/useJustifiedRows";
 import { ZOOM_TRANSITION } from "../../utils/motion";
 import { GridItem } from "./GridItem";
 import styles from "./GridView.module.css";
@@ -16,6 +17,7 @@ export function GridView() {
   // "no origin at mount" once and let the snake play just for fresh loads.
   const [freshLoad] = useState(() => origin === null);
   const snake = useSnakeReveal(gridRef, freshLoad);
+  const { widths, reportAspect } = useJustifiedRows(gridRef, projects);
 
   return (
     <motion.main
@@ -35,7 +37,12 @@ export function GridView() {
       transition={ZOOM_TRANSITION}
     >
       {projects.map((project) => (
-        <GridItem key={project.slug} project={project} />
+        <GridItem
+          key={project.slug}
+          project={project}
+          cellWidths={widths}
+          onAspect={reportAspect}
+        />
       ))}
     </motion.main>
   );
