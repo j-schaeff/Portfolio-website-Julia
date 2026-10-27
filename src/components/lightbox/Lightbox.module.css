@@ -40,7 +40,7 @@
   height: 44px;
   border-radius: 50%;
   color: var(--fg);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--control-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   opacity: 0.8;
@@ -51,7 +51,7 @@
 .close:hover,
 .arrow:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--control-bg-hover);
 }
 
 .close svg,

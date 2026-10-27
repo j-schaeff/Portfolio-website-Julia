@@ -30,7 +30,8 @@
     top: 12px;
     left: 12px;
     z-index: 20;
-    color: var(--bg);
+    /* White + difference inverts against what's behind it, in either theme. */
+    color: #fff;
     mix-blend-mode: difference;
   }
 }

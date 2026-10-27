@@ -8,7 +8,9 @@
      not the row below. */
   gap: 40px 12px;
   min-height: 100vh;
-  padding: 24px 14px;
+  /* Top padding clears the fixed theme toggle (top: 20px, ~14px tall) with a
+     small gap so the first row never sits underneath it. */
+  padding: 48px 14px 24px;
 }
 
 /* Snake-reveal on first load. The hook measures cell positions, orders them
@@ -35,7 +37,8 @@
 @media (max-width: 560px) {
   .grid {
     gap: 28px 8px;
-    padding: 12px 8px;
+    /* Toggle sits at top: 12px on mobile. */
+    padding: 38px 8px 12px;
   }
 }
 

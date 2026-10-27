@@ -1,0 +1,23 @@
+/* Mirrors the detail view's "Index" button, pinned to the opposite corner.
+   Sits below the lightbox (z-index 1000) so its close button stays on top. */
+.toggle {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 30;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+@media (max-width: 560px) {
+  .toggle {
+    top: 12px;
+    right: 12px;
+  }
+}
