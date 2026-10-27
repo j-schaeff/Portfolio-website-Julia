@@ -22,6 +22,11 @@ interface ProjectPagerProps {
 // between projects is ordinary scrolling, so the finger drives it directly;
 // selecting a project elsewhere (the "Next" link) smooth-scrolls to its page,
 // the same motion a swipe makes.
+//
+// The list loops: a copy of the last project sits above the first and a copy
+// of the first below the last. Scrolling onto a copy looks like wrapping
+// around, and once the scroll settles the pager jumps, invisibly, to the real
+// page it copies.
 export function ProjectPager({
   projects,
   activeIndex,
@@ -48,9 +53,10 @@ export function ProjectPager({
   // the way don't get reported (and flash their descriptions).
   const targetRef = useRef<string | null>(null);
 
-  const pageFor = (slug: string) =>
+  const pageFor = (slug: string, copy?: "head" | "tail") =>
     pagerRef.current?.querySelector<HTMLElement>(
-      `[data-project-slug="${CSS.escape(slug)}"]`,
+      `[data-project-slug="${CSS.escape(slug)}"]` +
+        (copy ? `[data-copy="${copy}"]` : ":not([data-copy])"),
     ) ?? null;
 
   const measure = () => {
@@ -107,7 +113,14 @@ export function ProjectPager({
     const first = !mountedRef.current;
     mountedRef.current = true;
     if (!pager || !slug || slug === inViewRef.current) return;
-    const page = pageFor(slug);
+    // "Next" on the last project carries on down into the copy of the first,
+    // so it reads as continuing the scroll rather than rewinding to the top.
+    const wraps =
+      !first &&
+      projects.length > 1 &&
+      inViewRef.current === projects[projects.length - 1]?.slug &&
+      slug === projects[0]?.slug;
+    const page = pageFor(slug, wraps ? "tail" : undefined);
     if (!page) return;
     targetRef.current = slug;
     pager.scrollTo({ top: page.offsetTop, behavior: first ? "auto" : "smooth" });
@@ -119,16 +132,41 @@ export function ProjectPager({
     const pager = pagerRef.current;
     if (!pager) return;
     let frame = 0;
-    const onScroll = () => {
+    let settleTimer = 0;
+
+    // Resting on a loop copy: swap in the real page at the same spot. The
+    // copy's horizontal position is carried over so nothing visibly moves.
+    const settle = () => {
+      const copy = Array.from(
+        pager.querySelectorAll<HTMLElement>("[data-copy]"),
+      ).find((page) => Math.abs(page.offsetTop - pager.scrollTop) < 2);
+      const slug = copy?.dataset.projectSlug;
+      const real = slug ? pageFor(slug) : null;
+      if (!copy || !real) return;
+      const copyStrip = copy.firstElementChild as HTMLElement | null;
+      const realStrip = real.firstElementChild as HTMLElement | null;
+      if (copyStrip && realStrip) realStrip.scrollLeft = copyStrip.scrollLeft;
+      pager.scrollTo({ top: real.offsetTop, behavior: "auto" });
+    };
+
+    const onScroll = (event: Event) => {
       if (!frame) frame = requestAnimationFrame(() => {
         frame = 0;
         measure();
       });
+      // Wait for momentum and snapping to finish before any jump; jumping
+      // mid-fling would cut the motion short.
+      if (event.target === pager) {
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(settle, 150);
+      }
     };
+
     pager.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => {
       pager.removeEventListener("scroll", onScroll, { capture: true });
       cancelAnimationFrame(frame);
+      window.clearTimeout(settleTimer);
     };
   }, []);
 
@@ -137,6 +175,14 @@ export function ProjectPager({
   if (!active) return null;
 
   const imageCount = active.images.length;
+
+  const first = projects[0];
+  const last = projects[projects.length - 1];
+  const pages: { project: Project; copy?: "head" | "tail" }[] = [
+    ...(projects.length > 1 && last ? [{ project: last, copy: "head" as const }] : []),
+    ...projects.map((project) => ({ project })),
+    ...(projects.length > 1 && first ? [{ project: first, copy: "tail" as const }] : []),
+  ];
 
   return (
     <>
@@ -153,7 +199,7 @@ export function ProjectPager({
             layoutId makes each one register for presence, which can block the
             detail route's exit (see ScrollStrip). */}
         <PresenceContext.Provider value={null}>
-          {projects.map((project) => {
+          {pages.map(({ project, copy }) => {
             // The project's largest image sets the scale for the rest.
             const largest = project.images.reduce<ImageSize>(
               (max, img) => (img.size > max ? img.size : max),
@@ -161,9 +207,11 @@ export function ProjectPager({
             );
             return (
               <section
-                key={project.slug}
+                key={copy ? `${copy}-${project.slug}` : project.slug}
                 className={styles.page}
                 data-project-slug={project.slug}
+                data-copy={copy}
+                aria-hidden={copy ? true : undefined}
               >
                 <div className={styles.strip}>
                   <div className={styles.group}>
@@ -177,7 +225,8 @@ export function ProjectPager({
                         size={img.size}
                         largest={largest}
                         isVideo={img.isVideo}
-                        rise={intro && project.slug === active.slug}
+                        rise={intro && !copy && project.slug === active.slug}
+                        shared={!copy}
                         onClick={(e) => onImageClick(project, i, e)}
                       />
                     ))}

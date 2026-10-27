@@ -12,7 +12,11 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--fg);
+  /* White + difference inverts against what's behind it, like the Index
+     button and the metadata: dark on a light page, light on a dark one, and
+     readable over images. */
+  color: #fff;
+  mix-blend-mode: difference;
 }
 
 @media (max-width: 560px) {

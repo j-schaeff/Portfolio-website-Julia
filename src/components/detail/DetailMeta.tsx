@@ -64,7 +64,7 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
           onClick={() => onSelectProject(next.slug)}
           aria-label={`View ${next.title}`}
         >
-          Next — {next.title} ↓
+          Next ↓
         </button>
       )}
 

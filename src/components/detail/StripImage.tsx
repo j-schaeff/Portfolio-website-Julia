@@ -17,10 +17,13 @@ interface StripImageProps {
   isVideo: boolean;
   // Play the page-entrance rise from the bottom on mount.
   rise: boolean;
+  // False for the mobile pager's loop copies: a layoutId must be unique, and
+  // the lightbox morphs to the real image.
+  shared?: boolean;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise, onClick }: StripImageProps) {
+export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise, shared = true, onClick }: StripImageProps) {
   // Every strip image keeps its layoutId so the lightbox can morph to/from it.
   // The grid has none, so opening a project never matches a grid image.
   const [isMobile, setIsMobile] = useState(
@@ -42,7 +45,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
-  const layoutId = imageLayoutId(slug, index);
+  const layoutId = shared ? imageLayoutId(slug, index) : undefined;
   const isLeadingMobileImage = isMobile && index === 0;
   const style: CSSProperties = isLeadingMobileImage
     ? { width: "auto", height: "100dvh", objectFit: "contain" }
