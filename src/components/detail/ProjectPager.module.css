@@ -33,9 +33,13 @@
   display: none;
 }
 
+/* Gap and end margin match the mobile index grid (GridView.module.css), so
+   the last image doesn't look cropped. No left margin: the first image stays
+   full-bleed. */
 .group {
   display: flex;
   gap: 8px;
+  padding: 0 8px 0 0;
   align-items: flex-start;
   width: max-content;
   height: 100%;
