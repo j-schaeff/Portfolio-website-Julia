@@ -88,6 +88,7 @@ export function Lightbox({
   if (typeof document === "undefined") return null;
 
   return createPortal(
+    <>
     <motion.div
       className={styles.scrim}
       onClick={onClose}
@@ -125,53 +126,44 @@ export function Lightbox({
         )}
       </AnimatePresence>
 
+    </motion.div>
+
+    {/* The controls sit outside the scrim: its backdrop-filter makes it an
+        isolated layer, so a difference blend inside it would only see the
+        image, not the blurred page around it. Out here they invert against
+        everything, like the Index button and the metadata. */}
+    <motion.div
+      className={styles.controls}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <button className={styles.close} onClick={onClose} aria-label="Close">
-        <Icon d="M5 5l14 14M19 5L5 19" />
+        Close
       </button>
 
       {hasMultiple && (
         <button
           className={`${styles.arrow} ${styles.left}`}
-          onClick={(e) => {
-            stop(e);
-            onPrev();
-          }}
+          onClick={onPrev}
           aria-label="Previous image"
         >
-          <Icon d="M15 4l-8 8 8 8" />
+          ←
         </button>
       )}
 
       {hasMultiple && (
         <button
           className={`${styles.arrow} ${styles.right}`}
-          onClick={(e) => {
-            stop(e);
-            onNext();
-          }}
+          onClick={onNext}
           aria-label="Next image"
         >
-          <Icon d="M9 4l8 8-8 8" />
+          →
         </button>
       )}
-    </motion.div>,
+    </motion.div>
+    </>,
     document.body,
-  );
-}
-
-// Thin-stroke line icon used for the close and arrow buttons.
-function Icon({ d }: { d: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={d} />
-    </svg>
   );
 }

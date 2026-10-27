@@ -27,42 +27,42 @@
   cursor: default;
 }
 
-/* Controls float over the image, so each sits on a small frosted disc that
-   stays legible on light and dark photos alike. */
+/* Above the scrim, not inside it (see Lightbox.tsx). Only the buttons take
+   clicks; everywhere else falls through to the scrim, which closes.
+   The blend lives here, not on the buttons: being fixed with a z-index makes
+   this layer its own stacking context, so a blend on the buttons would only
+   mix with this empty layer and leave them plain white. Blending the whole
+   (transparent) layer inverts the white text against the page instead. */
+.controls {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+/* Plain text, styled like the mobile "Next ↓" link: white, inverted by the
+   layer's difference blend against photos and the blurred page alike.
+   The padding is a comfortable tap target around the small type. */
 .close,
 .arrow {
   position: absolute;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  color: var(--fg);
-  background: var(--control-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  opacity: 0.8;
-  transition: opacity 200ms ease, background 200ms ease;
+  padding: 12px;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  pointer-events: auto;
   user-select: none;
 }
 
-.close:hover,
-.arrow:hover {
-  opacity: 1;
-  background: var(--control-bg-hover);
-}
-
-.close svg,
-.arrow svg {
-  width: 18px;
-  height: 18px;
-}
-
+/* Text lands where the theme toggle's does, which the lightbox covers. */
 .close {
-  top: 20px;
-  right: 20px;
+  top: 8px;
+  right: 12px;
 }
 
 .arrow {
@@ -71,9 +71,24 @@
 }
 
 .left {
-  left: 20px;
+  left: 8px;
 }
 
 .right {
-  right: 20px;
+  right: 8px;
+}
+
+@media (max-width: 560px) {
+  .close {
+    top: 0;
+    right: 0;
+  }
+
+  .left {
+    left: 0;
+  }
+
+  .right {
+    right: 0;
+  }
 }
