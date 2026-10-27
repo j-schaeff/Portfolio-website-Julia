@@ -36,7 +36,11 @@ export function LogoOverlay() {
         className={styles.overlayMark}
         exit={{ y: "100vh", transition: EXIT }}
       >
-        <LogoMark />
+        {/* Rotated on mobile (see the CSS). A separate layer so the rotation
+            doesn't turn the exit's downward slide sideways. */}
+        <div className={styles.overlayTurn}>
+          <LogoMark />
+        </div>
       </motion.div>
     </div>
   );
