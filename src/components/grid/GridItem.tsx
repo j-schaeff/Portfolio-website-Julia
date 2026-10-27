@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
-import { useAnimation } from "../../context/AnimationContext";
 import { cellKey } from "../../hooks/useJustifiedRows";
 import { InfoBlock } from "./InfoBlock";
 import { GridImage } from "./GridImage";
@@ -16,10 +15,7 @@ interface GridItemProps {
 
 export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
   const navigate = useNavigate();
-  const { setOrigin } = useAnimation();
-
-  const go = (imageIndex: number) => {
-    setOrigin({ slug: project.slug, imageIndex });
+  const go = () => {
     navigate(`/project?project=${encodeURIComponent(project.slug)}`);
   };
 
@@ -32,9 +28,9 @@ export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
       className={styles.infoButton}
       role="link"
       tabIndex={0}
-      onClick={() => go(0)}
+      onClick={go}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") go(0);
+        if (e.key === "Enter" || e.key === " ") go();
       }}
     >
       <InfoBlock title={project.title} type={project.type} />
@@ -64,7 +60,7 @@ export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
           alt={img.alt || `${project.title} — ${i + 1}`}
           size={img.size}
           isVideo={img.isVideo}
-          onActivate={() => go(i)}
+          onActivate={go}
           onAspect={(aspect) => onAspect(key, aspect)}
         />
         {/* Reserved label band keeps every image on a shared baseline. */}

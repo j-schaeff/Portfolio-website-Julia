@@ -1,22 +1,21 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
-import { useAnimation } from "../../context/AnimationContext";
+import { introPending, markIntroPlayed } from "../../utils/intro";
 import { useSnakeReveal } from "../../hooks/useSnakeReveal";
 import { LOGO_KEY, useJustifiedRows } from "../../hooks/useJustifiedRows";
-import { ZOOM_TRANSITION } from "../../utils/motion";
+import { GRID_EXIT_TRANSITION, ZOOM_TRANSITION } from "../../utils/motion";
 import { GridItem } from "./GridItem";
 import { LogoCell, LogoOverlay } from "./Logo";
 import styles from "./GridView.module.css";
 
 export function GridView() {
   const { projects } = useProjects();
-  const { origin, clearOrigin } = useAnimation();
   const gridRef = useRef<HTMLElement>(null);
-  // Snake-reveal only on a true page load. Returning from a project always
-  // carries an origin (it drives the shared-element zoom back), so capture
-  // "no origin at mount" once and let the snake play just for fresh loads.
-  const [freshLoad] = useState(() => origin === null);
+  // Logo + snake reveal only when the visitor first enters the site (or
+  // refreshes); coming back from a project just fades the grid in.
+  const [freshLoad] = useState(introPending);
+  useEffect(markIntroPlayed, []);
   const { widths, reportAspect } = useJustifiedRows(gridRef, projects);
   const { state: snake, logo, logoGone } = useSnakeReveal(gridRef, freshLoad, widths !== null);
 
@@ -29,12 +28,9 @@ export function GridView() {
       // container must be visible immediately instead of fading in as a block.
       initial={{ opacity: snake ? 1 : 0 }}
       animate={{ opacity: 1 }}
-      // Fade out as we hand off to the detail page. The clicked image keeps its
-      // shared layoutId and morphs into its detail strip slot on its own.
-      exit={{ opacity: 0 }}
-      onAnimationComplete={() => {
-        if (origin) clearOrigin();
-      }}
+      // Fade out quickly as we hand off to the detail page, whose strip images
+      // rise in from the bottom over the fading grid.
+      exit={{ opacity: 0, transition: GRID_EXIT_TRANSITION }}
       transition={ZOOM_TRANSITION}
     >
       {/* Loading screen: stays over the grid while the snake plays beneath

@@ -22,13 +22,12 @@ There is **no test suite and no linter configured**. The only automated check is
 src/
   main.tsx                 entry point (imports polyfills first, then App)
   polyfills.ts             defines global `Buffer` — gray-matter needs it at runtime
-  App.tsx                  providers: BrowserRouter → ProjectsProvider → AnimationProvider
+  App.tsx                  providers: BrowserRouter → ProjectsProvider
   AnimatedRoutes.tsx       routes: "/" → GridView, "/project/:slug" → DetailView
   data/projects.ts         loads & parses all Markdown at build time (the data layer)
   types/project.ts         Project / ProjectImage / Frontmatter / ImageSize types
   context/
     ProjectsContext.tsx    exposes parsed projects + helpers to the tree
-    AnimationContext.tsx   stores the click origin (slug, image index, DOMRect) for zoom transitions
   hooks/
     useProjects.ts         read ProjectsContext
     useLightbox.ts         index into the current project's images; ← → Esc keys; wraps around
@@ -40,6 +39,8 @@ src/
     imageSize.ts           clampImageSize() + size (1–5) → pixel height
     slug.ts                filename → URL slug
     media.ts               isVideo() extension check + dropboxDirect() share-link rewrite
+    motion.ts              shared transition timings (grid fade, strip rise, lightbox morph)
+    intro.ts               once-per-page-load flag for the logo + snake intro
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock
     detail/                DetailView, ScrollStrip, StripImage, DetailMeta
@@ -62,8 +63,8 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 
 ## Key conventions & gotchas
 
-- **Shared layout ids:** `imageLayoutId(slug, index)` must be identical wherever the same image appears (grid, strip, lightbox) — that's what lets Framer Motion morph between them. Don't change the format without updating every call site.
-- **Zoom transitions:** clicking a tile records a `DOMRect` in AnimationContext; `focalOrigin()` turns it into a `transform-origin` so the zoom radiates from the click. The origin is cleared on `onAnimationComplete`.
+- **Shared layout ids:** `imageLayoutId(slug, index)` must be identical between the detail strip and the lightbox — that's what lets Framer Motion morph between them. Grid images deliberately have none. Don't change the format without updating every call site.
+- **Grid → detail transition:** the grid fades out quickly while the detail page (fixed over the viewport, so it's in place during the `mode="sync"` crossfade) plays a staggered rise: each strip image slides up from below, then the metadata fades in. Timings live in [src/utils/motion.ts](src/utils/motion.ts). The rise only plays on the page's first render, not on project switches. The logo loading screen + snake reveal play once per page load (first entry or refresh), tracked by [src/utils/intro.ts](src/utils/intro.ts); returning to the index from a project just fades the grid in.
 - **Image sizing:** width follows the image's natural aspect ratio; only height scales, via the `size` field (1–5) → `imageHeight()`. The shared `ZOOM` easing `[0.22, 1, 0.36, 1]` over `0.5s` is duplicated in GridView and DetailView — keep them in sync if you change one.
 - **Video support:** assets can be video; use `isVideo(src)` rather than assuming `<img>`. A video can be an uploaded file or an external `videoUrl` (see the data layer above) — by the time it reaches a component the source is already resolved into `ProjectImage.src` with `isVideo` set, so components don't need to know which it was.
 - **CMS coupling:** [.pages.yml](.pages.yml) defines the content schema for Pages CMS. If you add/rename a frontmatter field, update `.pages.yml`, the `Frontmatter` type, and `toProject()` together, or the CMS and the site will drift.

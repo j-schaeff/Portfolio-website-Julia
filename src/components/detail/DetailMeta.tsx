@@ -1,5 +1,7 @@
 import { Fragment, useState } from "react";
+import { motion } from "framer-motion";
 import type { Project } from "../../types/project";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import styles from "./DetailMeta.module.css";
 
 interface DetailMetaProps {
@@ -37,7 +39,15 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
   const infoHeight = metaHeight(projects);
 
   return (
-    <div className={styles.meta} style={{ height: `${infoHeight}px` }}>
+    // Fades in just behind the strip's rise so the images lead the entrance.
+    // This block doesn't remount on project switches, so it plays only once.
+    <motion.div
+      className={styles.meta}
+      style={{ height: `${infoHeight}px` }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
+    >
       <p className={styles.description}>{active.description}</p>
 
       <div className={styles.namesCol}>
@@ -138,6 +148,6 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

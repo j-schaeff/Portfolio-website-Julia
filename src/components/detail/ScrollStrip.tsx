@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
 import { StripImage } from "./StripImage";
@@ -21,6 +21,11 @@ export function ScrollStrip({
 }: ScrollStripProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   const activeProject = projects[activeIndex] ?? projects[0];
+  // Only the images on screen when the page opens rise in. Switching projects
+  // re-keys the group, and those images mount after this flips, so they
+  // appear in place instead of replaying the entrance.
+  const [intro, setIntro] = useState(true);
+  useEffect(() => setIntro(false), []);
 
   useLayoutEffect(() => {
     if (!stripRef.current) return;
@@ -70,6 +75,7 @@ export function ScrollStrip({
             size={img.size}
             largest={largest}
             isVideo={img.isVideo}
+            rise={intro}
             onClick={(e) => onImageClick(activeProject, i, e)}
           />
         ))}

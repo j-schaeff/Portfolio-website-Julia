@@ -2,9 +2,6 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { imageHeight } from "../../utils/imageSize";
-import { imageLayoutId } from "../../utils/layoutId";
-import { ZOOM_TRANSITION } from "../../utils/motion";
-import { useAnimation } from "../../context/AnimationContext";
 import styles from "./GridImage.module.css";
 
 interface GridImageProps {
@@ -20,12 +17,9 @@ interface GridImageProps {
   onAspect?: (aspect: number) => void;
 }
 
-export function GridImage({ slug, index, src, alt, size, isVideo, onActivate, onAspect }: GridImageProps) {
-  const { origin } = useAnimation();
-  // Only the clicked image shares a layoutId, so a single element morphs into
-  // the detail strip instead of every grid image fighting for a match.
-  const isShared = origin?.slug === slug && origin?.imageIndex === index;
-  const layoutId = isShared ? imageLayoutId(slug, index) : undefined;
+// No layoutId here: opening a project doesn't morph the clicked image. The
+// detail strip rises in from the bottom on its own instead.
+export function GridImage({ src, alt, size, isVideo, onActivate, onAspect }: GridImageProps) {
   // Height goes through a CSS variable so the mobile layout can override it.
   const style = { "--img-h": `${imageHeight(size)}px` } as CSSProperties;
 
@@ -51,7 +45,6 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate, on
     return (
       <motion.video
         ref={mediaRef}
-        layoutId={layoutId}
         className={styles.image}
         src={src}
         aria-label={alt}
@@ -63,7 +56,6 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate, on
         onLoadedMetadata={reportAspect}
         onError={reportBroken}
         style={style}
-        transition={ZOOM_TRANSITION}
       />
     );
   }
@@ -71,7 +63,6 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate, on
   return (
     <motion.img
       ref={mediaRef}
-      layoutId={layoutId}
       className={styles.image}
       src={src}
       alt={alt}
@@ -80,7 +71,6 @@ export function GridImage({ slug, index, src, alt, size, isVideo, onActivate, on
       onLoad={reportAspect}
       onError={reportBroken}
       style={style}
-      transition={ZOOM_TRANSITION}
     />
   );
 }

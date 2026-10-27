@@ -1,11 +1,22 @@
+/* Pinned to the viewport: during the route crossfade (AnimatePresence
+   mode="sync") the exiting grid is still in the flow above this page, so a
+   static page would render below it — off screen if the grid was scrolled —
+   and only jump into view once the grid unmounts. Fixed, the strip's rise
+   plays in place over the fading grid. Body scroll is locked here anyway.
+   Fixed also makes this a stacking context, so the metadata's
+   mix-blend-mode: difference can only blend with what's inside it — hence the
+   explicit background; without it the white text blends with nothing and
+   vanishes on a light page. DetailView fades the page in to keep the
+   crossfade. */
 .detail {
-  position: relative;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   padding: 0 14px;
   box-sizing: border-box;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .back {

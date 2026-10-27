@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import { useProjects } from "../../hooks/useProjects";
 import { useLightbox } from "../../hooks/useLightbox";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
-import { useAnimation } from "../../context/AnimationContext";
+import { markIntroPlayed } from "../../utils/intro";
 import type { Project } from "../../types/project";
 import { ScrollStrip } from "./ScrollStrip";
 import { DetailMeta, metaHeight } from "./DetailMeta";
@@ -14,8 +15,10 @@ import styles from "./DetailView.module.css";
 export function DetailView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { clearOrigin } = useAnimation();
   const { projects } = useProjects();
+  // Landing straight on a project still counts as entering the site, so the
+  // index's logo intro won't play when the visitor heads there next.
+  useEffect(markIntroPlayed, []);
   // The lightbox only pages through the project whose image was clicked.
   const [lightboxSlug, setLightboxSlug] = useState<string | null>(null);
   const lightboxProject = projects.find((project) => project.slug === lightboxSlug);
@@ -94,16 +97,20 @@ export function DetailView() {
       : undefined;
 
   const goToIndex = () => {
-    clearOrigin();
     // The router basename already supplies the deploy subpath.
     navigate("/", { replace: true });
   };
 
   return (
-    <div
+    <motion.div
       className={styles.detail}
       // Lets the strip CSS end its images just above the metadata block.
       style={{ "--meta-h": `${metaHeight(projects)}px` } as React.CSSProperties}
+      // The page has an opaque background (see the CSS), so fade it in in step
+      // with the grid's exit to keep the handoff a crossfade.
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={GRID_EXIT_TRANSITION}
     >
       <button
         type="button"
@@ -141,7 +148,7 @@ export function DetailView() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
