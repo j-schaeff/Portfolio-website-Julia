@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
-import { LOGO_WIDTH } from "../../hooks/useJustifiedRows";
+import { LOGO_PAD_LEFT, LOGO_WIDTH } from "../../hooks/useJustifiedRows";
 import cellStyles from "./GridItem.module.css";
 import styles from "./Logo.module.css";
 
@@ -53,8 +53,11 @@ interface LogoCellProps {
 // it shares the row's baseline, but isn't a data-grid-cell: the snake reveal
 // never hides it.
 export function LogoCell({ width, showMark }: LogoCellProps) {
-  const cellWidth = width ?? LOGO_WIDTH;
-  const style = { "--cell-w": `${cellWidth}px` } as CSSProperties;
+  const cellWidth = width ?? LOGO_WIDTH + LOGO_PAD_LEFT;
+  const style = {
+    "--cell-w": `${cellWidth}px`,
+    paddingLeft: LOGO_PAD_LEFT,
+  } as CSSProperties;
 
   return (
     <div className={`${cellStyles.cell} ${styles.cell}`} style={style} aria-hidden="true">

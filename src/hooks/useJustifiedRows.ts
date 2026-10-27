@@ -35,9 +35,12 @@ export const LOGO_KEY = "logo";
 // The SVG viewBox, cropped to the lettering so its bottom edge is the
 // baseline that lines up with the images.
 const LOGO_ASPECT = 122 / 45.83;
-// 80% of the smallest image height (size 1).
-const LOGO_HEIGHT = imageHeight(1) * 0.8;
+// 55.2% of the smallest image height (size 1).
+const LOGO_HEIGHT = imageHeight(1) * 0.552;
 export const LOGO_WIDTH = LOGO_HEIGHT * LOGO_ASPECT;
+// Extra space before the logo, on top of the grid gap. Counted in the cell's
+// width so the row fill accounts for it and the mark keeps its size.
+export const LOGO_PAD_LEFT = 8;
 
 interface Cell {
   key: string;
@@ -154,7 +157,7 @@ export function useJustifiedRows(
         cells.push({ key, width: imageHeight(img.size) * aspect });
       }
     }
-    cells.push({ key: LOGO_KEY, width: LOGO_WIDTH });
+    cells.push({ key: LOGO_KEY, width: LOGO_WIDTH + LOGO_PAD_LEFT });
 
     const available = box.width - ROUNDING_SLACK_PX;
     const result: Record<string, number> = {};
