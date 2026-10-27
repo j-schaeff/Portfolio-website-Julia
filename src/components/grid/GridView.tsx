@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
 import { useAnimation } from "../../context/AnimationContext";
 import { useSnakeReveal } from "../../hooks/useSnakeReveal";
-import { useJustifiedRows } from "../../hooks/useJustifiedRows";
+import { LOGO_KEY, useJustifiedRows } from "../../hooks/useJustifiedRows";
 import { ZOOM_TRANSITION } from "../../utils/motion";
 import { GridItem } from "./GridItem";
+import { LogoCell, LogoOverlay } from "./Logo";
 import styles from "./GridView.module.css";
 
 export function GridView() {
@@ -16,8 +17,8 @@ export function GridView() {
   // carries an origin (it drives the shared-element zoom back), so capture
   // "no origin at mount" once and let the snake play just for fresh loads.
   const [freshLoad] = useState(() => origin === null);
-  const snake = useSnakeReveal(gridRef, freshLoad);
   const { widths, reportAspect } = useJustifiedRows(gridRef, projects);
+  const { state: snake, logo, logoGone } = useSnakeReveal(gridRef, freshLoad, widths !== null);
 
   return (
     <motion.main
@@ -36,6 +37,11 @@ export function GridView() {
       }}
       transition={ZOOM_TRANSITION}
     >
+      {/* Loading screen: stays over the grid while the snake plays beneath
+          it, then slides down out of view; the grid's copy appears after. */}
+      <AnimatePresence onExitComplete={logoGone}>
+        {logo === "overlay" && <LogoOverlay key="logo-overlay" />}
+      </AnimatePresence>
       {projects.map((project) => (
         <GridItem
           key={project.slug}
@@ -44,6 +50,7 @@ export function GridView() {
           onAspect={reportAspect}
         />
       ))}
+      <LogoCell width={widths?.[LOGO_KEY]} showMark={logo === "gone"} />
     </motion.main>
   );
 }

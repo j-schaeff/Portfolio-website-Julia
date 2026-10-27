@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 // Plays a serpentine ("snake") reveal across the grid on first page load: the
 // top row lights up left→right, the next row right→left, and so on, so the
@@ -12,14 +12,30 @@ import { useLayoutEffect, useState, type RefObject } from "react";
 // each row in the snake direction, and stamp a staggered transition delay onto
 // every cell. The actual fade/rise is done in CSS off the data-snake attribute.
 
-export type SnakeState = "pending" | "run" | null;
+// Fresh loads double as the loading screen: the logo covers the page while
+// every image and video loads ("loading"), the snake then plays behind it
+// ("run"), and once the snake has finished and a short pause has passed the
+// logo slides down out of the viewport, leaving its small copy in the grid's
+// last slot. null skips all of it (returning from a project, or reduced
+// motion).
+export type SnakeState = "loading" | "run" | null;
+
+// The loading logo: over the page, sliding out of view, or gone (only the
+// grid's copy remains, and only shows once the big one is out of sight).
+export type LogoPhase = "overlay" | "leaving" | "gone";
 
 // Milliseconds between each image lighting up as the snake travels.
 const STEP_MS = 120;
+// Each cell's own fade/rise. Keep in sync with the transition in
+// GridView.module.css.
+const REVEAL_MS = 900;
 // Rows are detected by a shared bottom edge; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
-// Don't let one slow-loading image hold the whole reveal hostage.
-const MAX_WAIT_MS = 2000;
+// Everything should be loaded before the reveal, so this is only a safety net
+// for a dead asset — long enough that normal loads always finish first.
+const MAX_WAIT_MS = 15000;
+// Pause between the snake finishing and the logo leaving.
+const LOGO_DELAY_MS = 200;
 
 function prefersReducedMotion(): boolean {
   return (
@@ -51,8 +67,9 @@ function snakeOrder(cells: HTMLElement[]): HTMLElement[] {
   });
 }
 
-// Resolve once every <img>/<video> in the container has the dimensions we need
-// to lay out (or after MAX_WAIT_MS, so a stalled asset can't freeze the reveal).
+// Resolve once every <img>/<video> in the container has loaded — images fully,
+// videos up to their first frame — or after MAX_WAIT_MS, so a stalled asset
+// can't freeze the loading screen.
 function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   const media = Array.from(
     container.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"),
@@ -61,7 +78,7 @@ function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   const isReady = (el: HTMLImageElement | HTMLVideoElement) =>
     el instanceof HTMLImageElement
       ? el.complete && el.naturalWidth > 0
-      : el.readyState >= 1; // HAVE_METADATA → intrinsic size is known
+      : el.readyState >= 2; // HAVE_CURRENT_DATA → first frame is ready
 
   let pending = media.filter((el) => !isReady(el)).length;
   let settled = false;
@@ -75,7 +92,7 @@ function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   const onReady = (event: Event) => {
     const el = event.currentTarget as HTMLImageElement | HTMLVideoElement;
     el.removeEventListener("load", onReady);
-    el.removeEventListener("loadedmetadata", onReady);
+    el.removeEventListener("loadeddata", onReady);
     el.removeEventListener("error", onReady);
     pending -= 1;
     if (pending <= 0) finish();
@@ -85,7 +102,7 @@ function whenMediaReady(container: HTMLElement, done: () => void): () => void {
     window.clearTimeout(timer);
     for (const el of media) {
       el.removeEventListener("load", onReady);
-      el.removeEventListener("loadedmetadata", onReady);
+      el.removeEventListener("loadeddata", onReady);
       el.removeEventListener("error", onReady);
     }
   };
@@ -100,49 +117,72 @@ function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   for (const el of media) {
     if (isReady(el)) continue;
     el.addEventListener("load", onReady);
-    el.addEventListener("loadedmetadata", onReady);
+    el.addEventListener("loadeddata", onReady);
     el.addEventListener("error", onReady);
   }
   const timer = window.setTimeout(finish, MAX_WAIT_MS);
   return cleanup;
 }
 
-export function useSnakeReveal(ref: RefObject<HTMLElement | null>, enabled: boolean): SnakeState {
+export function useSnakeReveal(
+  ref: RefObject<HTMLElement | null>,
+  enabled: boolean,
+  // Justified widths are applied, so measured positions are final.
+  layoutReady: boolean,
+) {
   // Decide once, at mount: a fresh load with motion allowed starts hidden so
   // there's no flash of fully-laid-out images before the snake runs.
   const [state, setState] = useState<SnakeState>(() =>
-    enabled && !prefersReducedMotion() ? "pending" : null,
+    enabled && !prefersReducedMotion() ? "loading" : null,
   );
+  const [logo, setLogo] = useState<LogoPhase>(() =>
+    state === "loading" ? "overlay" : "gone",
+  );
+  const [mediaReady, setMediaReady] = useState(false);
+  // How long the snake takes, measured when it starts.
+  const snakeMs = useRef(0);
 
   useLayoutEffect(() => {
-    if (state !== "pending") return;
+    if (state !== "loading") return;
     const container = ref.current;
     if (!container) {
       setState(null);
+      setLogo("gone");
       return;
     }
-
-    let raf = 0;
-    const cleanupMedia = whenMediaReady(container, () => {
-      // One more frame so flex-wrap has settled before we read positions.
-      raf = requestAnimationFrame(() => {
-        const cells = Array.from(
-          container.querySelectorAll<HTMLElement>("[data-grid-cell]"),
-        );
-        snakeOrder(cells).forEach((cell, i) => {
-          cell.style.setProperty("--reveal-delay", `${i * STEP_MS}ms`);
-        });
-        setState("run");
-      });
-    });
-
-    return () => {
-      cleanupMedia();
-      cancelAnimationFrame(raf);
-    };
-    // Runs once: state only ever moves pending → run | null, never back.
+    return whenMediaReady(container, () => setMediaReady(true));
+    // Runs once: state only ever moves forward, never back to "loading".
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return state;
+  useLayoutEffect(() => {
+    if (state !== "loading" || !mediaReady || !layoutReady) return;
+    const container = ref.current;
+    if (!container) return;
+
+    // One more frame so flex-wrap has settled before we read positions.
+    const raf = requestAnimationFrame(() => {
+      const cells = snakeOrder(
+        Array.from(container.querySelectorAll<HTMLElement>("[data-grid-cell]")),
+      );
+      cells.forEach((cell, i) => {
+        cell.style.setProperty("--reveal-delay", `${i * STEP_MS}ms`);
+      });
+      snakeMs.current = Math.max(0, cells.length - 1) * STEP_MS + REVEAL_MS;
+      setState("run");
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [state, mediaReady, layoutReady, ref]);
+
+  // Once the last cell has finished revealing, pause, then send the logo off.
+  useEffect(() => {
+    if (state !== "run" || logo !== "overlay") return;
+    const timer = window.setTimeout(() => setLogo("leaving"), snakeMs.current + LOGO_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [state, logo]);
+
+  // Called once the big logo has left the viewport.
+  const logoGone = useCallback(() => setLogo("gone"), []);
+
+  return { state, logo, logoGone };
 }

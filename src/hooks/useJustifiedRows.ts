@@ -29,6 +29,16 @@ const ROUNDING_SLACK_PX = 1;
 
 export const cellKey = (slug: string, index: number) => `${slug}:${index}`;
 
+// The logo takes the grid's final slot. It joins the row fill like any image,
+// so it always lands in the last row and that row's width accounts for it.
+export const LOGO_KEY = "logo";
+// The SVG viewBox, cropped to the lettering so its bottom edge is the
+// baseline that lines up with the images.
+const LOGO_ASPECT = 122 / 45.83;
+// 80% of the smallest image height (size 1).
+const LOGO_HEIGHT = imageHeight(1) * 0.8;
+export const LOGO_WIDTH = LOGO_HEIGHT * LOGO_ASPECT;
+
 interface Cell {
   key: string;
   width: number; // natural width at the image's authored size
@@ -144,6 +154,7 @@ export function useJustifiedRows(
         cells.push({ key, width: imageHeight(img.size) * aspect });
       }
     }
+    cells.push({ key: LOGO_KEY, width: LOGO_WIDTH });
 
     const available = box.width - ROUNDING_SLACK_PX;
     const result: Record<string, number> = {};

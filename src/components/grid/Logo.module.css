@@ -1,0 +1,51 @@
+/* Full-viewport loading logo layered over the index. z-index sits above
+   everything else on the page (theme toggle is 30, lightbox 1000).
+   pointer-events: none lets clicks fall through. */
+.overlay {
+  --overlay-pad: 24px;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--fg);
+}
+
+/* The largest box with the logo's 122 × 45.83 ratio that fits the viewport.
+   Sized to the logo's own shape, so it can slide out as one compact layer. */
+.overlayMark {
+  width: min(
+    100vw - 2 * var(--overlay-pad),
+    (100vh - 2 * var(--overlay-pad)) * 122 / 45.83
+  );
+  aspect-ratio: 122 / 45.83;
+  will-change: transform;
+}
+
+/* Grid slot: the cell width comes from useJustifiedRows via --cell-w. */
+.cell {
+  flex: none;
+  width: var(--cell-w);
+  align-items: stretch;
+  color: var(--fg);
+}
+
+.cellMark {
+  width: 100%;
+  aspect-ratio: 122 / 45.83;
+}
+
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 560px) {
+  .overlay {
+    --overlay-pad: 12px;
+  }
+}
