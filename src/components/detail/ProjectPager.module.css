@@ -1,0 +1,78 @@
+/* Vertical scroller of full-screen project pages; snapping makes each swipe
+   land on exactly one project. */
+.pager {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.pager::-webkit-scrollbar {
+  display: none;
+}
+
+.page {
+  height: 100dvh;
+  scroll-snap-align: start;
+  /* One project per swipe, however hard the flick. */
+  scroll-snap-stop: always;
+}
+
+.strip {
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  width: max-content;
+  height: 100%;
+}
+
+/* Image counter + progress bar. White + difference inverts against the
+   image behind, in either theme. */
+.position {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 20;
+  pointer-events: none;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+.counter {
+  position: absolute;
+  /* Centered: the right corner belongs to the theme toggle. Same top as the
+     Index button. */
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #fff;
+  transform-origin: left center;
+}

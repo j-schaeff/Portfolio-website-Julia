@@ -7,7 +7,9 @@ import { useLightbox } from "../../hooks/useLightbox";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { markIntroPlayed } from "../../utils/intro";
 import type { Project } from "../../types/project";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { ScrollStrip } from "./ScrollStrip";
+import { ProjectPager } from "./ProjectPager";
 import { DetailMeta, metaHeight } from "./DetailMeta";
 import { Lightbox } from "../lightbox/Lightbox";
 import styles from "./DetailView.module.css";
@@ -31,13 +33,31 @@ export function DetailView() {
     ? Math.max(projects.findIndex((project) => project.slug === projectSlug), 0)
     : 0;
   const active = projects[activeIndex] ?? projects[0];
+  const isMobile = useIsMobile();
   const wheelDeltaRef = useRef(0);
   const lastTriggerRef = useRef(0);
+  const lastWheelRef = useRef(0);
 
   useEffect(() => {
+    // On mobile the projects are a real vertical scroller (ProjectPager), so
+    // the wheel is left to it.
+    if (isMobile) return;
+
     const onWheel = (event: WheelEvent) => {
       const deltaY = event.deltaY;
       const now = Date.now();
+
+      // A pause ends the gesture, so stray vertical drift from earlier swipes
+      // can't add up to a project switch.
+      if (now - lastWheelRef.current > 200) wheelDeltaRef.current = 0;
+      lastWheelRef.current = now;
+
+      // Horizontal swipes belong to the media strip; trackpads add a little
+      // vertical drift to them, which mustn't count toward switching projects.
+      if (Math.abs(event.deltaX) > Math.abs(deltaY)) {
+        wheelDeltaRef.current = 0;
+        return;
+      }
 
       if (Math.abs(deltaY) < 4) return;
       if (now - lastTriggerRef.current < 460) return;
@@ -70,7 +90,7 @@ export function DetailView() {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [activeIndex, projectSlug, projects, setSearchParams]);
+  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
 
   if (!active) return null;
 
@@ -120,11 +140,20 @@ export function DetailView() {
         Index
       </button>
 
-      <ScrollStrip
-        projects={projects}
-        activeIndex={activeIndex}
-        onImageClick={handleImageClick}
-      />
+      {isMobile ? (
+        <ProjectPager
+          projects={projects}
+          activeIndex={activeIndex}
+          onActiveChange={handleProjectSelect}
+          onImageClick={handleImageClick}
+        />
+      ) : (
+        <ScrollStrip
+          projects={projects}
+          activeIndex={activeIndex}
+          onImageClick={handleImageClick}
+        />
+      )}
 
       <DetailMeta
         projects={projects}

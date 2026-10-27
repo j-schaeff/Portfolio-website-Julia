@@ -37,6 +37,13 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   const infoHeight = metaHeight(projects);
+  // Mobile has no project list, so the next project (wrapping to the first)
+  // is named under the description: it hints that swiping moves on, and a tap
+  // does the same.
+  const activeIdx = projects.findIndex((p) => p.slug === active.slug);
+  const next = projects.length > 1
+    ? projects[(activeIdx + 1) % projects.length]
+    : undefined;
 
   return (
     // Fades in just behind the strip's rise so the images lead the entrance.
@@ -49,6 +56,17 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
       <p className={styles.description}>{active.description}</p>
+
+      {next && (
+        <button
+          type="button"
+          className={[styles.next, styles.linkButton].join(" ")}
+          onClick={() => onSelectProject(next.slug)}
+          aria-label={`View ${next.title}`}
+        >
+          Next — {next.title} ↓
+        </button>
+      )}
 
       <div className={styles.namesCol}>
         <ul className={styles.names}>

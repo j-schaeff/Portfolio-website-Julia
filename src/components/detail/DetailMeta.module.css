@@ -128,7 +128,8 @@
   transform: translateX(20px);
 }
 
-.mobileProjectList {
+.mobileProjectList,
+.next {
   display: none;
 }
 
@@ -190,12 +191,25 @@
     text-indent: 24px;
     text-align: justify;
     color: inherit;
-    pointer-events: auto;
+    /* Lets a swipe that starts on the text reach the project scroller. */
+    pointer-events: none;
   }
 
   .namesCol,
   .specs,
   .mobileProjectList {
     display: none !important;
+  }
+
+  .next {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-sans);
+    font-feature-settings: "ss02";
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: auto;
   }
 }

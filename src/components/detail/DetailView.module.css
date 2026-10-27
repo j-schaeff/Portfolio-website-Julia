@@ -21,9 +21,11 @@
 
 .back {
   position: fixed;
-  top: 20px;
-  left: 24px;
+  /* Matches the metadata's 14px side padding and 18px bottom offset. */
+  top: 18px;
+  left: 14px;
   z-index: 10;
+  padding: 0;
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
   font-size: 11px;
