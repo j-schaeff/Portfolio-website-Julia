@@ -1,0 +1,42 @@
+/* Mirrors the detail view's "Index" button. Sits below the lightbox
+   (z-index 1000) so its close button stays on top. */
+.item {
+  position: fixed;
+  top: 20px;
+  z-index: 30;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* White + difference inverts against what's behind it, like the Index
+     button and the metadata: dark on a light page, light on a dark one, and
+     readable over images. */
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+/* Lines up with the grid's 14px side padding. */
+.left {
+  left: 14px;
+}
+
+.right {
+  right: 24px;
+}
+
+@media (max-width: 560px) {
+  .item {
+    top: 12px;
+  }
+
+  .left {
+    left: 12px;
+  }
+
+  .right {
+    right: 12px;
+  }
+}

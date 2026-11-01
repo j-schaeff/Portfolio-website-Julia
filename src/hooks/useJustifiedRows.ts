@@ -143,11 +143,14 @@ export function useJustifiedRows(
     setAspects((prev) => (prev[key] === aspect ? prev : { ...prev, [key]: aspect }));
   }, []);
 
-  const widths = useMemo(() => {
+  const layout = useMemo(() => {
     if (!box) return null;
 
-    const cells: Cell[] = [];
+    // On mobile each project gets its own rows, so a project always starts at
+    // the beginning of a line. Wider screens fill rows across projects.
+    const groups: Cell[][] = [];
     for (const project of projects) {
+      const cells: Cell[] = [];
       for (const [index, img] of project.images.entries()) {
         if (img.hideInGrid) continue;
         const key = cellKey(project.slug, index);
@@ -156,21 +159,47 @@ export function useJustifiedRows(
         if (!aspect) return null;
         cells.push({ key, width: imageHeight(img.size) * aspect });
       }
+      if (!cells.length) continue;
+      if (isMobile || !groups.length) groups.push(cells);
+      else groups[0].push(...cells);
     }
-    cells.push({ key: LOGO_KEY, width: LOGO_WIDTH + LOGO_PAD_LEFT });
+    // On mobile the logo gets a row of its own and fills the full width.
+    const logo = { key: LOGO_KEY, width: LOGO_WIDTH + LOGO_PAD_LEFT };
+    if (isMobile || !groups.length) groups.push([logo]);
+    else groups[0].push(logo);
 
     const available = box.width - ROUNDING_SLACK_PX;
-    const result: Record<string, number> = {};
+    const widths: Record<string, number> = {};
+    const breaks: Record<string, number> = {};
     const limits = isMobile ? MOBILE_ROWS : WIDE_ROWS;
-    const rows = buildRows(cells, available, box.gap, limits);
-    rows.forEach((row, r) => {
-      const fill = rowScale(row, available, box.gap);
-      // The last row isn't justified: authored size, shrunk only to fit.
-      const scale = r === rows.length - 1 ? Math.min(1, fill) : fill;
-      for (const cell of row) result[cell.key] = cell.width * scale;
+    groups.forEach((group, g) => {
+      const isLastGroup = g === groups.length - 1;
+      const rows = buildRows(group, available, box.gap, limits);
+      rows.forEach((row, r) => {
+        const fill = rowScale(row, available, box.gap);
+        // The grid's last row (except the mobile logo row, which fills the
+        // width), and a project's lone short row (e.g. a single-image
+        // project), aren't justified: authored size, shrunk only to fit.
+        const isLastRow = r === rows.length - 1;
+        const loose =
+          isLastRow && !(isMobile && isLastGroup) && (isLastGroup || row.length < limits.min);
+        const scale = loose ? Math.min(1, fill) : fill;
+        for (const cell of row) widths[cell.key] = cell.width * scale;
+        // A loose row that ends a project pads out the rest of the line, so
+        // the next project still wraps onto a new one.
+        if (loose && !isLastGroup) {
+          const used = row.reduce((sum, cell) => sum + widths[cell.key], 0);
+          const leftover = available - used - box.gap * (row.length - 1);
+          breaks[row[row.length - 1].key] = Math.max(0, leftover);
+        }
+      });
     });
-    return result;
+    return { widths, breaks };
   }, [isMobile, box, projects, aspects]);
 
-  return { widths, reportAspect };
+  return {
+    widths: layout?.widths ?? null,
+    breaks: layout?.breaks ?? null,
+    reportAspect,
+  };
 }

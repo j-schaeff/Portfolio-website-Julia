@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import styles from "./ThemeToggle.module.css";
 
 type Theme = "light" | "dark";
 
@@ -10,7 +9,8 @@ function initialTheme(): Theme {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
-export function ThemeToggle() {
+// Positioned and colored by CornerNav, which passes its item class.
+export function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<Theme>(initialTheme);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className={styles.toggle}
+      className={className}
       onClick={() => setTheme(next)}
       aria-label={`Switch to ${next} mode`}
     >

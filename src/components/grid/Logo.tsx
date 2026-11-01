@@ -60,7 +60,7 @@ export function LogoCell({ width, showMark }: LogoCellProps) {
   const cellWidth = width ?? LOGO_WIDTH + LOGO_PAD_LEFT;
   const style = {
     "--cell-w": `${cellWidth}px`,
-    paddingLeft: LOGO_PAD_LEFT,
+    "--logo-pad": `${LOGO_PAD_LEFT}px`,
   } as CSSProperties;
 
   return (

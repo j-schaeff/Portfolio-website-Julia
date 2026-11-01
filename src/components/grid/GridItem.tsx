@@ -10,10 +10,13 @@ interface GridItemProps {
   project: Project;
   // Mobile justified-row widths keyed by cellKey(); null on desktop.
   cellWidths: Record<string, number> | null;
+  // Trailing space after a project's last cell on mobile, so the next
+  // project wraps to a new line.
+  cellBreaks: Record<string, number> | null;
   onAspect: (key: string, aspect: number) => void;
 }
 
-export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
+export function GridItem({ project, cellWidths, cellBreaks, onAspect }: GridItemProps) {
   const navigate = useNavigate();
   const go = () => {
     navigate(`/project?project=${encodeURIComponent(project.slug)}`);
@@ -43,7 +46,10 @@ export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
   ) => {
     const key = cellKey(project.slug, i);
     const width = cellWidths?.[key];
-    const justify = width ? ({ "--cell-w": `${width}px` } as CSSProperties) : undefined;
+    const pad = cellBreaks?.[key];
+    const justify = width
+      ? ({ "--cell-w": `${width}px`, marginRight: pad || undefined } as CSSProperties)
+      : undefined;
 
     return (
       <div

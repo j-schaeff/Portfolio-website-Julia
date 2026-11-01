@@ -67,3 +67,26 @@ content:
             label: Alt text
             type: string
             description: Optional description for screen readers and accessibility.
+
+  - name: about
+    label: About
+    type: file
+    path: content/about.md
+    format: yaml-frontmatter
+    fields:
+      - name: bio
+        label: Bio
+        type: text
+        description: Separate paragraphs with an empty line.
+      - name: links
+        label: Links
+        type: object
+        list: true
+        fields:
+          - name: label
+            label: Label
+            type: string
+          - name: url
+            label: URL
+            type: string
+            description: A web address, or mailto:you@example.com for email.

@@ -35,6 +35,7 @@
   flex: none;
   width: var(--cell-w);
   align-items: stretch;
+  padding-left: var(--logo-pad);
   color: var(--fg);
 }
 
@@ -77,5 +78,20 @@
     width: var(--logo-len);
     height: calc(var(--logo-len) * 45.83 / 122);
     transform: translate(-50%, -50%) rotate(-90deg);
+  }
+
+  /* The logo has its own full-width row here, so no gap from a neighbour.
+     It's pinned to the grid's bottom edge (GridView.module.css reserves the
+     space), matching the 8px side gutter. */
+  .cell {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    padding-left: 0;
+  }
+
+  /* No label band: nothing sits below the logo but the screen edge. */
+  .cell > :last-child {
+    display: none;
   }
 }

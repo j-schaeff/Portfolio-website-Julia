@@ -37,8 +37,15 @@
 @media (max-width: 560px) {
   .grid {
     gap: 28px 8px;
-    /* Toggle sits at top: 12px on mobile. */
-    padding: 38px 8px 12px;
+    /* Toggle sits at top: 12px on mobile. The bottom padding reserves the
+       full-width logo row (see Logo.module.css), which is pinned to the page's
+       bottom edge so it always ends on the bottom of the screen, even when the
+       grid is shorter than the viewport. */
+    --logo-row-h: calc((100vw - 16px) * 45.83 / 122);
+    position: relative;
+    min-height: 100dvh;
+    align-content: flex-start;
+    padding: 38px 8px calc(var(--logo-row-h) + 8px + 28px);
   }
 }
 
