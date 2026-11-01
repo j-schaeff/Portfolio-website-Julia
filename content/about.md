@@ -10,9 +10,9 @@ column2: >-
 
   > Julia Schaeffler
 
-  [Straße und Hausnummer]
+  Mphlfeldgasse 6
 
-  [PLZ Ort], Österreich
+  1020, Österreich
 
 
   > juliaschaeffler99@gmail.com
