@@ -29,29 +29,50 @@ export function AboutView() {
         Index
       </button>
 
-      <div className={styles.content}>
-        {about.paragraphs.map((paragraph, i) => (
-          <p key={i} className={styles.paragraph}>
-            {paragraph}
-          </p>
-        ))}
+      {about.columns.map((paragraphs, column) => (
+        <div key={column} className={styles.column}>
+          {paragraphs.length > 0 && (
+            // The legal text is German; hyphenation follows this language.
+            <div className={styles.text} lang={column === 1 ? "de" : undefined}>
+              {paragraphs.map((paragraph, i) =>
+                // In the CMS text field, "# Title" marks a heading and "> "
+                // a paragraph indented on every line.
+                paragraph.startsWith("# ") ? (
+                  <h2 key={i} className={styles.heading}>
+                    {paragraph.slice(2)}
+                  </h2>
+                ) : paragraph.startsWith("> ") ? (
+                  <p key={i} className={`${styles.paragraph} ${styles.block}`}>
+                    {paragraph.slice(2)}
+                  </p>
+                ) : (
+                  <p key={i} className={styles.paragraph}>
+                    {paragraph}
+                  </p>
+                ),
+              )}
+            </div>
+          )}
 
-        {about.links.length > 0 && (
-          <ul className={styles.links}>
-            {about.links.map((link) => (
-              <li key={link.url}>
-                <a
-                  href={link.url}
-                  target={link.url.startsWith("mailto:") ? undefined : "_blank"}
-                  rel="noreferrer"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          {column === 0 && about.links.length > 0 && (
+            <ul className={styles.links}>
+              {about.links.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target={
+                      link.url.startsWith("mailto:") ? undefined : "_blank"
+                    }
+                    rel="noreferrer"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
     </motion.div>
   );
 }

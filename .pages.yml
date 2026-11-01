@@ -75,7 +75,15 @@ content:
     format: yaml-frontmatter
     fields:
       - name: bio
-        label: Bio
+        label: Bio (column 1)
+        type: text
+        description: Separate paragraphs with an empty line. The links appear below this column.
+      - name: column2
+        label: Column 2 (Impressum & AGB)
+        type: text
+        description: Separate paragraphs with an empty line. Start a paragraph with "# " to make it a heading, or with "> " to indent all of its lines.
+      - name: column3
+        label: Column 3
         type: text
         description: Separate paragraphs with an empty line.
       - name: links

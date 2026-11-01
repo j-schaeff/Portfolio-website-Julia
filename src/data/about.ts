@@ -7,9 +7,17 @@ export interface AboutLink {
 }
 
 export interface About {
-  // One entry per paragraph (blank-line separated in the CMS text field).
-  paragraphs: string[];
+  // Always three columns, each a list of paragraphs (blank-line separated in
+  // the CMS text field). A blank column stays empty to hold its place.
+  columns: string[][];
   links: AboutLink[];
+}
+
+function toParagraphs(text: unknown): string[] {
+  return String(text ?? "")
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 }
 
 function toAbout(source: string): About {
@@ -17,10 +25,7 @@ function toAbout(source: string): About {
   const links = Array.isArray(fm.links) ? fm.links : [];
 
   return {
-    paragraphs: String(fm.bio ?? "")
-      .split(/\n\s*\n/)
-      .map((p) => p.trim())
-      .filter(Boolean),
+    columns: [fm.bio, fm.column2, fm.column3].map(toParagraphs),
     links: links
       .map((entry) => {
         const e = (entry ?? {}) as Record<string, unknown>;
