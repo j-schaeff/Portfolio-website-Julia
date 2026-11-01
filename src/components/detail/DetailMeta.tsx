@@ -55,6 +55,8 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
       animate={{ opacity: 1 }}
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
+      {/* Mobile only: there's no project list there to name the active project. */}
+      <h2 className={styles.title}>{active.title}</h2>
       <p className={styles.description}>{active.description}</p>
 
       {next && (
