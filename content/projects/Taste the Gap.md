@@ -12,7 +12,7 @@ images:
   - image: public/images/uploads/6_taste_the_gap/taste-the-gap-3.jpg
     size: "3"
     hideInGrid: false
-    alt: "
+    alt: ""
   - image: public/images/uploads/6_taste_the_gap/taste-the-gap-2.jpg
     size: "3"
     hideInGrid: false
