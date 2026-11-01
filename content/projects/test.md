@@ -1,26 +1,24 @@
 ---
-title: Test
-type: Print
-description: Visual identity for a late-night concert series, using a deep violet system and expressive lettering.
+title: Taste the Gap
+type: Culinary Concept
+description: |-
+  Coconut & cardamom jellies with passion fruit curd cream
+  Vanilla blini with miso cream, passion fruit & blackcurrant caviar
+  Parmigiano crackers filled with spicy tomato & beet jam
+  Ginger & basil fermented soda
 year: 2021
 order: 5
 images:
-  - image: public/images/uploads/5_spring/cover-2.jpg
+  - image: /images/uploads/5_spring/cover-2.jpg
     size: "4"
     hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/5_spring/IMG_4423-3.jpg
+  - image: /images/uploads/5_spring/IMG_4423-3.jpg
     size: "3"
     hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/5_spring/Spring_sequesnce.jpg
+  - image: /images/uploads/5_spring/Spring_sequesnce.jpg
     size: "4"
     hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/5_spring/Spring.jpg
+  - image: /images/uploads/5_spring/Spring.jpg
     size: "2"
     hideInGrid: false
-    alt: ""
 ---
-
-Nocturne's identity flexes from posters to projection mapping.
