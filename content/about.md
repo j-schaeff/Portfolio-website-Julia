@@ -138,8 +138,8 @@ column2: >-
   Schutzvorschriften ihres Aufenthaltsstaats bleiben unberührt.
 column3: Placeholder for the third column — replace this text in Pages CMS (About).
 links:
-  - label: Email
+  - label: Electronic Mail
     url: Juliaschaeffler99@gmail.com
-  - label: Instagram
+  - label: "@j.schaeff"
     url: https://instagram.com/j.schaeff
 ---
