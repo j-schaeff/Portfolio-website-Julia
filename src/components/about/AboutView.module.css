@@ -76,7 +76,7 @@
 }
 
 .column:nth-of-type(2) .paragraph {
-  font-size: 14px;
+  font-size: 10px;
   break-inside: avoid;
 }
 
