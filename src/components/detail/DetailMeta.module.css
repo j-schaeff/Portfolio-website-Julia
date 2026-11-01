@@ -19,8 +19,24 @@
   pointer-events: none;
 }
 
-.description {
+.intro {
   flex: 0 1 32ch;
+  align-self: stretch;
+}
+
+.title {
+  margin: 0 0 3px;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  /* Only the Ultra cut of A2Z Faucet ships, so the small size is what lightens
+     it; a lower font-weight would change nothing. */
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+
+.description {
   margin: 0;
   font-size: 14px;
   line-height: 1.35;
@@ -29,7 +45,6 @@
   overflow-wrap: anywhere;
   color: inherit;
   pointer-events: auto;
-  align-self: stretch;
 }
 
 .namesCol {
@@ -128,7 +143,6 @@
   transform: translateX(20px);
 }
 
-.title,
 .mobileProjectList,
 .next {
   display: none;
@@ -142,9 +156,11 @@
     padding: 0 14px 0 14px;
   }
 
-  .description {
+  .intro {
     flex-basis: 100%;
-    max-width: none;
+  }
+
+  .description {
     text-indent: 20px;
   }
 
@@ -183,14 +199,6 @@
   }
 
   .title {
-    display: block;
-    margin: 0;
-    font: inherit;
-    font-family: var(--font-sans);
-    font-feature-settings: "ss02";
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.35;
     text-align: center;
   }
 

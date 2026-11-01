@@ -10,9 +10,9 @@ interface DetailMetaProps {
   onSelectProject: (slug: string) => void;
 }
 
-// Height of the metadata block: tall enough for the longest description so the
-// layout doesn't jump between projects. The detail strip also uses it to sit
-// its images just above the metadata.
+// Height of the metadata block: tall enough for the title line plus the longest
+// description so the layout doesn't jump between projects. The detail strip
+// also uses it to sit its images just above the metadata.
 export function metaHeight(projects: Project[]): number {
   const longestDescription = projects.reduce(
     (max, project) =>
@@ -25,10 +25,10 @@ export function metaHeight(projects: Project[]): number {
     Math.ceil((longestDescription.replace(/\s+/g, " ").trim().length || 1) / 32),
   );
 
-  return Math.max(112, longestDescriptionLines * 20 + 18);
+  return Math.max(112, (longestDescriptionLines + 1) * 20 + 18);
 }
 
-// Three independent blocks — description, project names, and type+date — laid
+// Three independent blocks — title+description, project names, and type+date — laid
 // out in a row that wraps as whole units when the viewport narrows. While they
 // sit side by side the name and type/date rows line up; once the type+date
 // block wraps it drops beneath the names as a single column. The in-view
@@ -55,9 +55,10 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
       animate={{ opacity: 1 }}
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
-      {/* Mobile only: there's no project list there to name the active project. */}
-      <h2 className={styles.title}>{active.title}</h2>
-      <p className={styles.description}>{active.description}</p>
+      <div className={styles.intro}>
+        <h2 className={styles.title}>{active.title}</h2>
+        <p className={styles.description}>{active.description}</p>
+      </div>
 
       {next && (
         <button
