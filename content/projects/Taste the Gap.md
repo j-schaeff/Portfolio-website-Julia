@@ -48,7 +48,7 @@ images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-20.jpg
     size: "3"
     hideInGrid: false
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-21.jpg
+  - image: /images/uploads/6_taste_the_gap/©inahoeller-julia-132.jpg
     size: "3"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-22.jpg
