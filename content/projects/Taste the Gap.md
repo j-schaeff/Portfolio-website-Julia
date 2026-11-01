@@ -9,17 +9,11 @@ description: |-
 year: 2021
 order: 5
 images:
-  - image: /images/uploads/5_spring/cover-2.jpg
-    size: "4"
-    hideInGrid: false
-  - size: "3"
-    hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/6_taste_the_gap/taste-the-gap-2.jpg
+  - image: public/images/uploads/6_taste_the_gap/taste-the-gap-3.jpg
     size: "3"
     hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/6_taste_the_gap/taste-the-gap-3.jpg
+    alt: "
+  - image: public/images/uploads/6_taste_the_gap/taste-the-gap-2.jpg
     size: "3"
     hideInGrid: false
     alt: ""
