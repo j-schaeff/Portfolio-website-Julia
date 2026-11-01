@@ -1,14 +1,13 @@
 /* Fixed and opaque like the detail page, so it plays in place over the
    exiting grid during the route crossfade. The page itself never scrolls:
-   each column scrolls on its own (on phones they stack, see below). The top
-   padding keeps scrolled text clear of the fixed "Index" button. */
+   each column scrolls on its own (on phones they stack, see below). */
 .about {
   position: fixed;
   inset: 0;
   z-index: 1;
   background: var(--bg);
   overflow: hidden;
-  padding: 96px 14px 0;
+  padding: 0 14px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: minmax(0, 1fr);
@@ -30,9 +29,10 @@
   text-transform: uppercase;
 }
 
+/* The padding is inside the scroller so text runs up to the page edge. */
 .column {
   overflow-y: auto;
-  padding-bottom: 48px;
+  padding: 96px 0 48px;
 }
 
 /* Long words hyphenate rather than overflow; the wrap is a fallback for words
@@ -60,6 +60,12 @@
   text-indent: 0;
 }
 
+.number {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-weight: 700;
+}
+
 /* The middle column is legal text: smaller, and set in two text columns.
    These sit on .text, not .column, because a
    multi-column box of fixed height would overflow sideways instead of
@@ -82,13 +88,12 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: center;
   break-after: avoid;
 }
 
-/* Any heading after the first in a column, i.e. "Allgemeine Geschäftsbedingungen". */
 .paragraph + .heading {
   margin-top: 40px;
-  text-align: center;
 }
 
 .links {
@@ -124,7 +129,7 @@
   .column {
     flex: none;
     overflow-y: visible;
-    padding-bottom: 0;
+    padding: 0;
   }
 
   /* A column left blank in the CMS shouldn't add a gap to the stack. */

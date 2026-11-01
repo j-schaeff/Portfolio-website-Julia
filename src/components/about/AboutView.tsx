@@ -6,6 +6,18 @@ import { markIntroPlayed } from "../../utils/intro";
 import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import styles from "./AboutView.module.css";
 
+// Sets a leading clause number ("1. Geltungsbereich") in the display face.
+function withNumber(text: string) {
+  const number = text.match(/^\d+\./)?.[0];
+  if (!number) return text;
+  return (
+    <>
+      <span className={styles.number}>{number}</span>
+      {text.slice(number.length)}
+    </>
+  );
+}
+
 export function AboutView() {
   const navigate = useNavigate();
   // Like landing on a project, landing here counts as entering the site.
@@ -47,7 +59,7 @@ export function AboutView() {
                   </p>
                 ) : (
                   <p key={i} className={styles.paragraph}>
-                    {paragraph}
+                    {withNumber(paragraph)}
                   </p>
                 ),
               )}
