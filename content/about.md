@@ -10,7 +10,7 @@ column2: >-
 
   > Julia Schaeffler
 
-  Mphlfeldgasse 6
+  Mühlfeldgasse 6
 
   1020, Österreich
 
