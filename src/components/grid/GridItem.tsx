@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
 import { cellKey } from "../../hooks/useJustifiedRows";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { InfoBlock } from "./InfoBlock";
 import { GridImage } from "./GridImage";
 import styles from "./GridItem.module.css";
@@ -10,14 +11,12 @@ interface GridItemProps {
   project: Project;
   // Mobile justified-row widths keyed by cellKey(); null on desktop.
   cellWidths: Record<string, number> | null;
-  // Trailing space after a project's last cell on mobile, so the next
-  // project wraps to a new line.
-  cellBreaks: Record<string, number> | null;
   onAspect: (key: string, aspect: number) => void;
 }
 
-export function GridItem({ project, cellWidths, cellBreaks, onAspect }: GridItemProps) {
+export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const go = () => {
     navigate(`/project?project=${encodeURIComponent(project.slug)}`);
   };
@@ -46,9 +45,8 @@ export function GridItem({ project, cellWidths, cellBreaks, onAspect }: GridItem
   ) => {
     const key = cellKey(project.slug, i);
     const width = cellWidths?.[key];
-    const pad = cellBreaks?.[key];
     const justify = width
-      ? ({ "--cell-w": `${width}px`, marginRight: pad || undefined } as CSSProperties)
+      ? ({ "--cell-w": `${width}px` } as CSSProperties)
       : undefined;
 
     return (
@@ -70,10 +68,20 @@ export function GridItem({ project, cellWidths, cellBreaks, onAspect }: GridItem
           onAspect={(aspect) => onAspect(key, aspect)}
         />
         {/* Reserved label band keeps every image on a shared baseline. */}
-        <div className={styles.label}>{isLead ? info : null}</div>
+        {!isMobile && <div className={styles.label}>{isLead ? info : null}</div>}
       </div>
     );
   };
 
-  return <>{visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}</>;
+  return (
+    <>
+      {/* Mobile: the info heads the project, so its images read as one group. */}
+      {isMobile && visibleImages.length > 0 && (
+        <div className={styles.heading} data-grid-cell>
+          {info}
+        </div>
+      )}
+      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}
+    </>
+  );
 }

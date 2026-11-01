@@ -36,8 +36,11 @@
 
 @media (max-width: 560px) {
   .grid {
-    gap: 28px 8px;
-    /* Toggle sits at top: 12px on mobile. The bottom padding reserves the
+    /* No label bands here, so images in a project stay tight; the space between
+       projects comes from each project's heading (GridItem.module.css). */
+    gap: 8px;
+    /* Toggle sits at top: 12px on mobile; the top padding plus the first
+       heading's margin clears it. The bottom padding reserves the
        full-width logo row (see Logo.module.css), which is pinned to the page's
        bottom edge so it always ends on the bottom of the screen, even when the
        grid is shorter than the viewport. */
@@ -45,7 +48,7 @@
     position: relative;
     min-height: 100dvh;
     align-content: flex-start;
-    padding: 38px 8px calc(var(--logo-row-h) + 8px + 28px);
+    padding: 14px 8px calc(var(--logo-row-h) + 8px + 72px);
   }
 }
 

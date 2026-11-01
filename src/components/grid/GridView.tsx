@@ -16,7 +16,7 @@ export function GridView() {
   // refreshes); coming back from a project just fades the grid in.
   const [freshLoad] = useState(introPending);
   useEffect(markIntroPlayed, []);
-  const { widths, breaks, reportAspect } = useJustifiedRows(gridRef, projects);
+  const { widths, reportAspect } = useJustifiedRows(gridRef, projects);
   const { state: snake, logo, logoGone } = useSnakeReveal(gridRef, freshLoad, widths !== null);
 
   return (
@@ -43,7 +43,6 @@ export function GridView() {
           key={project.slug}
           project={project}
           cellWidths={widths}
-          cellBreaks={breaks}
           onAspect={reportAspect}
         />
       ))}

@@ -170,7 +170,6 @@ export function useJustifiedRows(
 
     const available = box.width - ROUNDING_SLACK_PX;
     const widths: Record<string, number> = {};
-    const breaks: Record<string, number> = {};
     const limits = isMobile ? MOBILE_ROWS : WIDE_ROWS;
     groups.forEach((group, g) => {
       const isLastGroup = g === groups.length - 1;
@@ -185,21 +184,10 @@ export function useJustifiedRows(
           isLastRow && !(isMobile && isLastGroup) && (isLastGroup || row.length < limits.min);
         const scale = loose ? Math.min(1, fill) : fill;
         for (const cell of row) widths[cell.key] = cell.width * scale;
-        // A loose row that ends a project pads out the rest of the line, so
-        // the next project still wraps onto a new one.
-        if (loose && !isLastGroup) {
-          const used = row.reduce((sum, cell) => sum + widths[cell.key], 0);
-          const leftover = available - used - box.gap * (row.length - 1);
-          breaks[row[row.length - 1].key] = Math.max(0, leftover);
-        }
       });
     });
-    return { widths, breaks };
+    return widths;
   }, [isMobile, box, projects, aspects]);
 
-  return {
-    widths: layout?.widths ?? null,
-    breaks: layout?.breaks ?? null,
-    reportAspect,
-  };
+  return { widths: layout, reportAspect };
 }
