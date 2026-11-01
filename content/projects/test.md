@@ -2,15 +2,22 @@
 title: Taste the Gap
 type: Culinary Concept
 description: |-
-  Coconut & cardamom jellies with passion fruit curd cream
-  Vanilla blini with miso cream, passion fruit & blackcurrant caviar
-  Parmigiano crackers filled with spicy tomato & beet jam
-  Ginger & basil fermented soda
+  Coconut & cardamom jellies with passion fruit curd cream |
+  Vanilla blini with miso cream, passion fruit & blackcurrant caviar |
+  Parmigiano crackers filled with spicy tomato & beet jam |
+  Ginger & basil fermented soda 
 year: 2021
 order: 5
 images:
+<<<<<<< HEAD
   - image: public/images/uploads/6_taste_the_gap/taste-the-gap-1.jpg
     size: "3"
+=======
+  - image: /images/uploads/5_spring/cover-2.jpg
+    size: "4"
+    hideInGrid: false
+  - size: "3"
+>>>>>>> 255d1539a59031dceed7269fefb41ab31c5e194f
     hideInGrid: false
     alt: ""
   - image: public/images/uploads/6_taste_the_gap/taste-the-gap-2.jpg
