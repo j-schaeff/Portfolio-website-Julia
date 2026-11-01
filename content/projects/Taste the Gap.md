@@ -24,9 +24,6 @@ images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-7.jpg
     size: "3"
     hideInGrid: false
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-8.jpg
-    size: "3"
-    hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-9.jpg
     size: "3"
     hideInGrid: false
