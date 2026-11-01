@@ -1,7 +1,6 @@
 ---
-bio: >
-  Julia Schäffler — Creative culinary concepts, Art Direction, Graphic & Web
-  Design 
+bio: "Julia Schäffler — Creative culinary concepts, Art Direction, Graphic & Web
+  Design "
 column2: >-
   # Impressum
 
@@ -11,9 +10,9 @@ column2: >-
 
   > Julia Schaeffler
 
-  [Straße und Hausnummer]
+  Mphlfeldgasse 6
 
-  [PLZ Ort], Österreich
+  1020, Österreich
 
 
   > juliaschaeffler99@gmail.com
