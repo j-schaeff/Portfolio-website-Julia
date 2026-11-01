@@ -1,10 +1,7 @@
 ---
-bio: >-
-  Placeholder bio — replace this text in Pages CMS (About). Separate paragraphs
-  with an empty line.
-
-
-  A second paragraph, for example about studies, work or current projects.
+bio: >
+  Julia Schäffler — Creative culinary concepts, Art Direction, Graphic & Web
+  Design 
 column2: >-
   # Impressum
 
