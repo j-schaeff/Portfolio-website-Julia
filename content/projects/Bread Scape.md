@@ -38,6 +38,6 @@ images:
     size: "3"
     hideInGrid: false
   - video: /images/uploads/9_bread_scape/bread-scape-video-2.mp4
-    size: auto
+    size: "2"
     hideInGrid: false
 ---
