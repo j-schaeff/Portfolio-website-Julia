@@ -17,7 +17,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-7.jpg
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-15.jpg
     size: "3"
     hideInGrid: true
@@ -29,7 +29,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/©inahoeller-julia-132.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-23.jpg
     size: "4"
     hideInGrid: true
@@ -50,7 +50,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-30.jpg
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-33.jpg
     size: "3"
     hideInGrid: false
