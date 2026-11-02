@@ -19,4 +19,7 @@ images:
   - image: /images/uploads/8_philival/philival-poster-wall.jpg
     size: auto
     hideInGrid: true
+  - videoUrl: https://lottie.host/b85a9fa2-021d-4868-b83c-c3c46cc662e8/JLtHSTzPfU.json
+    size: auto
+    hideInGrid: false
 ---
