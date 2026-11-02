@@ -10,7 +10,7 @@ year: 2026
 order: 5
 images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
-    size: "4"
+    size: "5"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-13.jpg
     size: "2"
@@ -37,7 +37,7 @@ images:
     size: "2"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-26.jpg
-    size: "4"
+    size: "3"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-5.jpg
     size: "5"
@@ -46,7 +46,7 @@ images:
     size: "3"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-29.jpg
-    size: "2"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-30.jpg
     size: "4"
