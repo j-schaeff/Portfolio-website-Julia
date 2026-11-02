@@ -9,13 +9,13 @@ images:
   - image: /images/uploads/4_room_board/Test_green_House.mp4
     size: "5"
     hideInGrid: false
-  - image: /images/uploads/4_room_board/food_yellow.mp4
-    size: "3"
-    hideInGrid: false
   - image: /images/uploads/4_room_board/menu_blue.jpg
     size: auto
     hideInGrid: false
+  - image: /images/uploads/4_room_board/food_yellow.mp4
+    size: "3"
+    hideInGrid: true
   - image: /images/uploads/4_room_board/menu_yellow.jpg
     size: auto
-    hideInGrid: false
+    hideInGrid: true
 ---
