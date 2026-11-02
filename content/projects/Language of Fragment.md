@@ -6,15 +6,15 @@ year: 2026
 order: 1
 images:
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_Black.jpg
-    size: "3"
+    size: "4"
     hideInGrid: false
   - video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
-    size: auto
+    size: "3"
     hideInGrid: false
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_White.jpg
     size: "5"
     hideInGrid: false
   - video: /images/uploads/1_fragments/Poster.mp4
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
 ---
