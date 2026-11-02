@@ -37,7 +37,10 @@ function toImage(entry: unknown): ParsedImage | null {
     // file, so large videos can stream from external hosting instead of being
     // uploaded through the CMS. Such an entry is always treated as a video.
     const videoUrl = e.videoUrl ? dropboxDirect(String(e.videoUrl)) : "";
-    const fileSrc = e.image ?? e.src;
+    // Uploaded videos live in their own `video` field because the CMS's image
+    // field (which shows thumbnails) rejects video extensions. Older entries
+    // may still hold a video path in `image`; isVideo() catches those.
+    const fileSrc = e.video || e.image || e.src;
     const src = videoUrl || (fileSrc ? normalizeSrc(String(fileSrc)) : "");
     if (!src) return null;
     return {

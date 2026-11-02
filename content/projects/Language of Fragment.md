@@ -13,7 +13,7 @@ images:
     size: "5"
     hideInGrid: false
     alt: ""
-  - image: public/images/uploads/1_fragments/Poster.mp4
+  - video: public/images/uploads/1_fragments/Poster.mp4
     size: "4"
     hideInGrid: false
     alt: ""
