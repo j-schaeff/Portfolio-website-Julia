@@ -18,5 +18,5 @@ images:
     hideInGrid: false
   - image: /images/uploads/8_philival/philival-poster-wall.jpg
     size: auto
-    hideInGrid: false
+    hideInGrid: true
 ---
