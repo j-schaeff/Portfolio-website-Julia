@@ -17,5 +17,5 @@ images:
     hideInGrid: false
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-2.jpg
     size: auto
-    hideInGrid: true
+    hideInGrid: false
 ---
