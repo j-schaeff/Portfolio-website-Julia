@@ -5,22 +5,17 @@ description: From necessity grows a language of fragments where chaos forms rhyt
 year: 2026
 order: 1
 images:
-  - image: public/images/uploads/1_fragments/Rythm_of_Fragments_Black.jpg
+  - image: /images/uploads/1_fragments/Rythm_of_Fragments_Black.jpg
     size: "3"
     hideInGrid: false
-    alt: ""
-  - image: public/images/uploads/1_fragments/Rythm_of_Fragments_White.jpg
+  - video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
+    size: auto
+    hideInGrid: false
+  - image: /images/uploads/1_fragments/Rythm_of_Fragments_White.jpg
+    video: /images/uploads/1_fragments/Poster.mp4
     size: "5"
     hideInGrid: false
-    alt: ""
-  - video: public/images/uploads/1_fragments/Poster.mp4
+  - video: /images/uploads/1_fragments/Poster.mp4
     size: "4"
     hideInGrid: false
-    alt: ""
-  - video: public/images/uploads/1_fragments/BODEGA_SOUND.mp4
-    size: "auto"
-    hideInGrid: false
-    alt: ""
-
- 
 ---
