@@ -33,7 +33,7 @@ images:
     hideInGrid: true
   - image: /images/uploads/9_bread_scape/bread-scape-8.jpg
     size: auto
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/9_bread_scape/bread-scape-9.jpg
     size: auto
     hideInGrid: false
