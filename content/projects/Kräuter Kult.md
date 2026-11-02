@@ -21,6 +21,12 @@ images:
     size: "3"
     hideInGrid: false
     alt: ""
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_detail.jpg
+    size: auto
+    hideInGrid: false
+    alt: ""
+  - image: public/images/uploads/2_kraueterkult/Krauter_kult_grass.jpg
+    size: auto
+    hideInGrid: false
+    alt: ""
 ---
-
-Ember balances motion-rich hero sections with a strict performance budget.
