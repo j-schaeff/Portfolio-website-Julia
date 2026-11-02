@@ -34,7 +34,7 @@ content:
       - name: order
         label: Order
         type: number
-        description: Fallback position (ascending) for projects not listed in "Project order". Reorder projects by dragging them in "Project order" instead.
+        description: Controls position in the grid and lists (ascending).
       - name: images
         label: Images
         type: object
@@ -72,22 +72,6 @@ content:
             label: Alt text
             type: string
             description: Optional description for screen readers and accessibility.
-
-  - name: projectOrder
-    label: Project order
-    type: file
-    path: content/project-order.md
-    format: yaml-frontmatter
-    fields:
-      - name: projects
-        label: Projects
-        type: reference
-        list: true
-        description: Drag to reorder the projects on the site. Projects not listed here appear after these, sorted by their Order number.
-        options:
-          collection: projects
-          value: "{path}"
-          label: "{title}"
 
   - name: about
     label: About
