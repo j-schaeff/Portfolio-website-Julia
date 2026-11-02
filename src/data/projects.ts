@@ -1,7 +1,7 @@
 import matter from "gray-matter";
-import type { ImageSize, Project, ProjectImage } from "../types/project";
+import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
-import { clampImageSize, parseImageSize, resolveRhythm } from "../utils/imageSize";
+import { clampImageSize } from "../utils/imageSize";
 import { dropboxDirect, isVideo } from "../utils/media";
 
 const files = import.meta.glob("/content/projects/*.md", {
@@ -22,10 +22,7 @@ function normalizeSrc(src: string): string {
   return import.meta.env.BASE_URL + src.replace(/^\/+/, "").replace(/^public\//, "");
 }
 
-// Before resolveRhythm() runs, an auto size is still null.
-type ParsedImage = Omit<ProjectImage, "size"> & { size: ImageSize | null };
-
-function toImage(entry: unknown): ParsedImage | null {
+function toImage(entry: unknown): ProjectImage | null {
   // Legacy entries were plain path strings; current entries are objects.
   if (typeof entry === "string") {
     const src = normalizeSrc(entry);
@@ -45,7 +42,7 @@ function toImage(entry: unknown): ParsedImage | null {
     if (!src) return null;
     return {
       src,
-      size: parseImageSize(e.size),
+      size: clampImageSize(e.size),
       hideInGrid: Boolean(e.hideInGrid),
       alt: String(e.alt ?? ""),
       isVideo: Boolean(videoUrl) || isVideo(src),
@@ -59,11 +56,6 @@ function toProject(path: string, raw: string): Project {
   const fm = data as Record<string, unknown>;
   const slug = slugFromPath(path);
 
-  const parsed = Array.isArray(fm.images)
-    ? fm.images.map(toImage).filter((img): img is ParsedImage => img !== null)
-    : [];
-  const sizes = resolveRhythm(slug, parsed.map((img) => img.size));
-
   return {
     slug,
     title: String(fm.title ?? "Untitled"),
@@ -71,7 +63,9 @@ function toProject(path: string, raw: string): Project {
     description: String(fm.description ?? ""),
     year: Number(fm.year ?? 0),
     order: Number(fm.order ?? 0),
-    images: parsed.map((img, i) => ({ ...img, size: sizes[i] })),
+    images: Array.isArray(fm.images)
+      ? fm.images.map(toImage).filter((img): img is ProjectImage => img !== null)
+      : [],
   };
 }
 

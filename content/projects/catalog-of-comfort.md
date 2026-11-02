@@ -20,6 +20,6 @@ images:
     size: "4"
     hideInGrid: false
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-3.jpg
-    size: auto
+    size: "5"
     hideInGrid: true
 ---

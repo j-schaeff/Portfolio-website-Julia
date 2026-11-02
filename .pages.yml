@@ -59,11 +59,9 @@ content:
           - name: size
             label: Size
             type: select
-            description: Image height (width follows the image). Auto picks a varied height (2–5) so the project gets a rhythm with its neighbours; choose 1–5 to set it manually.
-            default: "auto"
+            description: Image height (width follows the image). Leave empty on new images and a varied size (2–5) is filled in automatically shortly after saving; change it any time.
             options:
               values:
-                - { value: "auto", label: "Auto (rhythm)" }
                 - { value: "1", label: "1" }
                 - { value: "2", label: "2" }
                 - { value: "3", label: "3" }

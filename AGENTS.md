@@ -12,6 +12,7 @@ A React + TypeScript + Vite single-page portfolio site. Projects are authored as
 npm run dev      # Vite dev server
 npm run build    # tsc (type-check) + vite build → dist/
 npm run preview  # preview the production build
+npm run sizes    # write a size into any project image that lacks one
 ```
 
 There is **no test suite and no linter configured**. The only automated check is the TypeScript compile in `npm run build` — run it to verify changes.
@@ -50,6 +51,7 @@ src/
     CornerNav.tsx          corner controls: About link top-left (index only) + ThemeToggle top-right
   styles/                  index.css, variables.css (CSS custom properties)
 content/projects/*.md      project content (one file per project)
+scripts/assign-sizes.mjs   fills missing image sizes (run in the deploy workflow)
 content/about.md           About page content (bio + links), editable in Pages CMS
 public/images/             image & video assets
 ```
@@ -70,7 +72,7 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 
 - **Shared layout ids:** `imageLayoutId(slug, index)` must be identical between the detail strip and the lightbox — that's what lets Framer Motion morph between them. Grid images deliberately have none. Don't change the format without updating every call site.
 - **Grid → detail transition:** the grid fades out quickly while the detail page (fixed over the viewport, so it's in place during the `mode="sync"` crossfade) plays a staggered rise: each strip image slides up from below, then the metadata fades in. Timings live in [src/utils/motion.ts](src/utils/motion.ts). The rise only plays on the page's first render, not on project switches. The logo loading screen + snake reveal play once per page load (first entry or refresh), tracked by [src/utils/intro.ts](src/utils/intro.ts); returning to the index from a project just fades the grid in.
-- **Image sizing:** width follows the image's natural aspect ratio; only height scales, via the `size` field (1–5) → `imageHeight()`. The shared `ZOOM` easing `[0.22, 1, 0.36, 1]` over `0.5s` is duplicated in GridView and DetailView — keep them in sync if you change one. A `size` of `"auto"` (the CMS default, also used when the key is missing) is filled at build time by `resolveRhythm()` in [src/utils/imageSize.ts](src/utils/imageSize.ts): a slug-seeded, stable mix of 2–5 where no two neighbours match; explicit 1–5 values are kept as-is.
+- **Image sizing:** width follows the image's natural aspect ratio; only height scales, via the `size` field (1–5) → `imageHeight()`. The shared `ZOOM` easing `[0.22, 1, 0.36, 1]` over `0.5s` is duplicated in GridView and DetailView — keep them in sync if you change one. Every image stores an explicit `size` in its frontmatter. New images saved without one are filled by [scripts/assign-sizes.mjs](scripts/assign-sizes.mjs) (`npm run sizes`), which the deploy workflow runs and commits back to `main`: a slug-seeded mix of 2–5 where no two neighbours match. Existing 1–5 values are never touched, so after that they are adjusted by hand in the CMS. Until the fill lands, `clampImageSize()` renders a missing size as 3.
 - **Video support:** assets can be video; use `isVideo(src)` rather than assuming `<img>`. A video can be an uploaded file or an external `videoUrl` (see the data layer above) — by the time it reaches a component the source is already resolved into `ProjectImage.src` with `isVideo` set, so components don't need to know which it was.
 - **CMS coupling:** [.pages.yml](.pages.yml) defines the content schema for Pages CMS. If you add/rename a frontmatter field, update `.pages.yml`, the `Frontmatter` type, and `toProject()` together, or the CMS and the site will drift.
 

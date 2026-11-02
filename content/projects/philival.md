@@ -14,12 +14,12 @@ images:
     size: "2"
     hideInGrid: false
   - image: /images/uploads/8_philival/philival-flyers.jpg
-    size: auto
+    size: "3"
     hideInGrid: false
   - image: /images/uploads/8_philival/philival-poster-wall.jpg
-    size: auto
+    size: "5"
     hideInGrid: true
   - video: /images/uploads/8_philival/philival-showreel.mp4
-    size: auto
+    size: "2"
     hideInGrid: true
 ---
