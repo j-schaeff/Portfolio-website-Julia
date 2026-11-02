@@ -52,6 +52,6 @@ images:
     size: "4"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-33.jpg
-    size: "3"
+    size: "4"
     hideInGrid: false
 ---
