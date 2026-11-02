@@ -36,6 +36,9 @@ images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-24.jpg
     size: "2"
     hideInGrid: true
+  - image: /images/uploads/6_taste_the_gap/taste-the-gap-29.jpg
+    size: "4"
+    hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-26.jpg
     size: "3"
     hideInGrid: false
@@ -45,9 +48,6 @@ images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-28.jpg
     size: "3"
     hideInGrid: true
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-29.jpg
-    size: "4"
-    hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-30.jpg
     size: "4"
     hideInGrid: true
