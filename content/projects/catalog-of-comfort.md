@@ -19,4 +19,7 @@ images:
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-3.jpg
     size: auto
     hideInGrid: true
+  - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-4.jpg
+    size: auto
+    hideInGrid: false
 ---
