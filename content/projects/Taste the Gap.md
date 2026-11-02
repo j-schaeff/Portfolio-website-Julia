@@ -6,7 +6,7 @@ description: |-
   Vanilla blini with miso cream, passion fruit & blackcurrant caviar |
   Parmigiano crackers filled with spicy tomato & beet jam |
   Ginger & basil fermented soda 
-year: 2021
+year: 2026
 order: 5
 images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
