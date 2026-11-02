@@ -53,10 +53,16 @@ content:
           - name: size
             label: Size
             type: select
-            description: Image height multiplier (width stays constant).
-            default: "2"
+            description: Image height (width follows the image). Auto picks a varied height (2–5) so the project gets a rhythm with its neighbours; choose 1–5 to set it manually.
+            default: "auto"
             options:
-              values: ["1", "2", "3", "4", "5"]
+              values:
+                - { value: "auto", label: "Auto (rhythm)" }
+                - { value: "1", label: "1" }
+                - { value: "2", label: "2" }
+                - { value: "3", label: "3" }
+                - { value: "4", label: "4" }
+                - { value: "5", label: "5" }
           - name: hideInGrid
             label: Hide in grid
             type: boolean

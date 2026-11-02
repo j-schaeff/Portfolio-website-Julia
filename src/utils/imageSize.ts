@@ -17,6 +17,45 @@ export function clampImageSize(value: unknown): ImageSize {
   return 1;
 }
 
+// A frontmatter size of 1–5 is a manual choice; "auto" (the CMS default),
+// a missing value or anything invalid is left for resolveRhythm() to fill.
+export function parseImageSize(value: unknown): ImageSize | null {
+  const n = Number(value);
+  if (Number.isInteger(n) && n >= 1 && n <= 5) return n as ImageSize;
+  return null;
+}
+
+// Heights auto sizes are drawn from: the range the rest of the index uses.
+const RHYTHM_POOL: ImageSize[] = [2, 3, 4, 5];
+
+// Fills auto (null) sizes with a varied rhythm where no two neighbours share a
+// height. The PRNG is seeded by the project slug rather than Math.random() so
+// the same content always builds the same layout instead of reshuffling on
+// every deploy.
+export function resolveRhythm(seed: string, sizes: (ImageSize | null)[]): ImageSize[] {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  const random = () => {
+    h = (h + 0x6d2b79f5) | 0;
+    let t = Math.imul(h ^ (h >>> 15), 1 | h);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  const out: ImageSize[] = [];
+  sizes.forEach((size, i) => {
+    if (size !== null) {
+      out.push(size);
+      return;
+    }
+    const prev = out[i - 1];
+    const next = sizes[i + 1];
+    const options = RHYTHM_POOL.filter((s) => s !== prev && s !== next);
+    out.push(options[Math.floor(random() * options.length)]);
+  });
+  return out;
+}
+
 export function imageHeight(size: ImageSize): number {
   return Math.round(BASE_HEIGHT * MULTIPLIER[size]);
 }
