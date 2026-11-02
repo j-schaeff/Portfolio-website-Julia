@@ -1,0 +1,11 @@
+---
+projects:
+  - content/projects/Language of Fragment.md
+  - content/projects/Kräuter Kult.md
+  - content/projects/An evening of Poetry.md
+  - content/projects/room&Board.md
+  - content/projects/spring.md
+  - content/projects/Taste the Gap.md
+  - content/projects/philival.md
+  - content/projects/catalog-of-comfort.md
+---
