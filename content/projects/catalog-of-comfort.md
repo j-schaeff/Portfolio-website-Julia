@@ -10,6 +10,9 @@ description: Consumer culture has turned authenticity into an aesthetic
 year: 2026
 order: 7
 images:
+  - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-4.jpg
+    size: "4"
+    hideInGrid: false
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-2.jpg
     size: auto
     hideInGrid: false
@@ -19,7 +22,4 @@ images:
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-3.jpg
     size: auto
     hideInGrid: true
-  - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-4.jpg
-    size: auto
-    hideInGrid: false
 ---
