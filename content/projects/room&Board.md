@@ -10,7 +10,7 @@ images:
     size: "5"
     hideInGrid: false
   - image: /images/uploads/4_room_board/menu_blue.jpg
-    size: auto
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/4_room_board/food_yellow.mp4
     size: "3"
