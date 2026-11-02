@@ -3,6 +3,7 @@ import type { ImageSize, Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize, parseImageSize, resolveRhythm } from "../utils/imageSize";
 import { dropboxDirect, isVideo } from "../utils/media";
+import orderRaw from "/content/project-order.md?raw";
 
 const files = import.meta.glob("/content/projects/*.md", {
   query: "?raw",
@@ -72,9 +73,25 @@ function toProject(path: string, raw: string): Project {
   };
 }
 
+// Pages CMS can't drag-reorder collection entries, only items in a list field,
+// so content/project-order.md holds a list of project paths that the editor
+// reorders by dragging. Listed projects come first in that order; unlisted ones
+// (new or forgotten) follow, sorted by their own `order`, then year, then title.
+// Entries pointing at deleted files simply match nothing.
+const orderList = (matter(orderRaw).data as Record<string, unknown>).projects;
+const position = new Map<string, number>(
+  (Array.isArray(orderList) ? orderList : []).map((p, i) => [slugFromPath(String(p)), i]),
+);
+
 export const projects: Project[] = Object.entries(files)
   .map(([path, raw]) => toProject(path, raw))
-  .sort((a, b) => a.order - b.order || a.year - b.year || a.title.localeCompare(b.title));
+  .sort(
+    (a, b) =>
+      (position.get(a.slug) ?? Infinity) - (position.get(b.slug) ?? Infinity) ||
+      a.order - b.order ||
+      a.year - b.year ||
+      a.title.localeCompare(b.title),
+  );
 
 // Flat sequence of every image across all projects, in project order. The
 // lightbox walks this list so navigation can cross project boundaries.

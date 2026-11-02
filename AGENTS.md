@@ -51,6 +51,7 @@ src/
   styles/                  index.css, variables.css (CSS custom properties)
 content/projects/*.md      project content (one file per project)
 content/about.md           About page content (bio + links), editable in Pages CMS
+content/project-order.md   drag-reorderable project order ("Project order" in Pages CMS)
 public/images/             image & video assets
 ```
 
@@ -59,7 +60,7 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 ## How the data layer works ([src/data/projects.ts](src/data/projects.ts))
 
 - All `content/projects/*.md` files are loaded at **build time** via Vite's `import.meta.glob` (eager, raw). Adding a Markdown file is enough to add a project — no registration step.
-- `gray-matter` parses the frontmatter into `Project` objects, sorted by `order`, then `year`, then `title`. (gray-matter needs a global `Buffer`; [src/polyfills.ts](src/polyfills.ts) supplies it and is imported first in `main.tsx`.)
+- `gray-matter` parses the frontmatter into `Project` objects. They're sorted by their position in [content/project-order.md](content/project-order.md) (a list of project paths, which editors reorder by dragging in Pages CMS, since its collection view can't drag). Unlisted projects follow, sorted by `order`, then `year`, then `title`. (gray-matter needs a global `Buffer`; [src/polyfills.ts](src/polyfills.ts) supplies it and is imported first in `main.tsx`.)
 - `normalizeSrc()` prefixes stored paths like `public/images/x.jpg` with `import.meta.env.BASE_URL`, producing `/images/x.jpg` locally and `/Portfolio-website-Julia/images/x.jpg` on the GitHub Pages subpath. **Keep this** — relative paths break on the `/project/:slug` route, and a hardcoded `/` base breaks the Pages build. Absolute (`http(s)://`, `//`, `data:`) sources pass through untouched.
 - `videoUrl` on an image entry overrides the uploaded `image`: it lets large videos stream from external hosting (e.g. Dropbox) instead of being committed through the CMS. `dropboxDirect()` rewrites Dropbox share links to a playable form (`raw=1`); such entries are always treated as video.
 - Legacy image entries may be plain strings instead of objects; `toImage()` handles both. Preserve that fallback.
