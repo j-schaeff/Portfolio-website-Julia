@@ -16,6 +16,6 @@ images:
     size: "3"
     hideInGrid: true
   - image: /images/uploads/4_room_board/menu_yellow.jpg
-    size: auto
+    size: "4"
     hideInGrid: true
 ---
