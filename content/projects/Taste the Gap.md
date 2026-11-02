@@ -22,13 +22,8 @@ images:
     size: "3"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-17.jpg
-<<<<<<< HEAD
     size: "2"
-    hideInGrid: false
-=======
-    size: "3"
     hideInGrid: true
->>>>>>> 8b90e4535c7413832af0550314fbc7ea5db08ded
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-18.jpg
     size: "5"
     hideInGrid: false
@@ -36,33 +31,17 @@ images:
     size: "3"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-23.jpg
-<<<<<<< HEAD
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-24.jpg
     size: "2"
-    hideInGrid: false
-=======
-    size: "3"
     hideInGrid: true
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-24.jpg
-    size: "3"
-    hideInGrid: true
->>>>>>> 8b90e4535c7413832af0550314fbc7ea5db08ded
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-26.jpg
-    size: "3"
-    hideInGrid: false
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-5.jpg
-<<<<<<< HEAD
-    size: "5"
-    hideInGrid: false
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-27.jpg
     size: "4"
     hideInGrid: false
-=======
-    size: "3"
+  - image: /images/uploads/6_taste_the_gap/taste-the-gap-5.jpg
+    size: "5"
     hideInGrid: true
->>>>>>> 8b90e4535c7413832af0550314fbc7ea5db08ded
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-28.jpg
     size: "3"
     hideInGrid: true
@@ -72,12 +51,6 @@ images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-30.jpg
     size: "4"
     hideInGrid: false
-<<<<<<< HEAD
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-31.jpg
-    size: "5"
-    hideInGrid: false
-=======
->>>>>>> 8b90e4535c7413832af0550314fbc7ea5db08ded
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-33.jpg
     size: "3"
     hideInGrid: false
