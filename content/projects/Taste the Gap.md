@@ -26,7 +26,7 @@ images:
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-18.jpg
     size: "5"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/©inahoeller-julia-132.jpg
     size: "3"
     hideInGrid: true
