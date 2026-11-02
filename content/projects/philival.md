@@ -13,4 +13,10 @@ images:
   - image: /images/uploads/Stickers-book.jpg
     size: "2"
     hideInGrid: false
+  - image: /images/uploads/8_philival/philival-flyers.jpg
+    size: auto
+    hideInGrid: false
+  - image: /images/uploads/8_philival/philival-poster-wall.jpg
+    size: auto
+    hideInGrid: false
 ---
