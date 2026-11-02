@@ -21,5 +21,5 @@ images:
     hideInGrid: true
   - video: /images/uploads/8_philival/philival-showreel.mp4
     size: auto
-    hideInGrid: false
+    hideInGrid: true
 ---
