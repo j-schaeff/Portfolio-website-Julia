@@ -12,7 +12,6 @@ images:
     size: auto
     hideInGrid: false
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_White.jpg
-    video: /images/uploads/1_fragments/Poster.mp4
     size: "5"
     hideInGrid: false
   - video: /images/uploads/1_fragments/Poster.mp4
