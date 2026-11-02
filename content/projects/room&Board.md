@@ -12,14 +12,7 @@ images:
   - image: /images/uploads/4_room_board/menu_blue.jpg
     size: "3"
     hideInGrid: false
-<<<<<<< HEAD
   - video: /images/uploads/4_room_board/food_yellow.mp4
-    size: "3"
-    hideInGrid: true
-  - image: /images/uploads/4_room_board/menu_yellow.jpg
-=======
-  - image: /images/uploads/4_room_board/food_yellow.mp4
->>>>>>> 709a5afb85c0ece2fa6da04304c383438cb79913
     size: "4"
     hideInGrid: true
   - image: /images/uploads/4_room_board/menu_yellow.jpg

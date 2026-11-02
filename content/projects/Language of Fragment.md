@@ -17,6 +17,10 @@ images:
     size: "4"
     hideInGrid: false
     alt: ""
+  - video: public/images/uploads/1_fragments/BODEGA_SOUND.mp4
+    size: "auto"
+    hideInGrid: false
+    alt: ""
 
  
 ---
