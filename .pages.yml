@@ -42,7 +42,7 @@ content:
         fields:
           - name: image
             label: Image or video
-            type: image
+            type: file
             description: Upload or pick a jpg, jpeg, png, gif, mov or mp4 file. Leave empty if you paste a video link below instead.
             options:
               extensions: [jpg, jpeg, png, gif, svg, mov, mp4]
