@@ -9,6 +9,9 @@ description: |-
 year: 2021
 order: 5
 images:
+  - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
+    size: "3"
+    hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-5.jpg
     size: "3"
     hideInGrid: false
@@ -70,9 +73,6 @@ images:
     size: "3"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-33.jpg
-    size: "3"
-    hideInGrid: false
-  - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
     size: "3"
     hideInGrid: false
 ---
