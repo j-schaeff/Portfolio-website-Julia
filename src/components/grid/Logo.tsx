@@ -1,16 +1,14 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { LOGO_PAD_LEFT, LOGO_WIDTH } from "../../hooks/useJustifiedRows";
-import { ZOOM_TRANSITION } from "../../utils/motion";
 import cellStyles from "./GridItem.module.css";
 import styles from "./Logo.module.css";
 
 // The exit: eases in, so the logo gathers speed as it drops out of view.
 const EXIT = { duration: 0.8, ease: [0.55, 0, 0.75, 0] } as const;
 
-// While the images load, the logo stands in as a skeleton: dimmed and slowly
-// breathing, with a highlight sweeping across it. Once everything is in, it
-// fills to solid just before the snake starts.
+// The loading logo is a skeleton the whole time it's on screen: dimmed and
+// slowly breathing, with a highlight sweeping across it.
 const PULSE = { duration: 1.6, ease: "easeInOut", repeat: Infinity } as const;
 const PULSE_OPACITY = [0.14, 0.32, 0.14];
 const SHIMMER_ID = "logo-shimmer";
@@ -56,9 +54,9 @@ function LogoMark({ shimmer = false }: { shimmer?: boolean }) {
 
 // Full-screen loading logo. Decorative and ignores the pointer. On exit it
 // slides down past the bottom of the viewport (transform only, so it stays
-// smooth on the compositor). `loading` shows the skeleton pulse until every
-// image is in; Framer Motion carries the opacity on from mid-pulse to solid.
-export function LogoOverlay({ loading }: { loading: boolean }) {
+// smooth on the compositor). The skeleton pulse runs for the overlay's whole
+// life, through the snake and the exit.
+export function LogoOverlay() {
   return (
     <div className={styles.overlay} aria-hidden="true">
       <motion.div
@@ -71,19 +69,14 @@ export function LogoOverlay({ loading }: { loading: boolean }) {
           <motion.div
             className={styles.layer}
             initial={{ opacity: PULSE_OPACITY[0] }}
-            animate={loading ? { opacity: PULSE_OPACITY } : { opacity: 1 }}
-            transition={loading ? PULSE : ZOOM_TRANSITION}
+            animate={{ opacity: PULSE_OPACITY }}
+            transition={PULSE}
           >
             <LogoMark />
           </motion.div>
-          <motion.div
-            className={styles.layer}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: loading ? 1 : 0 }}
-            transition={ZOOM_TRANSITION}
-          >
+          <div className={styles.layer}>
             <LogoMark shimmer />
-          </motion.div>
+          </div>
         </div>
       </motion.div>
     </div>
