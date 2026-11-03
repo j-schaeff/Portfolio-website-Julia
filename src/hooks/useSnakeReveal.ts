@@ -67,13 +67,19 @@ function snakeOrder(cells: HTMLElement[]): HTMLElement[] {
   });
 }
 
-// Resolve once every <img>/<video> in the container has loaded — images fully,
-// videos up to their first frame — or after MAX_WAIT_MS, so a stalled asset
-// can't freeze the loading screen.
+// Resolve once every <img> in the container has loaded, plus each video's
+// poster (the video itself only starts loading once the reveal begins) — or
+// after MAX_WAIT_MS, so a stalled asset can't freeze the loading screen. A
+// video without a poster is waited on up to its first frame.
 function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   const media = Array.from(
     container.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"),
-  );
+  ).map((el) => {
+    if (!(el instanceof HTMLVideoElement) || !el.poster) return el;
+    const poster = new Image();
+    poster.src = el.poster;
+    return poster;
+  });
 
   const isReady = (el: HTMLImageElement | HTMLVideoElement) =>
     el instanceof HTMLImageElement

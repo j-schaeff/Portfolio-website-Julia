@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
+import { useFallbackSrc } from "../../hooks/useFallbackSrc";
 import { imageLayoutId } from "../../utils/layoutId";
 import type { ProjectImage } from "../../types/project";
 import styles from "./Lightbox.module.css";
@@ -31,6 +32,9 @@ export function Lightbox({
   onPrev,
 }: LightboxProps) {
   useBodyScrollLock(true);
+  // The same copy as the detail strip, so it's usually already cached.
+  const { src, isOriginal, fallBack } = useFallbackSrc(image.full, image.src);
+  const onError = isOriginal ? undefined : fallBack;
 
   // The image clicked to open morphs in from the strip via its shared layoutId.
   // Once that intro finishes we drop the layoutId, so paging between images is a
@@ -102,7 +106,8 @@ export function Lightbox({
           <motion.video
             key={key}
             {...motionProps}
-            src={image.src}
+            src={src}
+            onError={onError}
             aria-label={caption}
             onLoadedMetadata={(e) =>
               recordAspect(e.currentTarget.videoWidth, e.currentTarget.videoHeight)
@@ -116,7 +121,8 @@ export function Lightbox({
           <motion.img
             key={key}
             {...motionProps}
-            src={image.src}
+            src={src}
+            onError={onError}
             alt={caption}
             onLoad={(e) =>
               recordAspect(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)

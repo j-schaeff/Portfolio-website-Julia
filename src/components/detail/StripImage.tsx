@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
+import { useFallbackSrc } from "../../hooks/useFallbackSrc";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { detailFillHeight, detailImageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
@@ -10,7 +11,9 @@ import styles from "./StripImage.module.css";
 interface StripImageProps {
   slug: string;
   index: number;
+  // The detail-sized copy, and the upload to fall back to if it's missing.
   src: string;
+  original: string;
   alt: string;
   size: ImageSize;
   // Largest size in the project; on tablet/desktop it fills the strip height.
@@ -24,10 +27,12 @@ interface StripImageProps {
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise, shared = true, onClick }: StripImageProps) {
+export function StripImage({ slug, index, src: preferred, original, alt, size, largest, isVideo, rise, shared = true, onClick }: StripImageProps) {
   // Every strip image keeps its layoutId so the lightbox can morph to/from it.
   // The grid has none, so opening a project never matches a grid image.
   const isMobile = useIsMobile();
+  const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
+  const onError = isOriginal ? undefined : fallBack;
 
   const layoutId = shared ? imageLayoutId(slug, index) : undefined;
   const isLeadingMobileImage = isMobile && index === 0;
@@ -65,6 +70,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
         autoPlay
         playsInline
         onClick={onClick}
+        onError={onError}
         style={style}
       />
     );
@@ -79,6 +85,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
       alt={alt}
       draggable={false}
       onClick={onClick}
+      onError={onError}
       style={style}
     />
   );

@@ -44,6 +44,7 @@ export function GridView() {
           project={project}
           cellWidths={widths}
           onAspect={reportAspect}
+          playVideos={snake !== "loading"}
         />
       ))}
       <LogoCell width={widths?.[LOGO_KEY]} showMark={logo === "gone"} />

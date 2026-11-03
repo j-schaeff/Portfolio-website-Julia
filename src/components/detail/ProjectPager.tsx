@@ -220,7 +220,8 @@ export function ProjectPager({
                         key={img.src + i}
                         slug={project.slug}
                         index={i}
-                        src={img.src}
+                        src={img.full}
+                        original={img.src}
                         alt={img.alt || `${project.title} — ${i + 1}`}
                         size={img.size}
                         largest={largest}

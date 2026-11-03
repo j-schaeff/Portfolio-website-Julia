@@ -2,7 +2,7 @@ import matter from "gray-matter";
 import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize } from "../utils/imageSize";
-import { dropboxDirect, isVideo } from "../utils/media";
+import { dropboxDirect, isVideo, optimizedSrc } from "../utils/media";
 
 const files = import.meta.glob("/content/projects/*.md", {
   query: "?raw",
@@ -22,11 +22,22 @@ function normalizeSrc(src: string): string {
   return import.meta.env.BASE_URL + src.replace(/^\/+/, "").replace(/^public\//, "");
 }
 
+// Point at the web-sized copies from scripts/optimize-media.mjs. External
+// sources have none, so optimizedSrc() hands them back unchanged.
+function withCopies(src: string, video: boolean) {
+  if (video) {
+    const opt = optimizedSrc(src, "opt.mp4");
+    const poster = optimizedSrc(src, "poster.webp");
+    return { src, isVideo: true, thumb: opt, full: opt, poster: poster === src ? undefined : poster };
+  }
+  return { src, isVideo: false, thumb: optimizedSrc(src, "thumb.webp"), full: optimizedSrc(src, "full.webp") };
+}
+
 function toImage(entry: unknown): ProjectImage | null {
   // Legacy entries were plain path strings; current entries are objects.
   if (typeof entry === "string") {
     const src = normalizeSrc(entry);
-    return { src, size: clampImageSize(undefined), hideInGrid: false, alt: "", isVideo: isVideo(src) };
+    return { ...withCopies(src, isVideo(src)), size: clampImageSize(undefined), hideInGrid: false, alt: "" };
   }
   if (entry && typeof entry === "object") {
     const e = entry as Record<string, unknown>;
@@ -41,11 +52,10 @@ function toImage(entry: unknown): ProjectImage | null {
     const src = videoUrl || (fileSrc ? normalizeSrc(String(fileSrc)) : "");
     if (!src) return null;
     return {
-      src,
+      ...withCopies(src, Boolean(videoUrl) || isVideo(src)),
       size: clampImageSize(e.size),
       hideInGrid: Boolean(e.hideInGrid),
       alt: String(e.alt ?? ""),
-      isVideo: Boolean(videoUrl) || isVideo(src),
     };
   }
   return null;

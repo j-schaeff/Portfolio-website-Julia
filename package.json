@@ -4,10 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/optimize-media.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/optimize-media.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "sizes": "node scripts/assign-sizes.mjs"
+    "sizes": "node scripts/assign-sizes.mjs",
+    "media": "node scripts/optimize-media.mjs"
   },
   "dependencies": {
     "buffer": "^6.0.3",
@@ -21,6 +24,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "sharp": "^0.35.5",
     "typescript": "^5.5.3",
     "vite": "^5.4.0"
   }

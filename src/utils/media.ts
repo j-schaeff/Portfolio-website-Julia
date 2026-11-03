@@ -22,3 +22,16 @@ export function dropboxDirect(url: string): string {
     return url;
   }
 }
+
+// Web-sized copies made by scripts/optimize-media.mjs: public/images/<path>
+// becomes public/optimized/<path>.<variant>. Only local uploads have copies;
+// anything else (external links, SVGs) is returned unchanged.
+export type MediaVariant = "thumb.webp" | "full.webp" | "opt.mp4" | "poster.webp";
+
+const OPTIMIZABLE = /\.(jpe?g|png|webp|tiff?|avif|mp4|mov|webm|m4v)$/i;
+
+export function optimizedSrc(src: string, variant: MediaVariant): string {
+  const images = import.meta.env.BASE_URL + "images/";
+  if (!src.startsWith(images) || !OPTIMIZABLE.test(src)) return src;
+  return import.meta.env.BASE_URL + "optimized/" + src.slice(images.length) + "." + variant;
+}

@@ -47,6 +47,15 @@ jobs:
             git push
           fi
 
+      # Reuse the web-sized media copies from earlier deploys; the optimiser
+      # (run by `npm run build`) only redoes files whose content changed.
+      - name: Cache optimised media
+        uses: actions/cache@v4
+        with:
+          path: public/optimized
+          key: optimized-media-${{ hashFiles('public/images/**', 'scripts/optimize-media.mjs') }}
+          restore-keys: optimized-media-
+
       # Served from the custom domain juliaschaeffler.com (set in the repo's
       # Pages settings), so the build uses the default "/" base. Without a
       # custom domain this would need DEPLOY_BASE: /Portfolio-website-Julia/

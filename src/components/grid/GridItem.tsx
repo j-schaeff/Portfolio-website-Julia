@@ -13,9 +13,11 @@ interface GridItemProps {
   // reported its aspect ratio.
   cellWidths: Record<string, number> | null;
   onAspect: (key: string, aspect: number) => void;
+  // False while the loading screen is up (see GridImage).
+  playVideos: boolean;
 }
 
-export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
+export function GridItem({ project, cellWidths, onAspect, playVideos }: GridItemProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const go = () => {
@@ -59,7 +61,10 @@ export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
         key={img.src + i}
       >
         <GridImage
-          src={img.src}
+          src={img.thumb}
+          original={img.src}
+          poster={img.poster}
+          play={playVideos}
           alt={img.alt || `${project.title} — ${i + 1}`}
           size={img.size}
           isVideo={img.isVideo}
