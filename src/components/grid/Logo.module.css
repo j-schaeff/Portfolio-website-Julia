@@ -26,8 +26,15 @@
 }
 
 .overlayTurn {
+  position: relative;
   width: 100%;
   height: 100%;
+}
+
+/* The pulsing base and the shimmer highlight, stacked on the same spot. */
+.layer {
+  position: absolute;
+  inset: 0;
 }
 
 /* Grid slot: the cell width comes from useJustifiedRows via --cell-w. */

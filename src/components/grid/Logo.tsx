@@ -1,21 +1,49 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { LOGO_PAD_LEFT, LOGO_WIDTH } from "../../hooks/useJustifiedRows";
+import { ZOOM_TRANSITION } from "../../utils/motion";
 import cellStyles from "./GridItem.module.css";
 import styles from "./Logo.module.css";
 
 // The exit: eases in, so the logo gathers speed as it drops out of view.
 const EXIT = { duration: 0.8, ease: [0.55, 0, 0.75, 0] } as const;
 
+// While the images load, the logo stands in as a skeleton: dimmed and slowly
+// breathing, with a highlight sweeping across it. Once everything is in, it
+// fills to solid just before the snake starts.
+const PULSE = { duration: 1.6, ease: "easeInOut", repeat: Infinity } as const;
+const PULSE_OPACITY = [0.14, 0.32, 0.14];
+const SHIMMER_ID = "logo-shimmer";
+
 // Inlined (not an <img>) so the fill can follow the theme via currentColor.
-function LogoMark() {
+// `shimmer` swaps the solid fill for the sweeping highlight gradient.
+function LogoMark({ shimmer = false }: { shimmer?: boolean }) {
   return (
     <svg
       className={styles.svg}
       viewBox="0 0 122 45.83"
-      fill="currentColor"
+      fill={shimmer ? `url(#${SHIMMER_ID})` : "currentColor"}
       xmlns="http://www.w3.org/2000/svg"
     >
+      {shimmer && (
+        <defs>
+          {/* userSpaceOnUse so the band crosses the whole logo once, rather
+              than sweeping each letter's own bounding box separately. */}
+          <linearGradient id={SHIMMER_ID} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="122" y2="0">
+            <stop offset="0.35" stopColor="currentColor" stopOpacity="0" />
+            <stop offset="0.5" stopColor="currentColor" stopOpacity="0.55" />
+            <stop offset="0.65" stopColor="currentColor" stopOpacity="0" />
+            <animateTransform
+              attributeName="gradientTransform"
+              type="translate"
+              from="-122 0"
+              to="122 0"
+              dur="1.6s"
+              repeatCount="indefinite"
+            />
+          </linearGradient>
+        </defs>
+      )}
       <path d="M44.6976 22.6171C41.5189 22.6171 39.8379 20.7832 39.8379 18.3992C39.8379 16.1069 40.9688 14.7926 44.2392 14.2425C48.8544 13.4478 49.9853 12.9588 49.9853 10.9415C49.9853 9.29104 48.7321 7.61 45.7368 7.61C42.6804 7.61 41.794 9.07709 41.2133 11.0943L40.2352 10.9415C40.9688 8.4658 42.0997 6.72363 45.7368 6.72363C49.1295 6.72363 50.9939 8.43524 50.9939 11.7056V19.2856C50.9939 20.4776 51.1773 21.4862 51.3607 22.3115H50.3826C50.1992 21.9752 49.9853 20.8749 50.0464 19.9886H49.9547C49.16 21.5168 47.4179 22.6171 44.6976 22.6171ZM44.9727 21.7307C47.968 21.7307 49.9853 19.744 49.9853 17.3295V12.6531C49.6185 14.0285 48.3653 14.3342 44.3614 15.0983C42.1913 15.4956 40.8465 16.2291 40.8465 18.3075C40.8465 20.2636 42.0385 21.7307 44.9727 21.7307Z" />
       <path d="M36.0347 3.88096V1.09961H37.2879V3.88096H36.0347ZM32.4893 22.2501L36.0347 6.96796L37.0128 7.18191L33.4673 22.4641L32.4893 22.2501Z" />
       <path d="M29.6436 22.6176C26.8011 22.6176 25.6396 19.225 25.6396 15.2516C25.6396 10.0557 27.5346 4.03449 30.2549 0L31.2635 0.244514C28.635 3.9428 26.6177 10.2391 26.6177 15.3739C26.6177 18.7971 27.4429 21.7313 29.6436 21.7313H30.1326V22.6176H29.6436Z" />
@@ -28,8 +56,9 @@ function LogoMark() {
 
 // Full-screen loading logo. Decorative and ignores the pointer. On exit it
 // slides down past the bottom of the viewport (transform only, so it stays
-// smooth on the compositor).
-export function LogoOverlay() {
+// smooth on the compositor). `loading` shows the skeleton pulse until every
+// image is in; Framer Motion carries the opacity on from mid-pulse to solid.
+export function LogoOverlay({ loading }: { loading: boolean }) {
   return (
     <div className={styles.overlay} aria-hidden="true">
       <motion.div
@@ -39,7 +68,22 @@ export function LogoOverlay() {
         {/* Rotated on mobile (see the CSS). A separate layer so the rotation
             doesn't turn the exit's downward slide sideways. */}
         <div className={styles.overlayTurn}>
-          <LogoMark />
+          <motion.div
+            className={styles.layer}
+            initial={{ opacity: PULSE_OPACITY[0] }}
+            animate={loading ? { opacity: PULSE_OPACITY } : { opacity: 1 }}
+            transition={loading ? PULSE : ZOOM_TRANSITION}
+          >
+            <LogoMark />
+          </motion.div>
+          <motion.div
+            className={styles.layer}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: loading ? 1 : 0 }}
+            transition={ZOOM_TRANSITION}
+          >
+            <LogoMark shimmer />
+          </motion.div>
         </div>
       </motion.div>
     </div>

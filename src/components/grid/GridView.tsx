@@ -36,7 +36,9 @@ export function GridView() {
       {/* Loading screen: stays over the grid while the snake plays beneath
           it, then slides down out of view; the grid's copy appears after. */}
       <AnimatePresence onExitComplete={logoGone}>
-        {logo === "overlay" && <LogoOverlay key="logo-overlay" />}
+        {logo === "overlay" && (
+          <LogoOverlay key="logo-overlay" loading={snake === "loading"} />
+        )}
       </AnimatePresence>
       {projects.map((project) => (
         <GridItem
