@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
-const STORAGE_KEY = "theme";
+// Holds only a choice the visitor made with the toggle. Renamed from "theme",
+// which also stored the OS preference on first visit and would otherwise keep
+// earlier visitors in dark mode. Keep in sync with index.html.
+const STORAGE_KEY = "theme-choice";
 
 // index.html sets data-theme before first paint; start from whatever it chose.
 function initialTheme(): Theme {
