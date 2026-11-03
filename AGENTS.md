@@ -80,10 +80,9 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 
 ## Deployment
 
-Pushing to `main` deploys two ways:
+Pushing to `main` deploys to **GitHub Pages** ([.github/workflows/](.github/workflows/)), served at the custom domain `juliaschaeffler.com` (set in the repo's Pages settings, DNS at GoDaddy). Because of the custom domain the build uses the default `/` base (see `base` in [vite.config.ts](vite.config.ts)); it copies `index.html` → `404.html` for the SPA fallback. If you change the `base` handling, keep it in sync with `normalizeSrc()`, which relies on `import.meta.env.BASE_URL`. Removing the custom domain would require `DEPLOY_BASE=/Portfolio-website-Julia/` again.
 
-- **Netlify** ([netlify.toml](netlify.toml)): `npm run build` → `dist`, SPA catch-all redirect. Base URL is `/`.
-- **GitHub Pages** ([.github/workflows/](.github/workflows/)): builds with `DEPLOY_BASE=/Portfolio-website-Julia/` so Vite emits subpath-correct asset URLs (see `base` in [vite.config.ts](vite.config.ts)), and copies `index.html` → `404.html` for the SPA fallback. If you change the `base` handling, keep it in sync with `normalizeSrc()`, which relies on `import.meta.env.BASE_URL`.
+[netlify.toml](netlify.toml) remains from the earlier Netlify setup (`npm run build` → `dist`, SPA catch-all redirect), but Netlify no longer serves the domain — its free build credits ran out under the volume of CMS commits.
 
 Content edits usually come through Pages CMS (which commits to `main`). Be deliberate about committing/pushing — every push to `main` ships to production.
 

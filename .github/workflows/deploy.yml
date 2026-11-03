@@ -35,8 +35,7 @@ jobs:
       # New images saved without a size get a varied one written back to the
       # Markdown, so it shows in Pages CMS for manual tweaking. Done here rather
       # than in its own workflow because pushes made with GITHUB_TOKEN don't
-      # trigger other workflows; this build already uses the filled sizes, and
-      # Netlify rebuilds on the bot commit.
+      # trigger other workflows; this build already uses the filled sizes.
       - name: Assign missing image sizes
         run: |
           npm run sizes
@@ -48,13 +47,11 @@ jobs:
             git push
           fi
 
+      # Served from the custom domain juliaschaeffler.com (set in the repo's
+      # Pages settings), so the build uses the default "/" base. Without a
+      # custom domain this would need DEPLOY_BASE: /Portfolio-website-Julia/
       - name: Build
         run: npm run build
-        # Project page: served from j-schaeff.github.io/Portfolio-website-Julia/
-        env:
-          DEPLOY_BASE: /Portfolio-website-Julia/
-          # For user/organization pages and custom domains, use 
-          # DEPLOY_BASE: /
 
       # SPA fallback so client-side (BrowserRouter) routes work on Pages
       - name: Add SPA fallback

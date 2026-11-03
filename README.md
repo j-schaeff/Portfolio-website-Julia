@@ -61,10 +61,9 @@ npm run sizes    # fill in a size for any project image that lacks one
 
 ## Deployment
 
-Every push to `main` deploys automatically, through two paths:
+Every push to `main` deploys automatically to **GitHub Pages** at [juliaschaeffler.com](https://juliaschaeffler.com) via the [Deploy to GitHub Pages](.github/workflows/deploy.yml) Actions workflow. It first runs `npm run sizes` and commits any newly filled image sizes back to `main`, then builds from the root (`/`) base and copies `index.html` to `404.html` as an SPA fallback. The custom domain is set in the repo's Pages settings; DNS is at GoDaddy.
 
-- **Netlify** ([live site](https://reliable-caramel-55ff44.netlify.app/)) — build config in [netlify.toml](netlify.toml) (`npm run build` → `dist`, with an SPA catch-all redirect).
-- **GitHub Pages** — via the [Deploy to GitHub Pages](.github/workflows/deploy.yml) Actions workflow. It first runs `npm run sizes` and commits any newly filled image sizes back to `main` (Netlify then rebuilds on that commit). Because the project page is served from a subpath (`/Portfolio-website-Julia/`), the workflow sets `DEPLOY_BASE` so Vite builds with the right base URL and copies `index.html` to `404.html` as an SPA fallback.
+[netlify.toml](netlify.toml) is kept from the earlier Netlify setup (`npm run build` → `dist`, with an SPA catch-all redirect) but Netlify no longer serves the domain.
 
 Other facts:
 
