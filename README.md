@@ -4,10 +4,12 @@ A single-page portfolio site for showcasing design projects. Built with React, T
 
 ## How it works
 
-- **Grid view** (`/`) — every project's images laid out in a grid.
-- **Detail view** (`/project/:slug`) — a horizontal, drag-to-scroll strip of a project's images plus its title, type, year, and description.
-- **Lightbox** — click any image to open a full-screen viewer that navigates across *all* images from every project (← → arrows / Escape).
-- **Shared-element transitions** — clicking a grid tile zooms smoothly into the detail view; the same image morphs between grid, strip, and lightbox.
+- **Grid view** (`/`) — every project's images laid out in justified rows.
+- **Detail view** (`/project?project=<slug>`) — a horizontal strip of a project's images plus its title, type, year, and description. Scrolling vertically moves between projects (on phones, each project is a swipeable full-screen page).
+- **Lightbox** — click any image in the detail view to open a full-screen viewer that pages through that project's images (← → arrows / Escape).
+- **About page** (`/about`) — bio, links, and further text columns (Impressum & AGB), linked from the top-left corner of the grid.
+- **Light/dark theme** — a toggle in the top-right corner; the choice is remembered in the browser.
+- **Transitions** — on first load a logo loading screen gives way to a snaking reveal of the grid; opening a project fades the grid out as the strip images rise in; strip images morph into the lightbox.
 
 ## Content
 
@@ -16,23 +18,32 @@ Projects live as Markdown files in [content/projects/](content/projects/), one f
 ```yaml
 ---
 title: Spring
-type: Print              # used to group projects
+type: Print              # shown next to the title
 description: Visual identity for a late-night concert series.
 year: 2021
 order: 5                 # controls position; ascending
 images:
   - image: public/images/uploads/5_spring/cover-2.jpg
+    video: ""            # optional: uploaded .mp4/.mov, shown instead of the image
     videoUrl: ""         # optional: link to an externally-hosted video instead
-    size: "5"            # height multiplier, 1–5 (width follows aspect ratio)
+    size: "5"            # height, 1–5 (width follows aspect ratio)
     hideInGrid: false    # hide in grid but still show in detail view
     alt: ""              # screen-reader description
 ---
 Optional body text (currently not rendered on the page).
 ```
 
-Images are uploaded to [public/images/](public/images/). The site supports images **and** video (`.mp4`, `.mov`, `.webm`, etc.).
+Uploads go to [public/images/uploads/](public/images/uploads/). The site supports images **and** video:
 
-For large videos you can skip the upload and paste a link into `videoUrl` instead — any direct video URL works, and Dropbox share links are converted to a playable form automatically. When set, `videoUrl` overrides the uploaded `image`.
+- **Images** go in the `image` field (jpg, jpeg, png, gif, svg).
+- **Uploaded videos** go in the `video` field (mp4, mov) — the CMS image field doesn't accept video files.
+- **Large videos** can skip the upload: paste a link into `videoUrl` instead. Any direct video URL works, and Dropbox share links are converted to a playable form automatically.
+
+If more than one is set, `videoUrl` wins over `video`, which wins over `image`.
+
+**Image sizes:** leave `size` empty on new images and a varied size (2–5, no two neighbours alike) is filled in automatically on the next deploy and committed back to the repo. After that it's never changed automatically, so adjust it by hand in the CMS whenever you like. Until it's filled in, a missing size displays as 3.
+
+The **About page** content lives in [content/about.md](content/about.md): a bio, two more text columns, and a list of links. In the text columns, separate paragraphs with an empty line; in column 2, start a paragraph with `# ` for a heading or `> ` to indent it.
 
 ### Editing content
 
@@ -45,6 +56,7 @@ npm install      # install dependencies
 npm run dev      # start the Vite dev server
 npm run build    # type-check (tsc) and build to dist/
 npm run preview  # preview the production build locally
+npm run sizes    # fill in a size for any project image that lacks one
 ```
 
 ## Deployment
@@ -52,7 +64,7 @@ npm run preview  # preview the production build locally
 Every push to `main` deploys automatically, through two paths:
 
 - **Netlify** ([live site](https://reliable-caramel-55ff44.netlify.app/)) — build config in [netlify.toml](netlify.toml) (`npm run build` → `dist`, with an SPA catch-all redirect).
-- **GitHub Pages** — via the [Deploy to GitHub Pages](.github/workflows/) Actions workflow. Because the project page is served from a subpath (`/Portfolio-website-Julia/`), the workflow sets `DEPLOY_BASE` so Vite builds with the right base URL and copies `index.html` to `404.html` as an SPA fallback.
+- **GitHub Pages** — via the [Deploy to GitHub Pages](.github/workflows/deploy.yml) Actions workflow. It first runs `npm run sizes` and commits any newly filled image sizes back to `main` (Netlify then rebuilds on that commit). Because the project page is served from a subpath (`/Portfolio-website-Julia/`), the workflow sets `DEPLOY_BASE` so Vite builds with the right base URL and copies `index.html` to `404.html` as an SPA fallback.
 
 Other facts:
 

@@ -140,35 +140,6 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
           );
         })}
       </div>
-
-      <div className={styles.mobileProjectList} aria-label="Project metadata list">
-        {projects.map((p) => {
-          const isActive = p.slug === active.slug;
-          const isHovered = p.slug === hoveredSlug;
-          return (
-            <button
-              key={p.slug}
-              type="button"
-              className={[
-                styles.mobileProjectRow,
-                isActive ? styles.active : "",
-                isHovered ? styles.hovered : "",
-                styles.linkButton,
-              ].join(" ")}
-              onClick={() => onSelectProject(p.slug)}
-              onMouseEnter={() => setHoveredSlug(p.slug)}
-              onMouseLeave={() => setHoveredSlug(null)}
-              aria-label={`View ${p.title}`}
-            >
-              <span className={styles.mobileTitle}>{p.title}</span>
-              <span className={styles.mobileSpecs}>
-                <span className={styles.mobileType}>{p.type}</span>
-                <span className={styles.mobileDate}>{p.year}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
     </motion.div>
   );
 }

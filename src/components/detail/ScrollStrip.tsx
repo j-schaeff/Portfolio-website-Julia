@@ -58,12 +58,6 @@ export function ScrollStrip({
         key={activeProject.slug}
         className={styles.group}
         data-project-slug={activeProject.slug}
-        style={{
-          opacity: 1,
-          visibility: "visible",
-          transform: "none",
-          pointerEvents: "auto",
-        }}
       >
         {activeProject.images.map((img, i) => (
           <StripImage

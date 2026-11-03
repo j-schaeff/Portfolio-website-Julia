@@ -1,38 +1,16 @@
-import { createContext, useMemo, type ReactNode } from "react";
+import { createContext, type ReactNode } from "react";
 import type { Project } from "../types/project";
-import {
-  projects as allProjects,
-  allImages,
-  globalImageIndex,
-  getProjectBySlug,
-  getProjectsByType,
-  getTypes,
-  type FlatImage,
-} from "../data/projects";
+import { projects } from "../data/projects";
 
 interface ProjectsContextValue {
   projects: Project[];
-  allImages: FlatImage[];
-  globalImageIndex: (slug: string, indexInProject: number) => number;
-  getProjectBySlug: (slug: string) => Project | undefined;
-  getProjectsByType: (type: string) => Project[];
-  getTypes: () => string[];
 }
 
 export const ProjectsContext = createContext<ProjectsContextValue | null>(null);
 
-export function ProjectsProvider({ children }: { children: ReactNode }) {
-  const value = useMemo<ProjectsContextValue>(
-    () => ({
-      projects: allProjects,
-      allImages,
-      globalImageIndex,
-      getProjectBySlug,
-      getProjectsByType,
-      getTypes,
-    }),
-    [],
-  );
+// Parsed at build time and never changes, so one shared value serves every render.
+const value: ProjectsContextValue = { projects };
 
+export function ProjectsProvider({ children }: { children: ReactNode }) {
   return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>;
 }

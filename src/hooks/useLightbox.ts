@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 export function useLightbox(total: number) {
   const [index, setIndex] = useState<number | null>(null);
 
-  const open = useCallback((globalIndex: number) => setIndex(globalIndex), []);
+  const open = useCallback((i: number) => setIndex(i), []);
 
   const close = useCallback(() => setIndex(null), []);
 

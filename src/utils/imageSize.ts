@@ -29,16 +29,11 @@ export function detailFillHeight(size: ImageSize, largest: ImageSize): string {
   return `${((MULTIPLIER[size] / MULTIPLIER[largest]) * 100).toFixed(2)}%`;
 }
 
-// Detail view: desktop keeps the original 50vh cap, while mobile scales the
-// entire size spectrum upward without changing the relative proportions.
-const DETAIL_MAX_VH = 50;
+// Detail strip on mobile: size 5 is 78vh and the rest scale with it, keeping
+// their relative proportions.
 const DETAIL_MAX_VH_MOBILE = 78;
 
-export function detailImageHeight(
-  size: ImageSize,
-  isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 560px)").matches,
-): string {
-  const maxVh = isMobile ? DETAIL_MAX_VH_MOBILE : DETAIL_MAX_VH;
-  const vh = (maxVh / MULTIPLIER[5]) * MULTIPLIER[size];
+export function detailImageHeight(size: ImageSize): string {
+  const vh = (DETAIL_MAX_VH_MOBILE / MULTIPLIER[5]) * MULTIPLIER[size];
   return `${vh.toFixed(2)}vh`;
 }

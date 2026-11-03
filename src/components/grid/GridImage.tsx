@@ -5,15 +5,13 @@ import { imageHeight } from "../../utils/imageSize";
 import styles from "./GridImage.module.css";
 
 interface GridImageProps {
-  slug: string;
-  index: number;
   src: string;
   alt: string;
   size: ImageSize;
   isVideo: boolean;
   onActivate: (event: React.MouseEvent<HTMLElement>) => void;
-  // Reports the media's natural aspect ratio once known, so the mobile grid
-  // can lay out its justified rows.
+  // Reports the media's natural aspect ratio once known, so the grid can lay
+  // out its justified rows.
   onAspect?: (aspect: number) => void;
 }
 

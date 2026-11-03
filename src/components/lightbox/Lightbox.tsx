@@ -139,12 +139,13 @@ export function Lightbox({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <button className={styles.close} onClick={onClose} aria-label="Close">
+      <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
         Close
       </button>
 
       {hasMultiple && (
         <button
+          type="button"
           className={`${styles.arrow} ${styles.left}`}
           onClick={onPrev}
           aria-label="Previous image"
@@ -155,6 +156,7 @@ export function Lightbox({
 
       {hasMultiple && (
         <button
+          type="button"
           className={`${styles.arrow} ${styles.right}`}
           onClick={onNext}
           aria-label="Next image"

@@ -1,6 +1,7 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { detailFillHeight, detailImageHeight } from "../../utils/imageSize";
 import { imageLayoutId } from "../../utils/layoutId";
 import { RISE_STAGGER, RISE_TRANSITION, ZOOM_TRANSITION } from "../../utils/motion";
@@ -26,24 +27,7 @@ interface StripImageProps {
 export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise, shared = true, onClick }: StripImageProps) {
   // Every strip image keeps its layoutId so the lightbox can morph to/from it.
   // The grid has none, so opening a project never matches a grid image.
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 560px)").matches,
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 560px)");
-    const handleChange = () => setIsMobile(mediaQuery.matches);
-
-    handleChange();
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-
-    mediaQuery.addListener(handleChange);
-    return () => mediaQuery.removeListener(handleChange);
-  }, []);
+  const isMobile = useIsMobile();
 
   const layoutId = shared ? imageLayoutId(slug, index) : undefined;
   const isLeadingMobileImage = isMobile && index === 0;
@@ -51,7 +35,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
     ? { width: "auto", height: "100dvh", objectFit: "contain" }
     : {
         width: "auto",
-        height: isMobile ? detailImageHeight(size, true) : detailFillHeight(size, largest),
+        height: isMobile ? detailImageHeight(size) : detailFillHeight(size, largest),
         objectFit: "contain",
       };
 
@@ -73,7 +57,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
       <motion.video
         {...motionProps}
         layoutId={layoutId}
-        className={["image-card", styles.image].join(" ")}
+        className={styles.image}
         src={src}
         aria-label={alt}
         muted
@@ -90,7 +74,7 @@ export function StripImage({ slug, index, src, alt, size, largest, isVideo, rise
     <motion.img
       {...motionProps}
       layoutId={layoutId}
-      className={["image-card", styles.image].join(" ")}
+      className={styles.image}
       src={src}
       alt={alt}
       draggable={false}

@@ -20,6 +20,12 @@ function toParagraphs(text: unknown): string[] {
     .filter(Boolean);
 }
 
+// A bare email address entered in the CMS would otherwise become a relative
+// link to a page that doesn't exist; give it the mailto: it was meant to have.
+function toHref(url: string): string {
+  return /^[^\s@:/]+@[^\s@/]+\.[^\s@/]+$/.test(url) ? `mailto:${url}` : url;
+}
+
 function toAbout(source: string): About {
   const fm = matter(source).data as Record<string, unknown>;
   const links = Array.isArray(fm.links) ? fm.links : [];
@@ -29,7 +35,7 @@ function toAbout(source: string): About {
     links: links
       .map((entry) => {
         const e = (entry ?? {}) as Record<string, unknown>;
-        return { label: String(e.label ?? ""), url: String(e.url ?? "") };
+        return { label: String(e.label ?? ""), url: toHref(String(e.url ?? "").trim()) };
       })
       .filter((link) => link.label && link.url),
   };

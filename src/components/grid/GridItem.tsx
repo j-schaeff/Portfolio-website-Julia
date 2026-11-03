@@ -9,7 +9,8 @@ import styles from "./GridItem.module.css";
 
 interface GridItemProps {
   project: Project;
-  // Mobile justified-row widths keyed by cellKey(); null on desktop.
+  // Justified-row widths keyed by cellKey(); null until every image has
+  // reported its aspect ratio.
   cellWidths: Record<string, number> | null;
   onAspect: (key: string, aspect: number) => void;
 }
@@ -58,8 +59,6 @@ export function GridItem({ project, cellWidths, onAspect }: GridItemProps) {
         key={img.src + i}
       >
         <GridImage
-          slug={project.slug}
-          index={i}
           src={img.src}
           alt={img.alt || `${project.title} — ${i + 1}`}
           size={img.size}

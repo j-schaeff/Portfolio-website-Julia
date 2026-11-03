@@ -42,9 +42,6 @@
      metadata, which the shadow (8px offset + 22px blur) falls into. */
   padding: 16px 14px 32px;
   pointer-events: auto;
-  transform-origin: top center;
-  transition: none;
-  will-change: auto;
 }
 
 @media (max-width: 560px) {

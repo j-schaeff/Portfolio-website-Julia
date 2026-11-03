@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type RefObject } from "react";
 import type { Project } from "../types/project";
 import { imageHeight } from "../utils/imageSize";
+import { useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
 // grid's width. On mobile every row holds 2–4 images; wider screens let each
@@ -15,7 +16,6 @@ import { imageHeight } from "../utils/imageSize";
 // width, so the (still flat) flex stream wraps exactly where we decided —
 // which keeps the snake reveal's row detection and the cell order untouched.
 
-const MOBILE_QUERY = "(max-width: 560px)";
 interface RowLimits {
   min: number;
   max: number;
@@ -106,18 +106,8 @@ export function useJustifiedRows(
   projects: Project[],
 ) {
   const [aspects, setAspects] = useState<Record<string, number>>({});
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches,
-  );
+  const isMobile = useIsMobile();
   const [box, setBox] = useState<{ width: number; gap: number } | null>(null);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(MOBILE_QUERY);
-    const handleChange = () => setIsMobile(mediaQuery.matches);
-    handleChange();
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
 
   // Track the grid's content width and gap (read from CSS, so the stylesheet
   // stays the source of truth for spacing).
