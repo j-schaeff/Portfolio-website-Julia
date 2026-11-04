@@ -37,7 +37,10 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
       tabIndex={0}
       onClick={go}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") go();
+        if (e.key !== "Enter" && e.key !== " ") return;
+        // Space would otherwise also scroll the page.
+        e.preventDefault();
+        go();
       }}
     >
       <InfoBlock title={project.title} type={project.type} />

@@ -10,3 +10,5 @@ export const RISE_TRANSITION = { duration: 0.9, ease: EASE } as const;
 export const RISE_STAGGER = 0.06;
 // Exit fade for the index: short, so it clears before the images settle.
 export const GRID_EXIT_TRANSITION = { duration: 0.35, ease: EASE } as const;
+// Lightbox paging: a quick crossfade between images.
+export const LIGHTBOX_FADE = { duration: 0.25, ease: EASE } as const;

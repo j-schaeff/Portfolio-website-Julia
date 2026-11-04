@@ -1,5 +1,5 @@
 import { AnimatePresence } from "framer-motion";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { GridView } from "./components/grid/GridView";
 import { DetailView } from "./components/detail/DetailView";
 import { AboutView } from "./components/about/AboutView";
@@ -13,7 +13,9 @@ export function AnimatedRoutes() {
         <Route path="/" element={<GridView />} />
         <Route path="/project" element={<DetailView />} />
         <Route path="/about" element={<AboutView />} />
-        <Route path="*" element={<GridView />} />
+        {/* Unknown paths land on the index's own URL, so CornerNav (which
+            keys off "/") still shows the About link. */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
   );

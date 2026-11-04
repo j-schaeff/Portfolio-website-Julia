@@ -39,6 +39,17 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
 
   const infoHeight = metaHeight(projects);
 
+  // A project's name, type and date highlight together, on hover or when active.
+  const stateClass = (p: Project) =>
+    [p.slug === active.slug && styles.active, p.slug === hoveredSlug && styles.hovered]
+      .filter(Boolean)
+      .join(" ");
+  const linkProps = (p: Project) => ({
+    onClick: () => onSelectProject(p.slug),
+    onMouseEnter: () => setHoveredSlug(p.slug),
+    onMouseLeave: () => setHoveredSlug(null),
+  });
+
   return (
     // Fades in just behind the strip's rise so the images lead the entrance.
     // This block doesn't remount on project switches, so it plays only once.
@@ -56,72 +67,42 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
 
       <div className={styles.namesCol}>
         <ul className={styles.names}>
-          {projects.map((p) => {
-            const isActive = p.slug === active.slug;
-            const isHovered = p.slug === hoveredSlug;
-            return (
-              <li
-                key={p.slug}
-                className={[
-                  isActive ? styles.active : "",
-                  isHovered ? styles.hovered : "",
-                ].join(" ").trim() || undefined}
+          {projects.map((p) => (
+            <li key={p.slug} className={stateClass(p) || undefined}>
+              <button
+                type="button"
+                className={styles.linkButton}
+                {...linkProps(p)}
+                aria-label={`View ${p.title}`}
               >
-                <button
-                  type="button"
-                  className={styles.linkButton}
-                  onClick={() => onSelectProject(p.slug)}
-                  onMouseEnter={() => setHoveredSlug(p.slug)}
-                  onMouseLeave={() => setHoveredSlug(null)}
-                  aria-label={`View ${p.title}`}
-                >
-                  {p.title}
-                </button>
-              </li>
-            );
-          })}
+                {p.title}
+              </button>
+            </li>
+          ))}
         </ul>
       </div>
 
       <div className={styles.specs}>
-        {projects.map((p) => {
-          const isActive = p.slug === active.slug;
-          const isHovered = p.slug === hoveredSlug;
-          return (
-            <Fragment key={p.slug}>
-              <button
-                type="button"
-                className={[
-                  styles.type,
-                  isActive ? styles.active : "",
-                  isHovered ? styles.hovered : "",
-                  styles.linkButton,
-                ].join(" ")}
-                onClick={() => onSelectProject(p.slug)}
-                onMouseEnter={() => setHoveredSlug(p.slug)}
-                onMouseLeave={() => setHoveredSlug(null)}
-                aria-label={`View ${p.title} project type`}
-              >
-                {p.type}
-              </button>
-              <button
-                type="button"
-                className={[
-                  styles.date,
-                  isActive ? styles.active : "",
-                  isHovered ? styles.hovered : "",
-                  styles.linkButton,
-                ].join(" ")}
-                onClick={() => onSelectProject(p.slug)}
-                onMouseEnter={() => setHoveredSlug(p.slug)}
-                onMouseLeave={() => setHoveredSlug(null)}
-                aria-label={`View ${p.title} project year`}
-              >
-                {p.year}
-              </button>
-            </Fragment>
-          );
-        })}
+        {projects.map((p) => (
+          <Fragment key={p.slug}>
+            <button
+              type="button"
+              className={`${styles.type} ${stateClass(p)} ${styles.linkButton}`}
+              {...linkProps(p)}
+              aria-label={`View ${p.title} project type`}
+            >
+              {p.type}
+            </button>
+            <button
+              type="button"
+              className={`${styles.date} ${stateClass(p)} ${styles.linkButton}`}
+              {...linkProps(p)}
+              aria-label={`View ${p.title} project year`}
+            >
+              {p.year}
+            </button>
+          </Fragment>
+        ))}
       </div>
     </motion.div>
   );

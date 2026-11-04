@@ -40,8 +40,10 @@ export function DetailView() {
 
   useEffect(() => {
     // On mobile the projects are a real vertical scroller (ProjectPager), so
-    // the wheel is left to it.
-    if (isMobile) return;
+    // the wheel is left to it. While the lightbox is open the wheel mustn't
+    // switch the project behind it, or closing it would morph to an image
+    // that's no longer in the strip.
+    if (isMobile || lightbox.index !== null) return;
 
     const onWheel = (event: WheelEvent) => {
       const deltaY = event.deltaY;
@@ -90,7 +92,7 @@ export function DetailView() {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
+  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile, lightbox.index]);
 
   if (!active) return null;
 

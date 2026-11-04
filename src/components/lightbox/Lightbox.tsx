@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
 import { imageLayoutId } from "../../utils/layoutId";
+import { LIGHTBOX_FADE } from "../../utils/motion";
 import type { ProjectImage } from "../../types/project";
 import styles from "./Lightbox.module.css";
 
@@ -85,11 +86,9 @@ export function Lightbox({
     initial: isHero ? false : { opacity: 0 },
     animate: { opacity: 1 },
     exit: { opacity: 0 },
-    transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const },
+    transition: LIGHTBOX_FADE,
     onLayoutAnimationComplete: isHero ? () => setIntroDone(true) : undefined,
   };
-
-  if (typeof document === "undefined") return null;
 
   return createPortal(
     <>
