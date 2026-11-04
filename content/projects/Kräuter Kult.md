@@ -10,9 +10,9 @@ order: 2
 images:
   - image: /images/uploads/2_kraueterkult/Krauter_kult_1.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/2_kraueterkult/Krauter_kult_5.jpg
-    size: "2"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/2_kraueterkult/Krauter_kult_9.jpg
     size: "5"
