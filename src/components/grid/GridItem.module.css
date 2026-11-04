@@ -51,6 +51,16 @@
   height: auto;
 }
 
+/* Mobile: rows after a project's first hang from the top of their line, so
+   they meet the bottom-aligned first row at one straight seam. Each line is as
+   tall as its tallest image, so both rows sit on the line edges, a grid gap
+   apart. */
+@media (max-width: 560px) {
+  .cell[data-hang] {
+    align-self: flex-start;
+  }
+}
+
 /* Hover lifts the image out of the row, leaving a notch in the flow. A
    transform so neighbours stay put. Triggered from the cell, which doesn't
    move: on the image itself, the lift would pull its bottom edge out from

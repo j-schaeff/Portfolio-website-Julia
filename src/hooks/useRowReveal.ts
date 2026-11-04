@@ -4,13 +4,13 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObje
 // up left→right, top row first, so the images appear in the same reading order
 // as the projects themselves.
 //
-// The grid is a flex-wrap of variable-width images that share a bottom baseline
-// (align-items: flex-end), so which image lands on which row is only known once
-// the browser has laid everything out — and that depends on each image's
-// natural width, i.e. on the images having loaded. So we wait for the images,
-// measure the cells, group them into rows by their (shared) bottom edge, order
-// each row left→right, and stamp a staggered transition delay onto
-// every cell. The actual fade/rise is done in CSS off the data-reveal attribute.
+// The grid is a flex-wrap of variable-width images whose rows sit on their
+// line's bottom (or, on mobile, hang from its top), so which image lands on
+// which row is only known once the browser has laid everything out — and that
+// depends on each image's natural width, i.e. on the images having loaded. So
+// we wait for the images, measure the cells, group them into rows by their
+// vertical overlap, order each row left→right, and stamp a staggered
+// transition delay onto every cell. The actual fade/rise is done in CSS off the data-reveal attribute.
 
 // Fresh loads double as the loading screen: the logo covers the page while
 // every image and video loads ("loading"), the reveal then plays behind it
@@ -29,7 +29,7 @@ const STEP_MS = 120;
 // Each cell's own fade/rise. Keep in sync with the transition in
 // GridView.module.css.
 const REVEAL_MS = 900;
-// Rows are detected by a shared bottom edge; allow for sub-pixel rounding.
+// Rows are detected by vertical overlap; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
 // Everything should be loaded before the reveal, so this is only a safety net
 // for a dead asset — long enough that normal loads always finish first.
@@ -45,23 +45,33 @@ function prefersReducedMotion(): boolean {
 }
 
 // Order cells in reading order: rows top to bottom, each row left→right.
+// Measures layout boxes (offset*), not client rects: the cells are scaled down
+// while the loading screen is up, which would shift their tops. A cell joins
+// the current row while it overlaps it vertically; a row's cells needn't share
+// a top or a bottom edge.
 function readingOrder(cells: HTMLElement[]): HTMLElement[] {
   const measured = cells
-    .map((el) => ({ el, rect: el.getBoundingClientRect() }))
-    .sort((a, b) => a.rect.bottom - b.rect.bottom || a.rect.left - b.rect.left);
+    .map((el) => ({
+      el,
+      top: el.offsetTop,
+      bottom: el.offsetTop + el.offsetHeight,
+      left: el.offsetLeft,
+    }))
+    .sort((a, b) => a.top - b.top || a.left - b.left);
 
   const rows: { bottom: number; items: typeof measured }[] = [];
   for (const item of measured) {
     const row = rows[rows.length - 1];
-    if (row && Math.abs(item.rect.bottom - row.bottom) <= ROW_TOLERANCE_PX) {
+    if (row && item.top < row.bottom - ROW_TOLERANCE_PX) {
       row.items.push(item);
+      row.bottom = Math.max(row.bottom, item.bottom);
     } else {
-      rows.push({ bottom: item.rect.bottom, items: [item] });
+      rows.push({ bottom: item.bottom, items: [item] });
     }
   }
 
   return rows.flatMap((row) => {
-    row.items.sort((a, b) => a.rect.left - b.rect.left);
+    row.items.sort((a, b) => a.left - b.left);
     return row.items.map((i) => i.el);
   });
 }

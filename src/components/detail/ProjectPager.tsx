@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
-import { ZOOM_TRANSITION } from "../../utils/motion";
+import { RISE_STAGGER, RISE_TRANSITION, ZOOM_TRANSITION } from "../../utils/motion";
 import { StripImage } from "./StripImage";
 import styles from "./ProjectPager.module.css";
 
@@ -10,6 +10,8 @@ interface ProjectPagerProps {
   activeIndex: number;
   // Called when native scrolling settles a different project into view.
   onActiveChange: (slug: string) => void;
+  // The "Next" link at the bottom of a project's page.
+  onSelectProject: (slug: string) => void;
   onImageClick: (
     project: Project,
     index: number,
@@ -23,6 +25,12 @@ interface ProjectPagerProps {
 // selecting a project elsewhere (the "Next" link) smooth-scrolls to its page,
 // the same motion a swipe makes.
 //
+// The project's title and a "Next" hint sit at the bottom of its page: they
+// stay put while the strip scrolls sideways and move with the page between
+// projects. The description is the strip's second item, a card right after
+// the full-screen first image, so swiping on reads it before the rest of the
+// images.
+//
 // The list loops: a copy of the last project sits above the first and a copy
 // of the first below the last. Scrolling onto a copy looks like wrapping
 // around, and once the scroll settles the pager jumps, invisibly, to the real
@@ -31,6 +39,7 @@ export function ProjectPager({
   projects,
   activeIndex,
   onActiveChange,
+  onSelectProject,
   onImageClick,
 }: ProjectPagerProps) {
   const pagerRef = useRef<HTMLDivElement>(null);
@@ -38,9 +47,8 @@ export function ProjectPager({
   // Only the images on screen when the page opens rise in.
   const [intro, setIntro] = useState(true);
   useEffect(() => setIntro(false), []);
-  // Which image sits under the active strip's center, and how far through
-  // the strip the visitor has scrolled (0–1).
-  const [position, setPosition] = useState({ index: 0, progress: 0 });
+  // Which image sits under the active strip's center.
+  const [position, setPosition] = useState(0);
 
   const activeSlugRef = useRef(active?.slug);
   activeSlugRef.current = active?.slug;
@@ -66,13 +74,15 @@ export function ProjectPager({
     if (!(strip instanceof HTMLElement)) return;
     const group = strip.firstElementChild;
     const center = strip.scrollLeft + strip.clientWidth / 2;
+    // The description card isn't an image, so it doesn't count; while it's
+    // centered the counter stays on the first image.
     let index = 0;
-    Array.from(group?.children ?? []).forEach((child, i) => {
-      if ((child as HTMLElement).offsetLeft <= center) index = i;
-    });
-    const range = strip.scrollWidth - strip.clientWidth;
-    const progress = range > 0 ? strip.scrollLeft / range : 0;
-    setPosition({ index, progress });
+    Array.from(group?.children ?? [])
+      .filter((child) => !(child as HTMLElement).dataset.info)
+      .forEach((child, i) => {
+        if ((child as HTMLElement).offsetLeft <= center) index = i;
+      });
+    setPosition(index);
   };
 
   // A page counts as in view once it covers half the screen.
@@ -205,6 +215,12 @@ export function ProjectPager({
               (max, img) => (img.size > max ? img.size : max),
               1,
             );
+            const rise = intro && !copy && project.slug === active.slug;
+            // The next project, wrapping to the first: the hint says swiping
+            // down moves on, and a tap does the same.
+            const next = projects.length > 1
+              ? projects[(projects.indexOf(project) + 1) % projects.length]
+              : undefined;
             return (
               <section
                 key={copy ? `${copy}-${project.slug}` : project.slug}
@@ -216,23 +232,57 @@ export function ProjectPager({
                 <div className={styles.strip}>
                   <div className={styles.group}>
                     {project.images.map((img, i) => (
-                      <StripImage
-                        key={img.src + i}
-                        slug={project.slug}
-                        index={i}
-                        src={img.full}
-                        original={img.src}
-                        alt={img.alt || `${project.title} — ${i + 1}`}
-                        size={img.size}
-                        largest={largest}
-                        isVideo={img.isVideo}
-                        rise={intro && !copy && project.slug === active.slug}
-                        shared={!copy}
-                        onClick={(e) => onImageClick(project, i, e)}
-                      />
+                      <Fragment key={img.src + i}>
+                        <StripImage
+                          slug={project.slug}
+                          index={i}
+                          src={img.full}
+                          original={img.src}
+                          alt={img.alt || `${project.title} — ${i + 1}`}
+                          size={img.size}
+                          largest={largest}
+                          isVideo={img.isVideo}
+                          rise={rise}
+                          shared={!copy}
+                          onClick={(e) => onImageClick(project, i, e)}
+                        />
+                        {i === 0 && (
+                          // Rises in step with the image slot it takes.
+                          <motion.div
+                            className={styles.info}
+                            data-info="true"
+                            initial={rise ? { y: window.innerHeight } : false}
+                            animate={{ y: 0 }}
+                            transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
+                          >
+                            <p className={styles.description}>{project.description}</p>
+                          </motion.div>
+                        )}
+                      </Fragment>
                     ))}
                   </div>
                 </div>
+                {/* Outside the strip, so it doesn't scroll sideways. Fades in
+                    behind the rise, like the counter. */}
+                <motion.div
+                  className={styles.caption}
+                  initial={rise ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
+                >
+                  <h2 className={styles.title}>{project.title}</h2>
+                  {next && (
+                    <button
+                      type="button"
+                      className={styles.next}
+                      onClick={() => onSelectProject(next.slug)}
+                      aria-label={`View ${next.title}`}
+                      tabIndex={copy ? -1 : undefined}
+                    >
+                      Next ↓
+                    </button>
+                  )}
+                </motion.div>
               </section>
             );
           })}
@@ -240,8 +290,8 @@ export function ProjectPager({
       </div>
 
       {/* The first image fills the screen, so a cropped edge alone doesn't
-          say there's more to the right. A counter and a thin progress bar
-          spell it out. Both arrive with the metadata, after the rise. */}
+          say there's more to the right. A counter spells it out, arriving
+          with the caption, after the rise. */}
       {imageCount > 1 && (
         <motion.div
           className={styles.position}
@@ -251,12 +301,8 @@ export function ProjectPager({
           aria-hidden="true"
         >
           <span className={styles.counter}>
-            {position.index + 1} / {imageCount}
+            {position + 1} / {imageCount}
           </span>
-          <span
-            className={styles.progress}
-            style={{ transform: `scaleX(${position.progress})` }}
-          />
         </motion.div>
       )}
     </>

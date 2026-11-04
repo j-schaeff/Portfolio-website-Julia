@@ -32,18 +32,12 @@ export function metaHeight(projects: Project[]): number {
 // out in a row that wraps as whole units when the viewport narrows. While they
 // sit side by side the name and type/date rows line up; once the type+date
 // block wraps it drops beneath the names as a single column. The in-view
-// project's name and its type/date slide right together.
+// project's name and its type/date slide right together. Tablet/desktop
+// only: on mobile ProjectPager shows the text inside each project's strip.
 export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProps) {
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   const infoHeight = metaHeight(projects);
-  // Mobile has no project list, so the next project (wrapping to the first)
-  // is named under the description: it hints that swiping moves on, and a tap
-  // does the same.
-  const activeIdx = projects.findIndex((p) => p.slug === active.slug);
-  const next = projects.length > 1
-    ? projects[(activeIdx + 1) % projects.length]
-    : undefined;
 
   return (
     // Fades in just behind the strip's rise so the images lead the entrance.
@@ -59,17 +53,6 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
         <h2 className={styles.title}>{active.title}</h2>
         <p className={styles.description}>{active.description}</p>
       </div>
-
-      {next && (
-        <button
-          type="button"
-          className={[styles.next, styles.linkButton].join(" ")}
-          onClick={() => onSelectProject(next.slug)}
-          aria-label={`View ${next.title}`}
-        >
-          Next ↓
-        </button>
-      )}
 
       <div className={styles.namesCol}>
         <ul className={styles.names}>

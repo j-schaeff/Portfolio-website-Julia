@@ -12,12 +12,14 @@ interface GridItemProps {
   // Justified-row widths keyed by cellKey(); null until every image has
   // reported its aspect ratio.
   cellWidths: Record<string, number> | null;
+  // Mobile: cells after a project's first row, aligned to the top of their line.
+  hangingCells: Set<string> | null;
   onAspect: (key: string, aspect: number) => void;
   // False while the loading screen is up (see GridImage).
   playVideos: boolean;
 }
 
-export function GridItem({ project, cellWidths, onAspect, playVideos }: GridItemProps) {
+export function GridItem({ project, cellWidths, hangingCells, onAspect, playVideos }: GridItemProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const go = () => {
@@ -57,6 +59,7 @@ export function GridItem({ project, cellWidths, onAspect, playVideos }: GridItem
         className={styles.cell}
         data-grid-cell
         data-justify={width ? "" : undefined}
+        data-hang={hangingCells?.has(key) ? "" : undefined}
         style={justify}
         key={img.src + i}
       >

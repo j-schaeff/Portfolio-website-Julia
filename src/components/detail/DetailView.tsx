@@ -145,6 +145,7 @@ export function DetailView() {
           projects={projects}
           activeIndex={activeIndex}
           onActiveChange={handleProjectSelect}
+          onSelectProject={handleProjectSelect}
           onImageClick={handleImageClick}
         />
       ) : (
@@ -155,11 +156,14 @@ export function DetailView() {
         />
       )}
 
-      <DetailMeta
-        projects={projects}
-        active={active}
-        onSelectProject={handleProjectSelect}
-      />
+      {/* On mobile the pager shows each project's text in its own strip. */}
+      {!isMobile && (
+        <DetailMeta
+          projects={projects}
+          active={active}
+          onSelectProject={handleProjectSelect}
+        />
+      )}
 
       <AnimatePresence>
         {lightboxProject && lightboxImage && lightbox.index !== null && (

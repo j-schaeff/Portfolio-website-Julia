@@ -10,7 +10,9 @@ import { useIsMobile } from "./useIsMobile";
 // last row isn't stretched: it keeps its authored size (shrinking only if it
 // would overflow) and sits left-aligned. Every image in a row scales by the
 // same factor, so aspect ratios and the size relationships within a row hold,
-// and the CSS gaps and padding stay fixed.
+// and the CSS gaps and padding stay fixed. On mobile a project's first row sits
+// on the bottom of its line and the rows after it hang from the top, so the
+// rows meet at one straight seam instead of leaving holes between them.
 //
 // Flex-wrap can't enforce a per-row count, so the rows are chosen here and
 // each cell gets an explicit width. The widths of a row sum to the content
@@ -179,6 +181,8 @@ export function useJustifiedRows(
 
     const available = box.width - ROUNDING_SLACK_PX;
     const widths: Record<string, number> = {};
+    // Cells that align to the top of their line (see the header comment).
+    const hanging = new Set<string>();
     const limits = isMobile ? MOBILE_ROWS : WIDE_ROWS;
     groups.forEach((group, g) => {
       const isLastGroup = g === groups.length - 1;
@@ -193,11 +197,14 @@ export function useJustifiedRows(
         const loose =
           isLastRow && !(isMobile && isLastGroup) && (isLastGroup || row.length < limits.min);
         const scale = loose ? Math.min(1, fill) : fill;
-        for (const cell of row) widths[cell.key] = cell.width * scale;
+        for (const cell of row) {
+          widths[cell.key] = cell.width * scale;
+          if (isMobile && r > 0 && !isLastGroup) hanging.add(cell.key);
+        }
       });
     });
-    return widths;
+    return { widths, hanging };
   }, [isMobile, box, projects, aspects]);
 
-  return { widths: layout, reportAspect };
+  return { widths: layout?.widths ?? null, hanging: layout?.hanging ?? null, reportAspect };
 }
