@@ -41,7 +41,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-26.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-5.jpg
     size: "5"
     hideInGrid: true
@@ -53,5 +53,5 @@ images:
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-33.jpg
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
 ---
