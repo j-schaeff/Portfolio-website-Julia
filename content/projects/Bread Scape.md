@@ -8,11 +8,9 @@ images:
     size: "5"
     hideInGrid: false
   - image: /images/uploads/9_bread_scape/bread-scape-4.jpg
-    video: /images/uploads/9_bread_scape/bread-scape-video-3.mp4
     size: "4"
     hideInGrid: true
   - image: /images/uploads/9_bread_scape/bread-scape-9.jpg
-    video: /images/uploads/9_bread_scape/bread-scape-video-3.mp4
     size: "3"
     hideInGrid: false
   - video: /images/uploads/9_bread_scape/bread-scape-video-3.mp4
