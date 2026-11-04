@@ -1,9 +1,8 @@
 ---
 title: Room & Board
 type: Art Direction & Video
-description: A field guide reimagined — botanical illustration meets a modular
-  grid system across four chapters.
-year: 2022
+description: "A visual connecting architechture with a meal "
+year: 2026
 order: 4
 images:
   - video: /images/uploads/4_room_board/Test_green_House.mp4
