@@ -12,11 +12,11 @@ images:
     hideInGrid: false
   - image: /images/uploads/5_spring/IMG_4423-3.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/5_spring/Spring_sequesnce.jpg
     size: "4"
     hideInGrid: true
   - image: /images/uploads/5_spring/Spring.jpg
-    size: "2"
+    size: "3"
     hideInGrid: false
 ---
