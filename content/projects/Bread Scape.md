@@ -9,7 +9,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/9_bread_scape/bread-scape-4.jpg
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - video: /images/uploads/9_bread_scape/bread-scape-video-3.mp4
     size: "2"
     hideInGrid: false
@@ -39,5 +39,5 @@ images:
     hideInGrid: false
   - video: /images/uploads/9_bread_scape/bread-scape-video-2.mp4
     size: "2"
-    hideInGrid: false
+    hideInGrid: true
 ---
