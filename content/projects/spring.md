@@ -14,7 +14,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/5_spring/Spring_sequesnce.jpg
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/5_spring/Spring.jpg
     size: "2"
     hideInGrid: false
