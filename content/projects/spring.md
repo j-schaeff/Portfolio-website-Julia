@@ -1,8 +1,9 @@
 ---
 title: Spring
 type: Print
-description: Visual identity for a late-night concert series, using a deep
-  violet system and expressive lettering.
+description: A zine celebrating the excitements of spring, featuring a
+  custom-type design created with imagery that hints at the delicate features of
+  the season.
 year: 2023
 order: 5
 images:
