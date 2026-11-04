@@ -136,7 +136,7 @@ column2: >-
   Schutzvorschriften ihres Aufenthaltsstaats bleiben unberührt.
 links:
   - label: Electronic Mail
-    url: Juliaschaeffler99@gmail.com
+    url: juliaschaeffler99@gmail.com
   - label: "@j.schaeff"
     url: https://instagram.com/j.schaeff
 ---
