@@ -9,17 +9,17 @@ year: 2023
 order: 3
 images:
   - image: /images/uploads/3_poetry/Booklet4.png
-    size: "4"
+    size: "3"
     hideInGrid: false
   - image: /images/uploads/3_poetry/bookletmockup.png
     size: "2"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/3_poetry/chair.jpg
     size: "4"
     hideInGrid: false
   - image: /images/uploads/3_poetry/Poetry_black.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/3_poetry/spreads.jpg
     size: "2"
     hideInGrid: true
