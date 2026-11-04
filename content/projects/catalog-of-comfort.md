@@ -15,7 +15,7 @@ images:
     hideInGrid: false
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-1.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-2.jpg
     size: "4"
     hideInGrid: false
