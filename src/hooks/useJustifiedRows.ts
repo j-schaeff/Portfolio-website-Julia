@@ -5,7 +5,8 @@ import { useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
 // grid's width. On mobile every row holds 2–4 images; wider screens let each
-// row take up to 8, however many fill it closest to their authored size. The
+// row take up to 8, however many fill it closest to their authored size, and
+// never split a project so that one of its images sits alone in a row. The
 // last row isn't stretched: it keeps its authored size (shrinking only if it
 // would overflow) and sits left-aligned. Every image in a row scales by the
 // same factor, so aspect ratios and the size relationships within a row hold,
@@ -44,6 +45,7 @@ export const LOGO_PAD_LEFT = 8;
 
 interface Cell {
   key: string;
+  group: string; // the project it belongs to (the logo is its own)
   width: number; // natural width at the image's authored size
 }
 
@@ -52,53 +54,70 @@ function rowScale(row: Cell[], available: number, gap: number): number {
   return (available - gap * (row.length - 1)) / total;
 }
 
-// How far a row is from its authored size, in either direction.
-function distortion(row: Cell[], available: number, gap: number): number {
-  return Math.abs(Math.log(rowScale(row, available, gap)));
-}
-
+// The rows are chosen together rather than greedily, so a break can be moved
+// earlier when the natural one would strand a project: every stretch of a
+// project within a row holds at least two images, so a project never starts
+// on a row's last slot or leaves a single image to open the next row. (A
+// single-image project may open a row or sit mid-row, and fills a row alone
+// only when nothing else fits.) Among the allowed breaks, the rows that stay
+// closest to their authored size win.
 function buildRows(
   cells: Cell[],
   available: number,
   gap: number,
   { min, max }: RowLimits,
+  looseLast: boolean,
 ): Cell[][] {
-  const rows: Cell[][] = [];
-  let row: Cell[] = [];
+  const n = cells.length;
+  if (n <= min) return n ? [cells] : [];
 
-  for (const cell of cells) {
-    if (row.length < min) {
-      row.push(cell);
-      continue;
-    }
-    // Take the next image only if it brings the row closer to its authored
-    // size (scale nearer 1); otherwise it starts the next row.
-    const without = distortion(row, available, gap);
-    const withIt = distortion([...row, cell], available, gap);
-    if (row.length < max && withIt < without) {
-      row.push(cell);
-    } else {
-      rows.push(row);
-      row = [cell];
-    }
+  // The [start, end) range of each cell's project.
+  const runStart: number[] = [];
+  const runEnd: number[] = [];
+  for (let i = 0; i < n; i++) {
+    runStart[i] = i > 0 && cells[i - 1].group === cells[i].group ? runStart[i - 1] : i;
   }
-  if (row.length) rows.push(row);
-
-  const last = rows[rows.length - 1];
-  const prev = rows[rows.length - 2];
-  if (!last || !prev) return rows;
-
-  // A last row short of the minimum joins the previous row, or borrows from it
-  // when that row is already full.
-  if (last.length < min) {
-    if (prev.length + last.length <= max) {
-      prev.push(...rows.pop()!);
-    } else {
-      while (last.length < min && prev.length > min) last.unshift(prev.pop()!);
-    }
+  for (let i = n - 1; i >= 0; i--) {
+    runEnd[i] = i < n - 1 && cells[i + 1].group === cells[i].group ? runEnd[i + 1] : i + 1;
   }
 
-  return rows;
+  // Whether a row of cells [i, j) may end before cell j.
+  const canBreak = (i: number, j: number) => {
+    const tail = j - Math.max(i, runStart[j - 1]);
+    if (runEnd[j - 1] > j) return tail >= 2 && runEnd[j - 1] - j >= 2;
+    return tail >= 2 || tail === j - i;
+  };
+
+  // Squared log scale: how far the row is from its authored size, in either
+  // direction. The grid's last row isn't stretched, so only overflow counts.
+  const cost = (i: number, j: number) => {
+    const d = Math.log(rowScale(cells.slice(i, j), available, gap));
+    return looseLast && j === n && d > 0 ? 0 : d * d;
+  };
+
+  const solve = (strict: boolean) => {
+    const best = new Array<number>(n + 1).fill(Infinity);
+    const from = new Array<number>(n + 1).fill(-1);
+    best[0] = 0;
+    for (let j = 1; j <= n; j++) {
+      for (let i = Math.max(0, j - max); i <= j - min; i++) {
+        if (best[i] === Infinity) continue;
+        if (strict && j < n && !canBreak(i, j)) continue;
+        const total = best[i] + cost(i, j);
+        if (total < best[j]) {
+          best[j] = total;
+          from[j] = i;
+        }
+      }
+    }
+    if (best[n] === Infinity) return null;
+    const rows: Cell[][] = [];
+    for (let j = n; j > 0; j = from[j]) rows.unshift(cells.slice(from[j], j));
+    return rows;
+  };
+
+  // Drop the project rule only if no layout can satisfy it.
+  return solve(true) ?? solve(false)!;
 }
 
 export function useJustifiedRows(
@@ -147,14 +166,14 @@ export function useJustifiedRows(
         const aspect = aspects[key];
         // The greedy row fill needs every width, so wait for all media.
         if (!aspect) return null;
-        cells.push({ key, width: imageHeight(img.size) * aspect });
+        cells.push({ key, group: project.slug, width: imageHeight(img.size) * aspect });
       }
       if (!cells.length) continue;
       if (isMobile || !groups.length) groups.push(cells);
       else groups[0].push(...cells);
     }
     // On mobile the logo gets a row of its own and fills the full width.
-    const logo = { key: LOGO_KEY, width: LOGO_WIDTH + LOGO_PAD_LEFT };
+    const logo = { key: LOGO_KEY, group: LOGO_KEY, width: LOGO_WIDTH + LOGO_PAD_LEFT };
     if (isMobile || !groups.length) groups.push([logo]);
     else groups[0].push(logo);
 
@@ -163,7 +182,8 @@ export function useJustifiedRows(
     const limits = isMobile ? MOBILE_ROWS : WIDE_ROWS;
     groups.forEach((group, g) => {
       const isLastGroup = g === groups.length - 1;
-      const rows = buildRows(group, available, box.gap, limits);
+      const looseLast = isLastGroup && !isMobile;
+      const rows = buildRows(group, available, box.gap, limits, looseLast);
       rows.forEach((row, r) => {
         const fill = rowScale(row, available, box.gap);
         // The grid's last row (except the mobile logo row, which fills the
