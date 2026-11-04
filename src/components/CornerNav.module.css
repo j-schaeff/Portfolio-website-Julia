@@ -39,4 +39,10 @@
   .right {
     right: 12px;
   }
+
+  /* Larger tap targets; the negative margin keeps the labels in place. */
+  .item {
+    padding: 12px;
+    margin: -12px;
+  }
 }

@@ -35,6 +35,10 @@ interface ProjectPagerProps {
 // of the first below the last. Scrolling onto a copy looks like wrapping
 // around, and once the scroll settles the pager jumps, invisibly, to the real
 // page it copies.
+//
+// Which project is active is only reported once a scroll has fully settled
+// (finger up, momentum and snapping done), so nothing re-renders while a page
+// is still moving.
 export function ProjectPager({
   projects,
   activeIndex,
@@ -54,12 +58,9 @@ export function ProjectPager({
   activeSlugRef.current = active?.slug;
   const onActiveChangeRef = useRef(onActiveChange);
   onActiveChangeRef.current = onActiveChange;
-  // The project the pager last reported as in view. An activeIndex that
+  // The project the pager rests on, or is scrolling to. An activeIndex that
   // matches it came from scrolling, so there's nothing to scroll to.
   const inViewRef = useRef<string | null>(null);
-  // Set while smooth-scrolling to a selected project, so the pages passed on
-  // the way don't get reported (and flash their descriptions).
-  const targetRef = useRef<string | null>(null);
 
   const pageFor = (slug: string, copy?: "head" | "tail") =>
     pagerRef.current?.querySelector<HTMLElement>(
@@ -85,34 +86,6 @@ export function ProjectPager({
     setPosition(index);
   };
 
-  // A page counts as in view once it covers half the screen.
-  useEffect(() => {
-    const pager = pagerRef.current;
-    if (!pager) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const slug = (entry.target as HTMLElement).dataset.projectSlug;
-          if (!slug) continue;
-          if (targetRef.current) {
-            if (slug !== targetRef.current) continue;
-            targetRef.current = null;
-          }
-          inViewRef.current = slug;
-          if (slug !== activeSlugRef.current) onActiveChangeRef.current(slug);
-        }
-      },
-      { root: pager, threshold: 0.5 },
-    );
-
-    pager
-      .querySelectorAll("[data-project-slug]")
-      .forEach((page) => observer.observe(page));
-    return () => observer.disconnect();
-  }, [projects]);
-
   // Bring the active project into view when it was chosen some other way than
   // scrolling: instantly on first render (landing on a project's URL), with a
   // smooth scroll afterwards.
@@ -132,7 +105,9 @@ export function ProjectPager({
       slug === projects[0]?.slug;
     const page = pageFor(slug, wraps ? "tail" : undefined);
     if (!page) return;
-    targetRef.current = slug;
+    // Arriving there won't need reporting; a touch that interrupts the scroll
+    // reports wherever it does land.
+    inViewRef.current = slug;
     pager.scrollTo({ top: page.offsetTop, behavior: first ? "auto" : "smooth" });
   }, [active?.slug]);
 
@@ -143,38 +118,73 @@ export function ProjectPager({
     if (!pager) return;
     let frame = 0;
     let settleTimer = 0;
+    let touching = false;
 
-    // Resting on a loop copy: swap in the real page at the same spot. The
-    // copy's horizontal position is carried over so nothing visibly moves.
+    // The scroll has come to rest: find the page it rests on. A loop copy is
+    // swapped for the real page at the same spot (its horizontal position
+    // carried over, so nothing visibly moves). Then report the project, if
+    // it's a new one.
     const settle = () => {
-      const copy = Array.from(
-        pager.querySelectorAll<HTMLElement>("[data-copy]"),
-      ).find((page) => Math.abs(page.offsetTop - pager.scrollTop) < 2);
-      const slug = copy?.dataset.projectSlug;
-      const real = slug ? pageFor(slug) : null;
-      if (!copy || !real) return;
-      const copyStrip = copy.firstElementChild as HTMLElement | null;
-      const realStrip = real.firstElementChild as HTMLElement | null;
-      if (copyStrip && realStrip) realStrip.scrollLeft = copyStrip.scrollLeft;
-      pager.scrollTo({ top: real.offsetTop, behavior: "auto" });
+      if (touching) return;
+      const page = Array.from(
+        pager.querySelectorAll<HTMLElement>("[data-project-slug]"),
+      ).find((el) => Math.abs(el.offsetTop - pager.scrollTop) < 2);
+      const slug = page?.dataset.projectSlug;
+      if (!page || !slug) return;
+      if (page.dataset.copy) {
+        const real = pageFor(slug);
+        if (!real) return;
+        const copyStrip = page.firstElementChild as HTMLElement | null;
+        const realStrip = real.firstElementChild as HTMLElement | null;
+        if (copyStrip && realStrip) realStrip.scrollLeft = copyStrip.scrollLeft;
+        pager.scrollTo({ top: real.offsetTop, behavior: "auto" });
+      }
+      inViewRef.current = slug;
+      if (slug !== activeSlugRef.current) onActiveChangeRef.current(slug);
     };
+
+    // Native scrollend fires once momentum and snapping are done. Where it's
+    // missing, a pause in scroll events stands in for it. Either way, never
+    // while a finger is down: that's a drag paused, not a scroll ended.
+    const hasScrollEnd = "onscrollend" in window;
 
     const onScroll = (event: Event) => {
       if (!frame) frame = requestAnimationFrame(() => {
         frame = 0;
         measure();
       });
-      // Wait for momentum and snapping to finish before any jump; jumping
-      // mid-fling would cut the motion short.
-      if (event.target === pager) {
+      if (!hasScrollEnd && event.target === pager) {
         window.clearTimeout(settleTimer);
         settleTimer = window.setTimeout(settle, 150);
       }
     };
+    const onScrollEnd = (event: Event) => {
+      if (event.target === pager) settle();
+    };
+    const onTouchStart = () => {
+      touching = true;
+      window.clearTimeout(settleTimer);
+    };
+    // A finger lifted without moving the pager fires no scrollend, so check
+    // here too; if it's still moving, settle finds no page edge and waits.
+    const onTouchEnd = (event: TouchEvent) => {
+      if (event.touches.length) return;
+      touching = false;
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(settle, 150);
+    };
 
     pager.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    pager.addEventListener("scrollend", onScrollEnd);
+    pager.addEventListener("touchstart", onTouchStart, { passive: true });
+    pager.addEventListener("touchend", onTouchEnd, { passive: true });
+    pager.addEventListener("touchcancel", onTouchEnd, { passive: true });
     return () => {
       pager.removeEventListener("scroll", onScroll, { capture: true });
+      pager.removeEventListener("scrollend", onScrollEnd);
+      pager.removeEventListener("touchstart", onTouchStart);
+      pager.removeEventListener("touchend", onTouchEnd);
+      pager.removeEventListener("touchcancel", onTouchEnd);
       cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
     };
@@ -196,15 +206,7 @@ export function ProjectPager({
 
   return (
     <>
-      <div
-        ref={pagerRef}
-        className={styles.pager}
-        // A touch takes over from a smooth scroll in progress, so stop
-        // waiting for its target.
-        onTouchStart={() => {
-          targetRef.current = null;
-        }}
-      >
+      <div ref={pagerRef} className={styles.pager}>
         {/* Keep strip images out of the route's AnimatePresence: their
             layoutId makes each one register for presence, which can block the
             detail route's exit (see ScrollStrip). */}

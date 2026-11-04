@@ -37,7 +37,8 @@ export function StripImage({ slug, index, src: preferred, original, alt, size, l
   const layoutId = shared ? imageLayoutId(slug, index) : undefined;
   const isLeadingMobileImage = isMobile && index === 0;
   const style: CSSProperties = isLeadingMobileImage
-    ? { width: "auto", height: "100dvh", objectFit: "contain" }
+    ? // Fills the strip exactly (it's the pager's height, see ProjectPager).
+      { width: "auto", height: "100%", objectFit: "contain" }
     : {
         width: "auto",
         height: isMobile ? detailImageHeight(size) : detailFillHeight(size, largest),

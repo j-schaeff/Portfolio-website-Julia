@@ -17,7 +17,9 @@
 .page {
   /* Anchors the caption. */
   position: relative;
-  height: 100dvh;
+  /* The pager's own height, not the viewport's: they can differ by a few px
+     (mobile toolbars), which would let snap points drift off the pages. */
+  height: 100%;
   scroll-snap-align: start;
   /* One project per swipe, however hard the flick. */
   scroll-snap-stop: always;
@@ -49,27 +51,31 @@
 
 /* Title + "Next" at the bottom of the page, over whatever the strip shows
    there; it stays put while the strip scrolls sideways. White + difference
-   inverts against the image behind, in either theme. */
+   inverts against the image behind, in either theme.
+   It doubles as the bottom safe zone: a full-width band (the top padding
+   extends it above the title) that swallows taps and swipes, so missing
+   "Next" doesn't open the lightbox or scroll. */
 .caption {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   box-sizing: border-box;
-  padding: 0 12px 18px;
+  padding: 24px 12px 18px;
   text-align: center;
   color: #fff;
   mix-blend-mode: difference;
-  pointer-events: none;
+  touch-action: none;
 }
 
 /* The project's description, the strip's second item. Its text starts at the
    top, clear of the Index button and the image counter, with roomy sides so
-   it sits apart from the images either side. On the page background, so
-   plain theme colours rather than difference blending. */
+   it sits apart from the images either side. Nearly a screen wide (capped on
+   larger phones) so lines stay long enough to read comfortably. On the page
+   background, so plain theme colours rather than difference blending. */
 .info {
   flex: 0 0 auto;
-  width: min(78vw, 340px);
+  width: min(100vw - 24px, 440px);
   height: 100%;
   box-sizing: border-box;
   padding: 44px 20px 0;
@@ -91,9 +97,21 @@
   font-size: 14px;
   line-height: 1.2;
   text-indent: 24px;
+  /* Justified, but hyphenated (English, from <html lang>) so a long word
+     can split instead of stretching the line's word spaces into large gaps.
+     Only words of 6+ letters split, keeping 3 on each side. Balanced breaks
+     avoid a lone word on the last line, which stays left-aligned. */
   text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+  text-wrap: pretty;
+  word-spacing: normal;
   white-space: normal;
-  overflow-wrap: anywhere;
+  /* Only breaks inside a word when it can't fit a line on its own (e.g. a
+     long URL), rather than anywhere it likes. */
+  overflow-wrap: break-word;
 }
 
 .next {
@@ -102,9 +120,10 @@
   background: transparent;
   color: inherit;
   padding: 0;
-  margin-top: 10px;
+  /* A larger tap target; the negative margin keeps the label in place. */
+  margin: 0 -16px -10px;
+  padding: 10px 16px;
   cursor: pointer;
-  pointer-events: auto;
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
   font-size: 10px;

@@ -34,15 +34,35 @@
   text-transform: uppercase;
 }
 
+.safeTop {
+  display: none;
+}
+
 @media (max-width: 560px) {
   .detail {
     padding: 0;
+  }
+
+  /* Safe zone for the top controls (Index, counter, theme switch): an
+     invisible band over the images that swallows taps and swipes, so a
+     near-miss on a button doesn't open the lightbox or scroll the strip.
+     Below the controls themselves (z 20/30), above the pager. */
+  .safeTop {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 44px;
+    z-index: 15;
+    touch-action: none;
   }
 
   .back {
     top: 12px;
     left: 12px;
     z-index: 20;
+    /* A larger tap target; the negative margin keeps the label in place. */
+    padding: 12px;
+    margin: -12px;
     /* White + difference inverts against what's behind it, in either theme. */
     color: #fff;
     mix-blend-mode: difference;

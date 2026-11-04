@@ -132,6 +132,9 @@ export function DetailView() {
       animate={{ opacity: 1 }}
       transition={GRID_EXIT_TRANSITION}
     >
+      {/* Mobile: a still band behind the top controls (see the CSS). */}
+      <div className={styles.safeTop} aria-hidden="true" />
+
       <button
         type="button"
         className={styles.back}
