@@ -137,7 +137,8 @@
     display: none;
   }
 
+  /* Two text columns on phones too, without the minimum width. */
   .column:nth-of-type(2) .text {
-    columns: auto;
+    columns: 2;
   }
 }
