@@ -1,6 +1,6 @@
 /* Keep every image in the same flex stream so row wrap is driven by the
    viewport, not by project wrappers. Some browsers can treat a per-project
-   display: contents wrapper inconsistently and then the snake ends up looking
+   display: contents wrapper inconsistently and then the reveal ends up looking
    project-based instead of breakpoint-based. */
 
 /* Image + reserved label band, so info stays in flow and rows align. */

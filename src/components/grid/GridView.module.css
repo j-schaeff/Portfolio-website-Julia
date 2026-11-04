@@ -13,19 +13,19 @@
   padding: 48px 14px 24px;
 }
 
-/* Snake-reveal on first load, behind the logo loading screen. The hook measures cell positions, orders them
-   along a serpentine path, and stamps each cell with a staggered --reveal-delay;
+/* Row-by-row reveal on first load, behind the logo loading screen. The hook measures cell positions, orders them
+   row by row, left→right, and stamps each cell with a staggered --reveal-delay;
    these rules hide the cells up front and then fade/rise them in on that delay.
    data-grid-cell is a stable hook (the .cell class lives in another CSS module),
    so it stays unscoped here while .grid is module-scoped. */
-.grid[data-snake="loading"] [data-grid-cell] {
+.grid[data-reveal="loading"] [data-grid-cell] {
   opacity: 0;
   /* Grow from a small seed at the cell's baseline into full size. */
   transform-origin: bottom center;
   transform: scale(0.5);
 }
 
-.grid[data-snake="run"] [data-grid-cell] {
+.grid[data-reveal="run"] [data-grid-cell] {
   opacity: 1;
   transform: scale(1);
   transform-origin: bottom center;
@@ -54,7 +54,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* Belt-and-braces: the hook already opts out, but never leave cells hidden. */
-  .grid[data-snake] [data-grid-cell] {
+  .grid[data-reveal] [data-grid-cell] {
     opacity: 1;
     transform: none;
     transition: none;

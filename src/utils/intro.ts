@@ -1,4 +1,4 @@
-// The logo loading screen + snake reveal play once per page load: on first
+// The logo loading screen + row reveal play once per page load: on first
 // entry or a refresh, never when navigating back to the index inside the app.
 // Module state survives client-side navigation and resets on reload.
 //

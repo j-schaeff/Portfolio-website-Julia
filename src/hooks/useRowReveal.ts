@@ -1,30 +1,30 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
-// Plays a serpentine ("snake") reveal across the grid on first page load: the
-// top row lights up left→right, the next row right→left, and so on, so the
-// images appear to fill the page by snaking back and forth.
+// Plays a row-by-row reveal across the grid on first page load: each row lights
+// up left→right, top row first, so the images appear in the same reading order
+// as the projects themselves.
 //
 // The grid is a flex-wrap of variable-width images that share a bottom baseline
 // (align-items: flex-end), so which image lands on which row is only known once
 // the browser has laid everything out — and that depends on each image's
 // natural width, i.e. on the images having loaded. So we wait for the images,
 // measure the cells, group them into rows by their (shared) bottom edge, order
-// each row in the snake direction, and stamp a staggered transition delay onto
-// every cell. The actual fade/rise is done in CSS off the data-snake attribute.
+// each row left→right, and stamp a staggered transition delay onto
+// every cell. The actual fade/rise is done in CSS off the data-reveal attribute.
 
 // Fresh loads double as the loading screen: the logo covers the page while
-// every image and video loads ("loading"), the snake then plays behind it
-// ("run"), and once the snake has finished and a short pause has passed the
+// every image and video loads ("loading"), the reveal then plays behind it
+// ("run"), and once the reveal has finished and a short pause has passed the
 // logo slides down out of the viewport, leaving its small copy in the grid's
 // last slot. null skips all of it (returning from a project, or reduced
 // motion).
-export type SnakeState = "loading" | "run" | null;
+export type RevealState = "loading" | "run" | null;
 
 // The loading logo: over the page, sliding out of view, or gone (only the
 // grid's copy remains, and only shows once the big one is out of sight).
 export type LogoPhase = "overlay" | "leaving" | "gone";
 
-// Milliseconds between each image lighting up as the snake travels.
+// Milliseconds between each image lighting up.
 const STEP_MS = 120;
 // Each cell's own fade/rise. Keep in sync with the transition in
 // GridView.module.css.
@@ -34,7 +34,7 @@ const ROW_TOLERANCE_PX = 10;
 // Everything should be loaded before the reveal, so this is only a safety net
 // for a dead asset — long enough that normal loads always finish first.
 const MAX_WAIT_MS = 15000;
-// Pause between the snake finishing and the logo leaving.
+// Pause between the reveal finishing and the logo leaving.
 const LOGO_DELAY_MS = 200;
 
 function prefersReducedMotion(): boolean {
@@ -44,8 +44,8 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-// Order cells along a boustrophedon path: row 0 left→right, row 1 right→left, …
-function snakeOrder(cells: HTMLElement[]): HTMLElement[] {
+// Order cells in reading order: rows top to bottom, each row left→right.
+function readingOrder(cells: HTMLElement[]): HTMLElement[] {
   const measured = cells
     .map((el) => ({ el, rect: el.getBoundingClientRect() }))
     .sort((a, b) => a.rect.bottom - b.rect.bottom || a.rect.left - b.rect.left);
@@ -60,9 +60,8 @@ function snakeOrder(cells: HTMLElement[]): HTMLElement[] {
     }
   }
 
-  return rows.flatMap((row, r) => {
+  return rows.flatMap((row) => {
     row.items.sort((a, b) => a.rect.left - b.rect.left);
-    if (r % 2 === 1) row.items.reverse();
     return row.items.map((i) => i.el);
   });
 }
@@ -130,23 +129,23 @@ function whenMediaReady(container: HTMLElement, done: () => void): () => void {
   return cleanup;
 }
 
-export function useSnakeReveal(
+export function useRowReveal(
   ref: RefObject<HTMLElement | null>,
   enabled: boolean,
   // Justified widths are applied, so measured positions are final.
   layoutReady: boolean,
 ) {
   // Decide once, at mount: a fresh load with motion allowed starts hidden so
-  // there's no flash of fully-laid-out images before the snake runs.
-  const [state, setState] = useState<SnakeState>(() =>
+  // there's no flash of fully-laid-out images before the reveal runs.
+  const [state, setState] = useState<RevealState>(() =>
     enabled && !prefersReducedMotion() ? "loading" : null,
   );
   const [logo, setLogo] = useState<LogoPhase>(() =>
     state === "loading" ? "overlay" : "gone",
   );
   const [mediaReady, setMediaReady] = useState(false);
-  // How long the snake takes, measured when it starts.
-  const snakeMs = useRef(0);
+  // How long the reveal takes, measured when it starts.
+  const revealMs = useRef(0);
 
   useLayoutEffect(() => {
     if (state !== "loading") return;
@@ -168,13 +167,13 @@ export function useSnakeReveal(
 
     // One more frame so flex-wrap has settled before we read positions.
     const raf = requestAnimationFrame(() => {
-      const cells = snakeOrder(
+      const cells = readingOrder(
         Array.from(container.querySelectorAll<HTMLElement>("[data-grid-cell]")),
       );
       cells.forEach((cell, i) => {
         cell.style.setProperty("--reveal-delay", `${i * STEP_MS}ms`);
       });
-      snakeMs.current = Math.max(0, cells.length - 1) * STEP_MS + REVEAL_MS;
+      revealMs.current = Math.max(0, cells.length - 1) * STEP_MS + REVEAL_MS;
       setState("run");
     });
     return () => cancelAnimationFrame(raf);
@@ -183,7 +182,7 @@ export function useSnakeReveal(
   // Once the last cell has finished revealing, pause, then send the logo off.
   useEffect(() => {
     if (state !== "run" || logo !== "overlay") return;
-    const timer = window.setTimeout(() => setLogo("leaving"), snakeMs.current + LOGO_DELAY_MS);
+    const timer = window.setTimeout(() => setLogo("leaving"), revealMs.current + LOGO_DELAY_MS);
     return () => window.clearTimeout(timer);
   }, [state, logo]);
 

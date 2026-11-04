@@ -39,7 +39,7 @@ function LogoMark() {
 // Full-screen loading logo. Decorative and ignores the pointer. On exit it
 // slides down past the bottom of the viewport (transform only, so it stays
 // smooth on the compositor). The skeleton pulse runs for the overlay's whole
-// life, through the snake and the exit.
+// life, through the reveal and the exit.
 export function LogoOverlay() {
   return (
     <div className={styles.overlay} aria-hidden="true">
@@ -70,7 +70,7 @@ interface LogoCellProps {
 }
 
 // The grid's final slot. Mirrors a GridItem cell (same reserved label band) so
-// it shares the row's baseline, but isn't a data-grid-cell: the snake reveal
+// it shares the row's baseline, but isn't a data-grid-cell: the row reveal
 // never hides it.
 export function LogoCell({ width, showMark }: LogoCellProps) {
   const cellWidth = width ?? LOGO_WIDTH + LOGO_PAD_LEFT;

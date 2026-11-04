@@ -15,7 +15,7 @@ import { useIsMobile } from "./useIsMobile";
 // Flex-wrap can't enforce a per-row count, so the rows are chosen here and
 // each cell gets an explicit width. The widths of a row sum to the content
 // width, so the (still flat) flex stream wraps exactly where we decided —
-// which keeps the snake reveal's row detection and the cell order untouched.
+// which keeps the row reveal's row detection and the cell order untouched.
 
 interface RowLimits {
   min: number;
