@@ -165,8 +165,10 @@ export function useJustifiedRows(
       for (const [index, img] of project.images.entries()) {
         if (img.hideInGrid) continue;
         const key = cellKey(project.slug, index);
-        const aspect = aspects[key];
-        // The greedy row fill needs every width, so wait for all media.
+        // The build-time ratio wins, so a late load report can't reflow the
+        // rows; measured ones only fill in for media without one.
+        const aspect = img.aspect ?? aspects[key];
+        // The row fill needs every width, so wait for any unknown media.
         if (!aspect) return null;
         cells.push({ key, group: project.slug, width: imageHeight(img.size) * aspect });
       }

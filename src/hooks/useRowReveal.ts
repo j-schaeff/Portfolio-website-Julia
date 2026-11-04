@@ -7,17 +7,19 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObje
 // The grid is a flex-wrap of variable-width images whose rows sit on their
 // line's bottom (or, on mobile, hang from its top), so which image lands on
 // which row is only known once the browser has laid everything out — and that
-// depends on each image's natural width, i.e. on the images having loaded. So
-// we wait for the images, measure the cells, group them into rows by their
-// vertical overlap, order each row left→right, and stamp a staggered
-// transition delay onto every cell. The actual fade/rise is done in CSS off the data-reveal attribute.
+// depends on each image's aspect ratio (known from the build, or measured once
+// it loads). So we wait for the layout, measure the cells, group them into
+// rows by their vertical overlap, order each row left→right, and stamp a
+// staggered transition delay onto every cell. The actual fade/rise is done in
+// CSS off the data-reveal attribute.
 
 // Fresh loads double as the loading screen: the logo covers the page while
-// every image and video loads ("loading"), the reveal then plays behind it
-// ("run"), and once the reveal has finished and a short pause has passed the
-// logo slides down out of the viewport, leaving its small copy in the grid's
-// last slot. null skips all of it (returning from a project, or reduced
-// motion).
+// the images and videos on screen load ("loading"), the reveal then plays
+// behind it ("run"), and once the on-screen cells have revealed and a short
+// pause has passed the logo slides down out of the viewport, leaving its small
+// copy in the grid's last slot. Media below the fold keeps loading after that;
+// waiting for it would hold the logo up for things the visitor can't see.
+// null skips all of it (returning from a project, or reduced motion).
 export type RevealState = "loading" | "run" | null;
 
 // The loading logo: over the page, sliding out of view, or gone (only the
@@ -31,8 +33,9 @@ const STEP_MS = 120;
 const REVEAL_MS = 900;
 // Rows are detected by vertical overlap; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
-// Everything should be loaded before the reveal, so this is only a safety net
-// for a dead asset — long enough that normal loads always finish first.
+// The on-screen media should be loaded before the reveal, so this is only a
+// safety net for a dead asset — long enough that normal loads always finish
+// first.
 const MAX_WAIT_MS = 15000;
 // Pause between the reveal finishing and the logo leaving.
 const LOGO_DELAY_MS = 200;
@@ -76,14 +79,35 @@ function readingOrder(cells: HTMLElement[]): HTMLElement[] {
   });
 }
 
-// Resolve once every <img> in the container has loaded, plus each video's
-// poster (the video itself only starts loading once the reveal begins) — or
-// after MAX_WAIT_MS, so a stalled asset can't freeze the loading screen. A
-// video without a poster is waited on up to its first frame.
-function whenMediaReady(container: HTMLElement, done: () => void): () => void {
-  const media = Array.from(
-    container.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video"),
-  ).map((el) => {
+// The cell's layout box in viewport coordinates. Built from offsets rather
+// than its client rect, which the loading screen's scale-down would skew.
+function layoutBox(el: HTMLElement): { top: number; bottom: number } {
+  const parent = el.offsetParent as HTMLElement | null;
+  // Offsets against <body> (or none) are measured from the document's top.
+  const origin =
+    parent && parent !== document.body
+      ? parent.getBoundingClientRect().top + parent.clientTop
+      : -window.scrollY;
+  const top = origin + el.offsetTop;
+  return { top, bottom: top + el.offsetHeight };
+}
+
+// Whether any of the cell shows in the viewport (a refresh may restore a
+// scrolled position, so it needn't be the top of the page).
+function onScreen(el: HTMLElement): boolean {
+  const { top, bottom } = layoutBox(el);
+  return bottom > 0 && top < window.innerHeight;
+}
+
+// Resolve once every <img> among the given media has loaded, plus each
+// video's poster (the video itself only starts loading once the reveal begins)
+// — or after MAX_WAIT_MS, so a stalled asset can't freeze the loading screen.
+// A video without a poster is waited on up to its first frame.
+function whenMediaReady(
+  elements: (HTMLImageElement | HTMLVideoElement)[],
+  done: () => void,
+): () => void {
+  const media = elements.map((el) => {
     if (!(el instanceof HTMLVideoElement) || !el.poster) return el;
     const poster = new Image();
     poster.src = el.poster;
@@ -153,8 +177,7 @@ export function useRowReveal(
   const [logo, setLogo] = useState<LogoPhase>(() =>
     state === "loading" ? "overlay" : "gone",
   );
-  const [mediaReady, setMediaReady] = useState(false);
-  // How long the reveal takes, measured when it starts.
+  // How long the on-screen part of the reveal takes, measured when it starts.
   const revealMs = useRef(0);
 
   useLayoutEffect(() => {
@@ -165,31 +188,37 @@ export function useRowReveal(
       setLogo("gone");
       return;
     }
-    return whenMediaReady(container, () => setMediaReady(true));
-    // Runs once: state only ever moves forward, never back to "loading".
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useLayoutEffect(() => {
-    if (state !== "loading" || !mediaReady || !layoutReady) return;
-    const container = ref.current;
-    if (!container) return;
+    if (!layoutReady) return;
 
     // One more frame so flex-wrap has settled before we read positions.
+    let cancelWait = () => {};
     const raf = requestAnimationFrame(() => {
       const cells = readingOrder(
         Array.from(container.querySelectorAll<HTMLElement>("[data-grid-cell]")),
       );
+      // Reading order runs top to bottom, so the visible cells are one stretch.
+      const visible = cells.filter(onScreen);
+      const lastVisible = visible.length ? cells.indexOf(visible[visible.length - 1]) : 0;
+      // Cells below the fold reveal together with the last visible one, so
+      // none is still hidden when the visitor scrolls down.
       cells.forEach((cell, i) => {
-        cell.style.setProperty("--reveal-delay", `${i * STEP_MS}ms`);
+        cell.style.setProperty("--reveal-delay", `${Math.min(i, lastVisible) * STEP_MS}ms`);
       });
-      revealMs.current = Math.max(0, cells.length - 1) * STEP_MS + REVEAL_MS;
-      setState("run");
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [state, mediaReady, layoutReady, ref]);
+      revealMs.current = lastVisible * STEP_MS + REVEAL_MS;
 
-  // Once the last cell has finished revealing, pause, then send the logo off.
+      const media = visible.flatMap((cell) =>
+        Array.from(cell.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video")),
+      );
+      cancelWait = whenMediaReady(media, () => setState("run"));
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      cancelWait();
+    };
+  }, [state, layoutReady, ref]);
+
+  // Once the on-screen cells have finished revealing, pause, then send the
+  // logo off.
   useEffect(() => {
     if (state !== "run" || logo !== "overlay") return;
     const timer = window.setTimeout(() => setLogo("leaving"), revealMs.current + LOGO_DELAY_MS);

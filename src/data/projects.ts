@@ -22,15 +22,30 @@ function normalizeSrc(src: string): string {
   return import.meta.env.BASE_URL + src.replace(/^\/+/, "").replace(/^public\//, "");
 }
 
+// Aspect ratios of the uploads, keyed by their path under public/images,
+// written by scripts/optimize-media.mjs. Globbed rather than imported so a
+// missing file (the script hasn't run) just means none are known.
+const aspectFiles = import.meta.glob("../generated/media-aspects.json", {
+  import: "default",
+  eager: true,
+}) as Record<string, Record<string, number>>;
+const aspects = Object.values(aspectFiles)[0] ?? {};
+
+function aspectOf(src: string): number | undefined {
+  const images = import.meta.env.BASE_URL + "images/";
+  return src.startsWith(images) ? aspects[src.slice(images.length)] : undefined;
+}
+
 // Point at the web-sized copies from scripts/optimize-media.mjs. External
 // sources have none, so optimizedSrc() hands them back unchanged.
 function withCopies(src: string, video: boolean) {
+  const aspect = aspectOf(src);
   if (video) {
     const opt = optimizedSrc(src, "opt.mp4");
     const poster = optimizedSrc(src, "poster.webp");
-    return { src, isVideo: true, thumb: opt, full: opt, poster: poster === src ? undefined : poster };
+    return { src, isVideo: true, thumb: opt, full: opt, poster: poster === src ? undefined : poster, aspect };
   }
-  return { src, isVideo: false, thumb: optimizedSrc(src, "thumb.webp"), full: optimizedSrc(src, "full.webp") };
+  return { src, isVideo: false, thumb: optimizedSrc(src, "thumb.webp"), full: optimizedSrc(src, "full.webp"), aspect };
 }
 
 function toImage(entry: unknown): ProjectImage | null {

@@ -9,6 +9,9 @@ export interface ProjectImage {
   thumb: string;
   full: string;
   poster?: string;
+  // Width ÷ height, recorded at build time so the grid can lay out before the
+  // media loads. Missing for external links; the grid measures those instead.
+  aspect?: number;
   size: ImageSize;
   hideInGrid: boolean;
   alt: string;

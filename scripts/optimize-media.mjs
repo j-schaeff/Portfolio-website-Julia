@@ -10,6 +10,7 @@
 // For each video:  <name>.<ext>.opt.mp4     H.264, 1280px long edge, faststart
 //                  <name>.<ext>.poster.webp first frame, 600px tall
 // Keep these names in sync with optimizedSrc() in src/utils/media.ts.
+// Each copy's aspect ratio also goes to src/generated/media-aspects.json.
 import { execFile } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -22,6 +23,8 @@ const run = promisify(execFile);
 const SRC = "public/images";
 const OUT = "public/optimized";
 const MANIFEST = path.join(OUT, ".manifest.json");
+// Read by src/data/projects.ts (gitignored, like the copies).
+const ASPECTS = "src/generated/media-aspects.json";
 // Bump when the settings below change, so every copy is regenerated.
 const VERSION = 1;
 
@@ -156,6 +159,24 @@ async function main() {
 
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, files: next }, null, 2));
+
+  // Every copy's aspect ratio, so the index can lay out its rows (and the
+  // loading screen can tell which images are on screen) before any image has
+  // loaded. Read from the copies: they're already EXIF-rotated, and a poster
+  // has its video's proportions. Rewritten every run, skipped work included.
+  const aspects = {};
+  for (const rel of Object.keys(next)) {
+    const base = path.join(OUT, rel);
+    const file = VIDEO_EXT.test(rel) ? `${base}.poster.webp` : `${base}.thumb.webp`;
+    try {
+      const { width, height } = await sharp(file).metadata();
+      if (width && height) aspects[rel] = width / height;
+    } catch {
+      // No ratio: the grid falls back to measuring the image once it loads.
+    }
+  }
+  fs.mkdirSync(path.dirname(ASPECTS), { recursive: true });
+  fs.writeFileSync(ASPECTS, JSON.stringify(aspects, null, 2));
   console.log(`optimize-media: ${made} updated, ${Object.keys(next).length - made} unchanged, ${failed} skipped`);
 }
 
