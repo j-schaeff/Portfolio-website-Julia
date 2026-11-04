@@ -4,7 +4,7 @@ type: Food Design
 year: 2026
 order: 8
 images:
-  - video: /images/uploads/9_bread_scape/bread-scape-video-4.mp4
+  - video: /images/uploads/9_bread_scape/bread-scape-video-hero-4.mp4
     size: "5"
     hideInGrid: false
   - image: /images/uploads/9_bread_scape/bread-scape-4.jpg
