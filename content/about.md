@@ -134,7 +134,6 @@ column2: >-
   UN-Kaufrechts. Gerichtsstand für Unternehmer:innen ist Wien. Für
   Verbraucher:innen gelten die gesetzlichen Gerichtsstände. Zwingende
   Schutzvorschriften ihres Aufenthaltsstaats bleiben unberührt.
-column3: Placeholder for the third column — replace this text in Pages CMS (About).
 links:
   - label: Electronic Mail
     url: Juliaschaeffler99@gmail.com
