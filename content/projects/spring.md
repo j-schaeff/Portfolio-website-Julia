@@ -5,7 +5,7 @@ description: A zine celebrating the excitements of spring, featuring a
   custom-type design created with imagery that hints at the delicate features of
   the season.
 year: 2023
-order: 5
+order: 6
 images:
   - image: /images/uploads/5_spring/cover-2.jpg
     size: "4"
