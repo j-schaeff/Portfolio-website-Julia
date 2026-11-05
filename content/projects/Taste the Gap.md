@@ -7,7 +7,7 @@ description: |-
   Parmigiano crackers filled with spicy tomato & beet jam |
   Ginger & basil fermented soda 
 year: 2026
-order: 5
+order: 2
 images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
     size: "5"
