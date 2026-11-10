@@ -121,6 +121,9 @@ function whenMediaReady(
 
   let pending = media.filter((el) => !isReady(el)).length;
   let settled = false;
+  // Declared up front: when everything is already cached, finish() (and so
+  // cleanup) runs before the timeout below is ever set.
+  let timer = 0;
   const finish = () => {
     if (settled) return;
     settled = true;
@@ -159,7 +162,7 @@ function whenMediaReady(
     el.addEventListener("loadeddata", onReady);
     el.addEventListener("error", onReady);
   }
-  const timer = window.setTimeout(finish, MAX_WAIT_MS);
+  timer = window.setTimeout(finish, MAX_WAIT_MS);
   return cleanup;
 }
 

@@ -66,6 +66,8 @@ export function ScrollStrip({
             index={i}
             src={img.full}
             original={img.src}
+            aspect={img.aspect}
+            placeholder={img.isVideo ? img.poster : img.thumb}
             alt={img.alt || `${activeProject.title} — ${i + 1}`}
             size={img.size}
             largest={largest}

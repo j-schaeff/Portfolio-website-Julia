@@ -53,6 +53,12 @@ export function ProjectPager({
   useEffect(() => setIntro(false), []);
   // Which image sits under the active strip's center.
   const [position, setPosition] = useState(0);
+  // Projects whose first item has loaded enough to know its size. Until then
+  // a first item without a build-time aspect ratio is 0px wide, which would
+  // leave the description card showing in its place.
+  const [sized, setSized] = useState<ReadonlySet<string>>(() => new Set());
+  const markSized = (slug: string) =>
+    setSized((prev) => (prev.has(slug) ? prev : new Set(prev).add(slug)));
 
   const activeSlugRef = useRef(active?.slug);
   activeSlugRef.current = active?.slug;
@@ -218,6 +224,7 @@ export function ProjectPager({
               1,
             );
             const rise = intro && !copy && project.slug === active.slug;
+            const firstSized = !!project.images[0]?.aspect || sized.has(project.slug);
             // The next project, wrapping to the first: the hint says swiping
             // down moves on, and a tap does the same.
             const next = projects.length > 1
@@ -240,6 +247,8 @@ export function ProjectPager({
                           index={i}
                           src={img.full}
                           original={img.src}
+                          aspect={img.aspect}
+                          placeholder={img.isVideo ? img.poster : img.thumb}
                           alt={img.alt || `${project.title} — ${i + 1}`}
                           size={img.size}
                           largest={largest}
@@ -247,6 +256,7 @@ export function ProjectPager({
                           rise={rise}
                           shared={!copy}
                           onClick={(e) => onImageClick(project, i, e)}
+                          onReady={i === 0 ? () => markSized(project.slug) : undefined}
                         />
                         {i === 0 && (
                           // Rises in step with the image slot it takes.
@@ -256,6 +266,7 @@ export function ProjectPager({
                             initial={rise ? { y: window.innerHeight } : false}
                             animate={{ y: 0 }}
                             transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
+                            style={firstSized ? undefined : { visibility: "hidden" }}
                           >
                             <p className={styles.description}>{project.description}</p>
                           </motion.div>

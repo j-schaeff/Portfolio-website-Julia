@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
@@ -14,6 +14,12 @@ interface StripImageProps {
   // The detail-sized copy, and the upload to fall back to if it's missing.
   src: string;
   original: string;
+  // Width ÷ height from the build. Sizes the box before the file arrives, so
+  // nothing after it in the strip shifts (or shows early) while it loads.
+  aspect?: number;
+  // Already-cached stand-in shown until the detail copy loads: the grid
+  // thumbnail for an image, the poster frame for a video.
+  placeholder?: string;
   alt: string;
   size: ImageSize;
   // Largest size in the project; on tablet/desktop it fills the strip height.
@@ -25,14 +31,21 @@ interface StripImageProps {
   // the lightbox morphs to the real image.
   shared?: boolean;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  // Fires once the media knows its own dimensions (loaded / metadata).
+  onReady?: () => void;
 }
 
-export function StripImage({ slug, index, src: preferred, original, alt, size, largest, isVideo, rise, shared = true, onClick }: StripImageProps) {
+export function StripImage({ slug, index, src: preferred, original, alt, size, largest, isVideo, rise, shared = true, onClick, onReady, aspect, placeholder }: StripImageProps) {
   // Every strip image keeps its layoutId so the lightbox can morph to/from it.
   // The grid has none, so opening a project never matches a grid image.
   const isMobile = useIsMobile();
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   const onError = isOriginal ? undefined : fallBack;
+  const [loaded, setLoaded] = useState(false);
+  const handleReady = () => {
+    setLoaded(true);
+    onReady?.();
+  };
 
   const layoutId = shared ? imageLayoutId(slug, index) : undefined;
   const isLeadingMobileImage = isMobile && index === 0;
@@ -44,6 +57,14 @@ export function StripImage({ slug, index, src: preferred, original, alt, size, l
         height: isMobile ? detailImageHeight(size) : detailFillHeight(size, largest),
         objectFit: "contain",
       };
+  if (aspect) style.aspectRatio = aspect;
+  // The placeholder fills the box exactly (it has the same aspect ratio), and
+  // is dropped once the real image is in so it can't show through
+  // transparent areas.
+  if (placeholder && !isVideo && !loaded) {
+    style.backgroundImage = `url("${placeholder}")`;
+    style.backgroundSize = "100% 100%";
+  }
 
   // Start a full viewport down so every image, whatever its height, begins
   // hidden; the strip clips it, so it emerges from the strip's baseline. Only
@@ -65,12 +86,14 @@ export function StripImage({ slug, index, src: preferred, original, alt, size, l
         layoutId={layoutId}
         className={styles.image}
         src={src}
+        poster={placeholder}
         aria-label={alt}
         muted
         loop
         autoPlay
         playsInline
         onClick={onClick}
+        onLoadedMetadata={handleReady}
         onError={onError}
         style={style}
       />
@@ -86,6 +109,7 @@ export function StripImage({ slug, index, src: preferred, original, alt, size, l
       alt={alt}
       draggable={false}
       onClick={onClick}
+      onLoad={handleReady}
       onError={onError}
       style={style}
     />
