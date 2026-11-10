@@ -12,11 +12,11 @@ content:
     filename: "{fields.title}.md"
     format: yaml-frontmatter
     view:
-      fields: [order, title, type, year]
+      fields: [title, type, year]
       primary: title
-      sort: [order, year, title]
+      sort: [title, year]
       default:
-        sort: order
+        sort: title
         order: asc
     fields:
       - name: title
@@ -31,10 +31,6 @@ content:
       - name: year
         label: Year
         type: number
-      - name: order
-        label: Order
-        type: number
-        description: Controls position in the grid and lists (ascending).
       - name: images
         label: Images
         type: object
@@ -107,3 +103,22 @@ content:
             label: URL
             type: string
             description: A web address, or mailto:you@example.com for email.
+
+  # One list that sets the order of the projects on the site; drag entries to
+  # reorder. Read by src/data/projects.ts, where unlisted projects go last.
+  - name: order
+    label: Project order
+    type: file
+    path: content/order.md
+    format: yaml-frontmatter
+    fields:
+      - name: projects
+        label: Projects
+        type: reference
+        list: true
+        description: Drag to reorder; the top project shows first. Add new projects here, or they appear at the end.
+        options:
+          collection: projects
+          search: title
+          value: "{path}"
+          label: "{title}"

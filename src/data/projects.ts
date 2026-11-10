@@ -87,13 +87,41 @@ function toProject(path: string, raw: string): Project {
     type: String(fm.type ?? "Uncategorized"),
     description: String(fm.description ?? ""),
     year: Number(fm.year ?? 0),
-    order: Number(fm.order ?? 0),
     images: Array.isArray(fm.images)
       ? fm.images.map(toImage).filter((img): img is ProjectImage => img !== null)
       : [],
   };
 }
 
+// The site's project order comes from the single "Project order" list in the
+// CMS (content/order.md), where entries are dragged into place. Entries are
+// project file paths; they're matched by slug so a bare filename works too.
+// Globbed so a missing file just means no order. Filenames are NFC-normalised
+// first because macOS can store "ä" decomposed, which would change the slug.
+const orderFiles = import.meta.glob("/content/order.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+const orderRaw = Object.values(orderFiles)[0];
+const orderList = orderRaw ? (matter(orderRaw).data as Record<string, unknown>).projects : undefined;
+
+const orderKey = (path: string) => slugFromPath(path.normalize("NFC"));
+const position = new Map<string, number>();
+(Array.isArray(orderList) ? orderList : []).forEach((entry, i) => {
+  const key = orderKey(String(entry ?? ""));
+  if (key && !position.has(key)) position.set(key, i);
+});
+
+// Listed projects first, in list order; anything not listed yet (e.g. a newly
+// created project) follows, by year then title. Entries for deleted files are
+// simply never matched.
 export const projects: Project[] = Object.entries(files)
-  .map(([path, raw]) => toProject(path, raw))
-  .sort((a, b) => a.order - b.order || a.year - b.year || a.title.localeCompare(b.title));
+  .map(([path, raw]) => ({ project: toProject(path, raw), rank: position.get(orderKey(path)) ?? Infinity }))
+  .sort(
+    (a, b) =>
+      (a.rank === b.rank ? 0 : a.rank - b.rank) ||
+      a.project.year - b.project.year ||
+      a.project.title.localeCompare(b.project.title),
+  )
+  .map(({ project }) => project);

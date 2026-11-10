@@ -8,7 +8,6 @@ description: Consumer culture has turned authenticity into an aesthetic
   in what it allows us to feel. Authenticity, then, may be less a matter of
   truth than of belief.
 year: 2026
-order: 7
 images:
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-4.jpg
     size: "5"

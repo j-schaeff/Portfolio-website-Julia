@@ -6,7 +6,6 @@ description: A typographic poster for a fictional creative culinary experience
   the movement and forms of growing herbs, embodying the delicate, airy
   atmosphere of an open-air event.
 year: 2025
-order: 5
 images:
   - image: /images/uploads/2_kraueterkult/Krauter_kult_1.jpg
     size: "3"

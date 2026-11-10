@@ -23,7 +23,6 @@ export interface Frontmatter {
   type: string;
   description: string;
   year: number;
-  order: number;
   images: ProjectImage[];
 }
 

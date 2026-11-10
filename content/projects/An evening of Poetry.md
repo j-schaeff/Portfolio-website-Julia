@@ -6,7 +6,6 @@ description: An intimate event created by friends, for friends, centered around
   invitation and booklet put a modern spin on a familiar event symbol, blending
   nostalgia with a fresh, contemporary design.
 year: 2023
-order: 3
 images:
   - image: /images/uploads/3_poetry/Booklet4.png
     size: "3"

@@ -3,7 +3,6 @@ title: Room & Board
 type: Art Direction & Video
 description: "A visual connecting architechture with a meal "
 year: 2026
-order: 4
 images:
   - video: /images/uploads/4_room_board/Test_green_House.mp4
     size: "5"
