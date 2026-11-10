@@ -62,15 +62,35 @@
   pointer-events: auto;
 }
 
+/* Set in the same small caps style as type and year. */
+.client {
+  flex: 0 0 auto;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+/* Underlines on hover so it reads as a link. */
+.clientLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .specs {
   flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
-  column-gap: 48px;
+  /* Wide gap; the year ends on the page's 14px right margin. */
+  column-gap: 128px;
   line-height: 1.25;
   white-space: nowrap;
-  padding-right: 20px;
   box-sizing: border-box;
   pointer-events: auto;
 }
@@ -124,10 +144,9 @@
     flex: 0 1 auto;
     display: grid;
     grid-template-columns: minmax(80px, 1fr) auto;
-    column-gap: 16px;
+    column-gap: 48px;
     justify-content: start;
     white-space: nowrap;
-    padding-right: 20px;
   }
 
   .type,

@@ -87,6 +87,8 @@ function toProject(path: string, raw: string): Project {
     type: String(fm.type ?? "Uncategorized"),
     description: String(fm.description ?? ""),
     year: Number(fm.year ?? 0),
+    client: String(fm.client ?? "").trim(),
+    clientUrl: String(fm.clientUrl ?? "").trim(),
     images: Array.isArray(fm.images)
       ? fm.images.map(toImage).filter((img): img is ProjectImage => img !== null)
       : [],

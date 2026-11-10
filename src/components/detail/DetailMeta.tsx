@@ -26,10 +26,10 @@ export function metaHeight(projects: Project[]): number {
   return Math.max(112, (longestDescriptionLines + 1) * 20 + 18);
 }
 
-// Only the in-view project's info, in one row of three columns: description,
-// title, then type+date at the right edge. Scrolling switches the project (see
-// DetailView), and this text follows it. Once the viewport narrows, title and
-// type+date wrap beneath the description. `projects` is still needed so metaHeight() can size the block
+// Only the in-view project's info, in one row: description, title, client
+// (when set; a link when it has a URL), then type+date at the right edge. Scrolling switches the project (see
+// DetailView), and this text follows it. Once the viewport narrows, the other
+// columns wrap beneath the description. `projects` is still needed so metaHeight() can size the block
 // for the longest description. Tablet/desktop only: on mobile ProjectPager
 // shows the text inside each project's strip.
 export function DetailMeta({ projects, active }: DetailMetaProps) {
@@ -52,6 +52,23 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       <div className={styles.titleCol}>
         <h2 className={styles.title}>{active.title}</h2>
       </div>
+
+      {active.client && (
+        <div className={styles.client}>
+          {active.clientUrl ? (
+            <a
+              href={active.clientUrl}
+              target={active.clientUrl.startsWith("mailto:") ? undefined : "_blank"}
+              rel="noreferrer"
+              className={styles.clientLink}
+            >
+              {active.client}
+            </a>
+          ) : (
+            active.client
+          )}
+        </div>
+      )}
 
       <div className={styles.specs}>
         <span className={styles.type}>{active.type}</span>

@@ -31,6 +31,14 @@ content:
       - name: year
         label: Year
         type: number
+      - name: client
+        label: Client
+        type: string
+        description: Optional. Shown next to the project name on the project page.
+      - name: clientUrl
+        label: Client link
+        type: string
+        description: Optional. A web address; when set, the client name links to it.
       - name: images
         label: Images
         type: object
