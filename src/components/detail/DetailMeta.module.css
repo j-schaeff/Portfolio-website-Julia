@@ -6,7 +6,9 @@
   z-index: 3;
   display: flex;
   flex-wrap: nowrap;
-  align-items: flex-start;
+  justify-content: space-between;
+  /* Title, description and type/date share their first line. */
+  align-items: baseline;
   column-gap: 128px;
   row-gap: 0;
   min-height: 112px;
@@ -21,19 +23,32 @@
 
 .intro {
   flex: 0 1 32ch;
-  align-self: stretch;
+}
+
+.titleCol {
+  /* Soaks up the row's free space (pushing the specs block to the right edge)
+     and centers the title within it, so it sits near the page center. */
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
 }
 
 .title {
-  margin: 0 0 3px;
-  font-family: var(--font-sans);
-  font-feature-settings: "ss02";
-  /* Only the Ultra cut of A2Z Faucet ships, so the small size is what lightens
-     it; a lower font-weight would change nothing. */
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  margin: 0;
+  /* Styled like the description text, not as a heading. */
+  font-size: 14px;
+  font-weight: inherit;
   line-height: 1.35;
+}
+
+/* Same »Title« marks as the grid's InfoBlock. */
+.title::before {
+  content: "\00BB";
+}
+
+.title::after {
+  content: "\00AB";
 }
 
 .description {
@@ -47,57 +62,12 @@
   pointer-events: auto;
 }
 
-.namesCol {
-  /* Soaks up the row's free space (pushing the specs block to the right edge
-     and keeping it content-width) and centers the title list within that
-     stretched span — so the left-aligned titles sit near the page center. */
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-width: 0;
-  pointer-events: auto;
-}
-
-.names {
-  text-align: left;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  /* Tighter leading; kept identical to .specs so the rows stay aligned. */
-  row-gap: 2px;
-  line-height: 1.25;
-  font-size: 14px;
-}
-
-.names li {
-  white-space: nowrap;
-  transition: transform var(--transition);
-}
-
-.linkButton {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
-  text-align: inherit;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  transition: transform var(--transition);
-}
-
 .specs {
-  flex: 0.0001 1 auto;
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
   column-gap: 48px;
-  row-gap: 8px;
   line-height: 1.25;
   white-space: nowrap;
   padding-right: 20px;
@@ -114,7 +84,6 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: transform var(--transition);
   white-space: nowrap;
 }
 
@@ -127,20 +96,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
-  transition: transform var(--transition);
   white-space: nowrap;
-}
-
-.names li.hovered,
-.type.hovered,
-.date.hovered {
-  transform: translateX(10px);
-}
-
-.names li.active,
-.type.active,
-.date.active {
-  transform: translateX(20px);
 }
 
 @media (max-width: 880px) {
@@ -159,10 +115,9 @@
     text-indent: 20px;
   }
 
-  .namesCol {
+  .titleCol {
     flex: 1 1 0;
     justify-content: flex-start;
-    min-width: 0;
   }
 
   .specs {

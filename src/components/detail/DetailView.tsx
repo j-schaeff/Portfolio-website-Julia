@@ -166,7 +166,6 @@ export function DetailView() {
         <DetailMeta
           projects={projects}
           active={active}
-          onSelectProject={handleProjectSelect}
         />
       )}
 

@@ -1,4 +1,3 @@
-import { Fragment, useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "../../types/project";
 import { ZOOM_TRANSITION } from "../../utils/motion";
@@ -7,7 +6,6 @@ import styles from "./DetailMeta.module.css";
 interface DetailMetaProps {
   projects: Project[];
   active: Project;
-  onSelectProject: (slug: string) => void;
 }
 
 // Height of the metadata block: tall enough for the title line plus the longest
@@ -28,27 +26,14 @@ export function metaHeight(projects: Project[]): number {
   return Math.max(112, (longestDescriptionLines + 1) * 20 + 18);
 }
 
-// Three independent blocks — title+description, project names, and type+date — laid
-// out in a row that wraps as whole units when the viewport narrows. While they
-// sit side by side the name and type/date rows line up; once the type+date
-// block wraps it drops beneath the names as a single column. The in-view
-// project's name and its type/date slide right together. Tablet/desktop
-// only: on mobile ProjectPager shows the text inside each project's strip.
-export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProps) {
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-
+// Only the in-view project's info, in one row of three columns: description,
+// title, then type+date at the right edge. Scrolling switches the project (see
+// DetailView), and this text follows it. Once the viewport narrows, title and
+// type+date wrap beneath the description. `projects` is still needed so metaHeight() can size the block
+// for the longest description. Tablet/desktop only: on mobile ProjectPager
+// shows the text inside each project's strip.
+export function DetailMeta({ projects, active }: DetailMetaProps) {
   const infoHeight = metaHeight(projects);
-
-  // A project's name, type and date highlight together, on hover or when active.
-  const stateClass = (p: Project) =>
-    [p.slug === active.slug && styles.active, p.slug === hoveredSlug && styles.hovered]
-      .filter(Boolean)
-      .join(" ");
-  const linkProps = (p: Project) => ({
-    onClick: () => onSelectProject(p.slug),
-    onMouseEnter: () => setHoveredSlug(p.slug),
-    onMouseLeave: () => setHoveredSlug(null),
-  });
 
   return (
     // Fades in just behind the strip's rise so the images lead the entrance.
@@ -61,48 +46,16 @@ export function DetailMeta({ projects, active, onSelectProject }: DetailMetaProp
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
       <div className={styles.intro}>
-        <h2 className={styles.title}>{active.title}</h2>
         <p className={styles.description}>{active.description}</p>
       </div>
 
-      <div className={styles.namesCol}>
-        <ul className={styles.names}>
-          {projects.map((p) => (
-            <li key={p.slug} className={stateClass(p) || undefined}>
-              <button
-                type="button"
-                className={styles.linkButton}
-                {...linkProps(p)}
-                aria-label={`View ${p.title}`}
-              >
-                {p.title}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className={styles.titleCol}>
+        <h2 className={styles.title}>{active.title}</h2>
       </div>
 
       <div className={styles.specs}>
-        {projects.map((p) => (
-          <Fragment key={p.slug}>
-            <button
-              type="button"
-              className={`${styles.type} ${stateClass(p)} ${styles.linkButton}`}
-              {...linkProps(p)}
-              aria-label={`View ${p.title} project type`}
-            >
-              {p.type}
-            </button>
-            <button
-              type="button"
-              className={`${styles.date} ${stateClass(p)} ${styles.linkButton}`}
-              {...linkProps(p)}
-              aria-label={`View ${p.title} project year`}
-            >
-              {p.year}
-            </button>
-          </Fragment>
-        ))}
+        <span className={styles.type}>{active.type}</span>
+        <span className={styles.date}>{active.year}</span>
       </div>
     </motion.div>
   );
