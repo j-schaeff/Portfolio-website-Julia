@@ -113,10 +113,11 @@ content:
     format: yaml-frontmatter
     fields:
       - name: projects
-        label: Projects
+        # Pages CMS repeats a list field's description under every entry, so
+        # the instructions live in the label, which shows once above the list.
+        label: "Projects — drag to reorder, top shows first. Add new projects here, or they appear at the end."
         type: reference
         list: true
-        description: Drag to reorder; the top project shows first. Add new projects here, or they appear at the end.
         options:
           collection: projects
           search: title
