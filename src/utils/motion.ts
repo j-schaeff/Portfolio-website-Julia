@@ -1,4 +1,4 @@
-const EASE = [0.22, 1, 0.36, 1] as const;
+export const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Shared timing for the grid's fade and the strip ↔ lightbox shared-element
 // morph.
@@ -12,3 +12,16 @@ export const RISE_STAGGER = 0.06;
 export const GRID_EXIT_TRANSITION = { duration: 0.35, ease: EASE } as const;
 // Lightbox paging: a quick crossfade between images.
 export const LIGHTBOX_FADE = { duration: 0.25, ease: EASE } as const;
+
+// Mobile detail view: once the rise is done, the strip slides a little to the
+// left and back, hinting that it scrolls sideways. Out with the usual ease,
+// back with a gentler in-out.
+export const NUDGE_DELAY = RISE_TRANSITION.duration + RISE_STAGGER;
+// How much of the strip past the first image's right edge the nudge shows
+// (the gap, then the start of the description card).
+export const NUDGE_PEEK = 64;
+export const NUDGE_TRANSITION = {
+  duration: 1.1,
+  times: [0, 0.4, 1],
+  ease: [[...EASE], [0.45, 0, 0.55, 1]] as [number, number, number, number][],
+};

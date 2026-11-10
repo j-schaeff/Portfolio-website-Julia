@@ -43,7 +43,7 @@
     padding: 0;
   }
 
-  /* Safe zone for the top controls (Index, counter, theme switch): an
+  /* Safe zone for the top controls (Index, theme switch): an
      invisible band over the images that swallows taps and swipes, so a
      near-miss on a button doesn't open the lightbox or scroll the strip.
      Below the controls themselves (z 20/30), above the pager. */

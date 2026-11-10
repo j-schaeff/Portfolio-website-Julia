@@ -69,7 +69,7 @@
 }
 
 /* The project's description, the strip's second item. Its text starts at the
-   top, clear of the Index button and the image counter, with roomy sides so
+   top, clear of the Index button and the theme switch, with roomy sides so
    it sits apart from the images either side. Nearly a screen wide (capped on
    larger phones) so lines stay long enough to read comfortably. On the page
    background, so plain theme colours rather than difference blending. */
@@ -130,30 +130,4 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-/* Image counter. White + difference inverts against the
-   image behind, in either theme. */
-.position {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 20;
-  pointer-events: none;
-  color: #fff;
-  mix-blend-mode: difference;
-}
-
-.counter {
-  position: absolute;
-  /* Centered: the right corner belongs to the theme toggle. Same top as the
-     Index button. */
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-sans);
-  font-feature-settings: "ss02";
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
 }

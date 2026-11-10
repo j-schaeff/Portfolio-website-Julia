@@ -1,7 +1,14 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, PresenceContext } from "framer-motion";
+import { animate, motion, PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
-import { RISE_STAGGER, RISE_TRANSITION, ZOOM_TRANSITION } from "../../utils/motion";
+import {
+  NUDGE_DELAY,
+  NUDGE_PEEK,
+  NUDGE_TRANSITION,
+  RISE_STAGGER,
+  RISE_TRANSITION,
+  ZOOM_TRANSITION,
+} from "../../utils/motion";
 import { StripImage } from "./StripImage";
 import styles from "./ProjectPager.module.css";
 
@@ -31,6 +38,13 @@ interface ProjectPagerProps {
 // the full-screen first image, so swiping on reads it before the rest of the
 // images.
 //
+// The first image fills the screen, so a cropped edge alone doesn't say
+// there's more to the right. Once the entrance rise is done, the strip nudges:
+// it slides a little to the left, so the description card's edge peeks in,
+// and eases back. It moves the real scroll position, so it shows the actual
+// gesture. It plays once per opening of the detail view, not on project
+// switches, and a touch stops it where it is.
+//
 // The list loops: a copy of the last project sits above the first and a copy
 // of the first below the last. Scrolling onto a copy looks like wrapping
 // around, and once the scroll settles the pager jumps, invisibly, to the real
@@ -51,8 +65,6 @@ export function ProjectPager({
   // Only the images on screen when the page opens rise in.
   const [intro, setIntro] = useState(true);
   useEffect(() => setIntro(false), []);
-  // Which image sits under the active strip's center.
-  const [position, setPosition] = useState(0);
   // Projects whose first item has loaded enough to know its size. Until then
   // a first item without a build-time aspect ratio is 0px wide, which would
   // leave the description card showing in its place.
@@ -73,24 +85,6 @@ export function ProjectPager({
       `[data-project-slug="${CSS.escape(slug)}"]` +
         (copy ? `[data-copy="${copy}"]` : ":not([data-copy])"),
     ) ?? null;
-
-  const measure = () => {
-    const strip = activeSlugRef.current
-      ? pageFor(activeSlugRef.current)?.firstElementChild
-      : null;
-    if (!(strip instanceof HTMLElement)) return;
-    const group = strip.firstElementChild;
-    const center = strip.scrollLeft + strip.clientWidth / 2;
-    // The description card isn't an image, so it doesn't count; while it's
-    // centered the counter stays on the first image.
-    let index = 0;
-    Array.from(group?.children ?? [])
-      .filter((child) => !(child as HTMLElement).dataset.info)
-      .forEach((child, i) => {
-        if ((child as HTMLElement).offsetLeft <= center) index = i;
-      });
-    setPosition(index);
-  };
 
   // Bring the active project into view when it was chosen some other way than
   // scrolling: instantly on first render (landing on a project's URL), with a
@@ -117,12 +111,53 @@ export function ProjectPager({
     pager.scrollTo({ top: page.offsetTop, behavior: first ? "auto" : "smooth" });
   }, [active?.slug]);
 
-  // Scroll events don't bubble, but a capturing listener on the pager hears
-  // every strip's. rAF-throttled.
+  // The nudge, once the rise has finished (see the header comment).
   useEffect(() => {
     const pager = pagerRef.current;
     if (!pager) return;
-    let frame = 0;
+    let controls: ReturnType<typeof animate> | undefined;
+    let touched = false;
+    const onTouch = () => {
+      touched = true;
+      controls?.stop();
+    };
+    const timer = window.setTimeout(() => {
+      if (touched || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const slug = activeSlugRef.current;
+      const strip = slug ? pageFor(slug)?.firstElementChild : null;
+      if (!(strip instanceof HTMLElement) || strip.scrollLeft > 0) return;
+      // Far enough to bring the first image's right edge on screen with a
+      // little of what follows it: a landscape image at full height runs well
+      // past the screen, and a fixed nudge would only slide its picture.
+      const firstItem = strip.firstElementChild?.firstElementChild;
+      const firstRight = firstItem
+        ? firstItem.getBoundingClientRect().right - strip.getBoundingClientRect().left
+        : 0;
+      const distance = Math.min(
+        Math.max(firstRight - strip.clientWidth + NUDGE_PEEK, NUDGE_PEEK),
+        strip.scrollWidth - strip.clientWidth,
+      );
+      if (distance <= 0) return;
+      controls = animate(0, [0, distance, 0], {
+        ...NUDGE_TRANSITION,
+        // Longer swings take a little longer, so they don't whip.
+        duration: NUDGE_TRANSITION.duration + Math.min(distance / 1000, 0.6),
+        onUpdate: (value: number) => {
+          strip.scrollLeft = value;
+        },
+      });
+    }, NUDGE_DELAY * 1000);
+    pager.addEventListener("touchstart", onTouch, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      controls?.stop();
+      pager.removeEventListener("touchstart", onTouch);
+    };
+  }, []);
+
+  useEffect(() => {
+    const pager = pagerRef.current;
+    if (!pager) return;
     let settleTimer = 0;
     let touching = false;
 
@@ -154,15 +189,10 @@ export function ProjectPager({
     // while a finger is down: that's a drag paused, not a scroll ended.
     const hasScrollEnd = "onscrollend" in window;
 
-    const onScroll = (event: Event) => {
-      if (!frame) frame = requestAnimationFrame(() => {
-        frame = 0;
-        measure();
-      });
-      if (!hasScrollEnd && event.target === pager) {
-        window.clearTimeout(settleTimer);
-        settleTimer = window.setTimeout(settle, 150);
-      }
+    const onScroll = () => {
+      if (hasScrollEnd) return;
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(settle, 150);
     };
     const onScrollEnd = (event: Event) => {
       if (event.target === pager) settle();
@@ -180,27 +210,22 @@ export function ProjectPager({
       settleTimer = window.setTimeout(settle, 150);
     };
 
-    pager.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    pager.addEventListener("scroll", onScroll, { passive: true });
     pager.addEventListener("scrollend", onScrollEnd);
     pager.addEventListener("touchstart", onTouchStart, { passive: true });
     pager.addEventListener("touchend", onTouchEnd, { passive: true });
     pager.addEventListener("touchcancel", onTouchEnd, { passive: true });
     return () => {
-      pager.removeEventListener("scroll", onScroll, { capture: true });
+      pager.removeEventListener("scroll", onScroll);
       pager.removeEventListener("scrollend", onScrollEnd);
       pager.removeEventListener("touchstart", onTouchStart);
       pager.removeEventListener("touchend", onTouchEnd);
       pager.removeEventListener("touchcancel", onTouchEnd);
-      cancelAnimationFrame(frame);
       window.clearTimeout(settleTimer);
     };
   }, []);
 
-  useEffect(measure, [active?.slug]);
-
   if (!active) return null;
-
-  const imageCount = active.images.length;
 
   const first = projects[0];
   const last = projects[projects.length - 1];
@@ -211,113 +236,94 @@ export function ProjectPager({
   ];
 
   return (
-    <>
-      <div ref={pagerRef} className={styles.pager}>
-        {/* Keep strip images out of the route's AnimatePresence: their
-            layoutId makes each one register for presence, which can block the
-            detail route's exit (see ScrollStrip). */}
-        <PresenceContext.Provider value={null}>
-          {pages.map(({ project, copy }) => {
-            // The project's largest image sets the scale for the rest.
-            const largest = project.images.reduce<ImageSize>(
-              (max, img) => (img.size > max ? img.size : max),
-              1,
-            );
-            const rise = intro && !copy && project.slug === active.slug;
-            const firstSized = !!project.images[0]?.aspect || sized.has(project.slug);
-            // The next project, wrapping to the first: the hint says swiping
-            // down moves on, and a tap does the same.
-            const next = projects.length > 1
-              ? projects[(projects.indexOf(project) + 1) % projects.length]
-              : undefined;
-            return (
-              <section
-                key={copy ? `${copy}-${project.slug}` : project.slug}
-                className={styles.page}
-                data-project-slug={project.slug}
-                data-copy={copy}
-                aria-hidden={copy ? true : undefined}
-              >
-                <div className={styles.strip}>
-                  <div className={styles.group}>
-                    {project.images.map((img, i) => (
-                      <Fragment key={img.src + i}>
-                        <StripImage
-                          slug={project.slug}
-                          index={i}
-                          src={img.full}
-                          original={img.src}
-                          aspect={img.aspect}
-                          placeholder={img.isVideo ? img.poster : img.thumb}
-                          alt={img.alt || `${project.title} — ${i + 1}`}
-                          size={img.size}
-                          largest={largest}
-                          isVideo={img.isVideo}
-                          rise={rise}
-                          shared={!copy}
-                          onClick={(e) => onImageClick(project, i, e)}
-                          onReady={i === 0 ? () => markSized(project.slug) : undefined}
-                        />
-                        {i === 0 && (
-                          // Rises in step with the image slot it takes.
-                          <motion.div
-                            className={styles.info}
-                            data-info="true"
-                            initial={rise ? { y: window.innerHeight } : false}
-                            animate={{ y: 0 }}
-                            transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
-                            style={firstSized ? undefined : { visibility: "hidden" }}
-                          >
-                            <p className={styles.description}>{project.description}</p>
-                          </motion.div>
-                        )}
-                      </Fragment>
-                    ))}
-                  </div>
+    <div ref={pagerRef} className={styles.pager}>
+      {/* Keep strip images out of the route's AnimatePresence: their
+          layoutId makes each one register for presence, which can block the
+          detail route's exit (see ScrollStrip). */}
+      <PresenceContext.Provider value={null}>
+        {pages.map(({ project, copy }) => {
+          // The project's largest image sets the scale for the rest.
+          const largest = project.images.reduce<ImageSize>(
+            (max, img) => (img.size > max ? img.size : max),
+            1,
+          );
+          const rise = intro && !copy && project.slug === active.slug;
+          const firstSized = !!project.images[0]?.aspect || sized.has(project.slug);
+          // The next project, wrapping to the first: the hint says swiping
+          // down moves on, and a tap does the same.
+          const next = projects.length > 1
+            ? projects[(projects.indexOf(project) + 1) % projects.length]
+            : undefined;
+          return (
+            <section
+              key={copy ? `${copy}-${project.slug}` : project.slug}
+              className={styles.page}
+              data-project-slug={project.slug}
+              data-copy={copy}
+              aria-hidden={copy ? true : undefined}
+            >
+              <div className={styles.strip}>
+                <div className={styles.group}>
+                  {project.images.map((img, i) => (
+                    <Fragment key={img.src + i}>
+                      <StripImage
+                        slug={project.slug}
+                        index={i}
+                        src={img.full}
+                        original={img.src}
+                        aspect={img.aspect}
+                        placeholder={img.isVideo ? img.poster : img.thumb}
+                        alt={img.alt || `${project.title} — ${i + 1}`}
+                        size={img.size}
+                        largest={largest}
+                        isVideo={img.isVideo}
+                        rise={rise}
+                        shared={!copy}
+                        onClick={(e) => onImageClick(project, i, e)}
+                        onReady={i === 0 ? () => markSized(project.slug) : undefined}
+                      />
+                      {i === 0 && (
+                        // Rises in step with the image slot it takes.
+                        <motion.div
+                          className={styles.info}
+                          data-info="true"
+                          initial={rise ? { y: window.innerHeight } : false}
+                          animate={{ y: 0 }}
+                          transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
+                          style={firstSized ? undefined : { visibility: "hidden" }}
+                        >
+                          <p className={styles.description}>{project.description}</p>
+                        </motion.div>
+                      )}
+                    </Fragment>
+                  ))}
                 </div>
-                {/* Outside the strip, so it doesn't scroll sideways. Fades in
-                    behind the rise, like the counter. */}
-                <motion.div
-                  className={styles.caption}
-                  initial={rise ? { opacity: 0 } : false}
-                  animate={{ opacity: 1 }}
-                  transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
-                >
-                  <h2 className={styles.title}>{project.title}</h2>
-                  {next && (
-                    <button
-                      type="button"
-                      className={styles.next}
-                      onClick={() => onSelectProject(next.slug)}
-                      aria-label={`View ${next.title}`}
-                      tabIndex={copy ? -1 : undefined}
-                    >
-                      Next ↓
-                    </button>
-                  )}
-                </motion.div>
-              </section>
-            );
-          })}
-        </PresenceContext.Provider>
-      </div>
-
-      {/* The first image fills the screen, so a cropped edge alone doesn't
-          say there's more to the right. A counter spells it out, arriving
-          with the caption, after the rise. */}
-      {imageCount > 1 && (
-        <motion.div
-          className={styles.position}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
-          aria-hidden="true"
-        >
-          <span className={styles.counter}>
-            {position + 1} / {imageCount}
-          </span>
-        </motion.div>
-      )}
-    </>
+              </div>
+              {/* Outside the strip, so it doesn't scroll sideways. Fades in
+                  behind the rise. */}
+              <motion.div
+                className={styles.caption}
+                initial={rise ? { opacity: 0 } : false}
+                animate={{ opacity: 1 }}
+                transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
+              >
+                <h2 className={styles.title}>{project.title}</h2>
+                {next && (
+                  <button
+                    type="button"
+                    className={styles.next}
+                    onClick={() => onSelectProject(next.slug)}
+                    aria-label={`View ${next.title}`}
+                    tabIndex={copy ? -1 : undefined}
+                  >
+                    Next ↓
+                  </button>
+                )}
+              </motion.div>
+            </section>
+          );
+        })}
+      </PresenceContext.Provider>
+    </div>
   );
 }
