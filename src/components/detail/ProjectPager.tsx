@@ -10,6 +10,7 @@ import {
   ZOOM_TRANSITION,
 } from "../../utils/motion";
 import { StripImage } from "./StripImage";
+import { JustifiedText } from "../JustifiedText";
 import styles from "./ProjectPager.module.css";
 
 interface ProjectPagerProps {
@@ -292,7 +293,7 @@ export function ProjectPager({
                           transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
                           style={firstSized ? undefined : { visibility: "hidden" }}
                         >
-                          <p className={styles.description}>{project.description}</p>
+                          <JustifiedText className={styles.description} text={project.description} />
                         </motion.div>
                       )}
                     </Fragment>

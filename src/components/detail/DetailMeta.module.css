@@ -47,8 +47,17 @@
   font-size: 14px;
   line-height: 1.35;
   text-indent: 24px;
+  /* Justified. JustifiedText sets the lines itself to avoid wide word gaps;
+     these rules only show until it has measured: hyphenated so long words
+     split instead of stretching word spaces, last line left-aligned. */
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+  text-wrap: pretty;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   color: inherit;
   pointer-events: auto;
 }

@@ -46,11 +46,13 @@ src/
     media.ts               isVideo() extension check, dropboxDirect() share-link rewrite, optimizedSrc()
     motion.ts              shared transition timings (grid fade, strip rise, lightbox morph)
     intro.ts               once-per-page-load flag for the logo + reveal intro
+    justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
     detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta
     lightbox/              Lightbox
     about/                 AboutView
+    JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)
     CornerNav.tsx          corner controls: About link top-left (index only) + ThemeToggle top-right
     ThemeToggle.tsx        light/dark switch, saved to localStorage
   styles/                  index.css, variables.css (CSS custom properties)

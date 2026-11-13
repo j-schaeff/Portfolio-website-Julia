@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { Project } from "../../types/project";
 import { ZOOM_TRANSITION } from "../../utils/motion";
+import { JustifiedText } from "../JustifiedText";
 import styles from "./DetailMeta.module.css";
 
 interface DetailMetaProps {
@@ -47,7 +48,7 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
       <div className={styles.intro} data-meta-scroll>
-        <p className={styles.description}>{active.description}</p>
+        <JustifiedText className={styles.description} text={active.description} />
       </div>
 
       <div className={styles.titleCol}>
