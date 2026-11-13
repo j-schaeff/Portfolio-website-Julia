@@ -15,14 +15,6 @@
   font-weight: 300;
 }
 
-.title::before {
-  content: "\00BB";
-}
-
-.title::after {
-  content: "\00AB";
-}
-
 .type {
   font-family: var(--font-sans);
   font-feature-settings: "ss02";

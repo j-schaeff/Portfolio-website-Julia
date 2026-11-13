@@ -127,14 +127,6 @@
     line-height: 1.35;
   }
 
-  .endTitle::before {
-    content: "\00BB";
-  }
-
-  .endTitle::after {
-    content: "\00AB";
-  }
-
   .endLabel {
     font-family: var(--font-sans);
     font-feature-settings: "ss02";

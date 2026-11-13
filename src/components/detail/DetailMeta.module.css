@@ -42,15 +42,6 @@
   line-height: 1.35;
 }
 
-/* Same »Title« marks as the grid's InfoBlock. */
-.title::before {
-  content: "\00BB";
-}
-
-.title::after {
-  content: "\00AB";
-}
-
 .description {
   margin: 0;
   font-size: 14px;
@@ -182,6 +173,11 @@
 
   .intro::-webkit-scrollbar {
     display: none;
+  }
+
+  /* The intro keeps its own full-width row; the text fills its left half. */
+  .description {
+    max-width: 50%;
   }
 }
 
