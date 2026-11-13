@@ -18,13 +18,13 @@
   mix-blend-mode: difference;
 }
 
-/* Lines up with the grid's 14px side padding. */
+/* Both line up with the grid's 14px side padding. */
 .left {
   left: 14px;
 }
 
 .right {
-  right: 24px;
+  right: 14px;
 }
 
 @media (max-width: 560px) {

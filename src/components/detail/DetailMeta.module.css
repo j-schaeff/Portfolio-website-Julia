@@ -155,3 +155,40 @@
     text-align: left;
   }
 }
+
+/* Tablet: the metadata fills the third below the strip (ScrollStrip's 40px
+   top margin + two thirds of the screen). Title, client, type and year share
+   the first row; the description follows beneath and scrolls if it's long.
+   The !important beats the inline metaHeight() height. */
+@media (min-width: 561px) and (max-width: 880px) {
+  .meta {
+    top: calc(40px + 100vh * 2 / 3);
+    top: calc(40px + 100dvh * 2 / 3);
+    bottom: 18px;
+    height: auto !important;
+    min-height: 0;
+    align-content: flex-start;
+  }
+
+  .intro {
+    order: 1;
+    max-height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    pointer-events: auto;
+  }
+
+  .intro::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Phone turned sideways: the info moves to the end of the image strip
+   (ScrollStrip), so the images can fill the screen. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .meta {
+    display: none;
+  }
+}

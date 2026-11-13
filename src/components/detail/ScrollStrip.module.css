@@ -58,3 +58,99 @@
     justify-content: flex-start;
   }
 }
+
+/* Tablet: the strip takes two thirds of the screen; the metadata sits
+   beneath it (DetailMeta.module.css). */
+@media (min-width: 561px) and (max-width: 880px) {
+  .strip {
+    height: calc(100vh * 2 / 3);
+    height: calc(100dvh * 2 / 3);
+  }
+}
+
+/* The project's info as the strip's last item. Phone-landscape only (below). */
+.endInfo {
+  display: none;
+}
+
+/* Phone turned sideways: the desktop strip, but every image fills the
+   screen's height and the info follows the last image, so nothing has to
+   share the short screen with the images. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .strip {
+    height: 100vh;
+    height: 100dvh;
+    margin-top: 0;
+    /* The strip itself takes touches here: iOS Safari won't pan a scroller
+       that has pointer-events: none, even from its children. pan-y lets a
+       long description scroll in the info block. */
+    pointer-events: auto;
+    touch-action: pan-x pan-y;
+  }
+
+  .group {
+    padding: 0;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  /* Overrides the size-based heights StripImage sets inline. */
+  .group > :not(.endInfo) {
+    height: 100% !important;
+  }
+
+  .endInfo {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: min(40ch, 60vw);
+    box-sizing: border-box;
+    /* Top clears the theme switch; the right side keeps the page margin. */
+    padding: 44px 14px 18px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    color: var(--fg);
+  }
+
+  .endInfo::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Same type as the desktop metadata (DetailMeta.module.css). */
+  .endTitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: inherit;
+    line-height: 1.35;
+  }
+
+  .endTitle::before {
+    content: "\00BB";
+  }
+
+  .endTitle::after {
+    content: "\00AB";
+  }
+
+  .endLabel {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss02";
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.25;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .endDescription {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.35;
+    text-indent: 24px;
+    overflow-wrap: break-word;
+  }
+}

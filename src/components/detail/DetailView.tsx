@@ -94,6 +94,51 @@ export function DetailView() {
     return () => window.removeEventListener("wheel", onWheel);
   }, [activeIndex, projectSlug, projects, setSearchParams, isMobile, lightbox.index]);
 
+  useEffect(() => {
+    // Touch screens on this layout (tablets, a phone turned sideways) have no
+    // wheel, so a vertical swipe switches the project instead. Sideways swipes
+    // stay with the strip, and swipes that start in the description are left
+    // to it, since on a short screen it scrolls.
+    if (isMobile || lightbox.index !== null) return;
+
+    let start: { x: number; y: number } | null = null;
+
+    const onTouchStart = (event: TouchEvent) => {
+      const target = event.target as Element | null;
+      start =
+        event.touches.length === 1 && !target?.closest("[data-meta-scroll]")
+          ? { x: event.touches[0].clientX, y: event.touches[0].clientY }
+          : null;
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (!start) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      start = null;
+
+      if (Math.abs(dy) < 60 || Math.abs(dy) < Math.abs(dx) * 1.5) return;
+      const now = Date.now();
+      if (now - lastTriggerRef.current < 460) return;
+      lastTriggerRef.current = now;
+
+      // Swiping up (finger moves up) goes to the next project, like scrolling down.
+      const direction = dy < 0 ? 1 : -1;
+      const nextProject = projects[(activeIndex + direction + projects.length) % projects.length];
+      if (nextProject && nextProject.slug !== projectSlug) {
+        setSearchParams({ project: nextProject.slug }, { replace: true });
+      }
+    };
+
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile, lightbox.index]);
+
   if (!active) return null;
 
   const handleImageClick = (

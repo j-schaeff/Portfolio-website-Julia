@@ -69,3 +69,11 @@
   }
 }
 
+/* Phone turned sideways: the images fill the screen, so the Index button sits
+   over them and inverts against them like the theme switch. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .back {
+    color: #fff;
+    mix-blend-mode: difference;
+  }
+}

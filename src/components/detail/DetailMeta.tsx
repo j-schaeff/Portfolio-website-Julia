@@ -29,7 +29,8 @@ export function metaHeight(projects: Project[]): number {
 // Only the in-view project's info, in one row: description, title, client
 // (when set; a link when it has a URL), then type+date at the right edge. Scrolling switches the project (see
 // DetailView), and this text follows it. Once the viewport narrows, the other
-// columns wrap beneath the description. `projects` is still needed so metaHeight() can size the block
+// columns wrap beneath the description (on tablets, 561–880px, they sit
+// above it, directly under the strip). `projects` is still needed so metaHeight() can size the block
 // for the longest description. Tablet/desktop only: on mobile ProjectPager
 // shows the text inside each project's strip.
 export function DetailMeta({ projects, active }: DetailMetaProps) {
@@ -45,7 +46,7 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       animate={{ opacity: 1 }}
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
-      <div className={styles.intro}>
+      <div className={styles.intro} data-meta-scroll>
         <p className={styles.description}>{active.description}</p>
       </div>
 
