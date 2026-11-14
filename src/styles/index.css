@@ -8,6 +8,17 @@
   font-display: swap;
 }
 
+/* The List page's hover weight. Cut from the official variable font
+   (github.com/floriankarsten/montagu-slab) at opsz 120, wght 700, so it pairs
+   with the 120pt Light above. */
+@font-face {
+  font-family: "Montagu Slab";
+  src: url("/fonts/MontaguSlab_120pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: "A2Z Faucet";
   src: url("/fonts/A2Z-Faucet-Ultra.otf") format("opentype");

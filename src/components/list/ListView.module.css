@@ -52,18 +52,11 @@
   translate: 24px 0;
 }
 
-/* The title gets heavier. Only the Light weight of Montagu Slab is loaded, so
-   a font-weight change would be a browser-faked bold that also widens the
-   line; a stroke in the text colour thickens the letters in place and
-   animates smoothly. */
-.row > .title {
-  -webkit-text-stroke: 0 currentColor;
-  transition: -webkit-text-stroke-width var(--transition);
-}
-
+/* The title switches to the real Bold (index.css). It's centred, so the
+   wider bold grows evenly to both sides. */
 .row:hover > .title,
 .row:focus-visible > .title {
-  -webkit-text-stroke-width: 0.9px;
+  font-weight: 700;
 }
 
 .row:hover > .type:not(.year),
