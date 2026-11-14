@@ -158,13 +158,14 @@ export function ProjectPager({
 
     // The scroll has come to rest: find the page it rests on. A loop copy is
     // swapped for the real page at the same spot (its horizontal position
-    // carried over, so nothing visibly moves). Then report the project, if
-    // it's a new one.
+    // carried over, so nothing visibly moves). Every other page's strip is
+    // rewound to its first image — they're all off screen by now — so a
+    // project scrolled back to starts from the beginning, not where it was
+    // left. Then report the project, if it's a new one.
     const settle = () => {
       if (touching) return;
-      const page = Array.from(
-        pager.querySelectorAll<HTMLElement>("[data-project-slug]"),
-      ).find((el) => Math.abs(el.offsetTop - pager.scrollTop) < 2);
+      const pages = Array.from(pager.querySelectorAll<HTMLElement>("[data-project-slug]"));
+      let page = pages.find((el) => Math.abs(el.offsetTop - pager.scrollTop) < 2);
       const slug = page?.dataset.projectSlug;
       if (!page || !slug) return;
       if (page.dataset.copy) {
@@ -174,6 +175,12 @@ export function ProjectPager({
         const realStrip = real.firstElementChild as HTMLElement | null;
         if (copyStrip && realStrip) realStrip.scrollLeft = copyStrip.scrollLeft;
         pager.scrollTo({ top: real.offsetTop, behavior: "auto" });
+        page = real;
+      }
+      for (const other of pages) {
+        if (other === page) continue;
+        const strip = other.firstElementChild as HTMLElement | null;
+        if (strip && strip.scrollLeft !== 0) strip.scrollLeft = 0;
       }
       inViewRef.current = slug;
       if (slug !== activeSlugRef.current) onActiveChangeRef.current(slug);
