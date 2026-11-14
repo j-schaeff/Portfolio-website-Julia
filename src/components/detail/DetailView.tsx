@@ -1,17 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import { useProjects } from "../../hooks/useProjects";
-import { useLightbox } from "../../hooks/useLightbox";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { markIntroPlayed } from "../../utils/intro";
-import type { Project } from "../../types/project";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { ScrollStrip } from "./ScrollStrip";
 import { ProjectPager } from "./ProjectPager";
 import { DetailMeta, metaHeight } from "./DetailMeta";
-import { Lightbox } from "../lightbox/Lightbox";
 import styles from "./DetailView.module.css";
 
 export function DetailView() {
@@ -21,11 +18,6 @@ export function DetailView() {
   // Landing straight on a project still counts as entering the site, so the
   // index's logo intro won't play when the visitor heads there next.
   useEffect(markIntroPlayed, []);
-  // The lightbox only pages through the project whose image was clicked.
-  const [lightboxSlug, setLightboxSlug] = useState<string | null>(null);
-  const lightboxProject = projects.find((project) => project.slug === lightboxSlug);
-  const lightbox = useLightbox(lightboxProject?.images.length ?? 0);
-  const [openAspect, setOpenAspect] = useState<number | undefined>(undefined);
   useBodyScrollLock(true);
 
   const projectSlug = searchParams.get("project") ?? projects[0]?.slug ?? null;
@@ -40,10 +32,8 @@ export function DetailView() {
 
   useEffect(() => {
     // On mobile the projects are a real vertical scroller (ProjectPager), so
-    // the wheel is left to it. While the lightbox is open the wheel mustn't
-    // switch the project behind it, or closing it would morph to an image
-    // that's no longer in the strip.
-    if (isMobile || lightbox.index !== null) return;
+    // the wheel is left to it.
+    if (isMobile) return;
 
     const onWheel = (event: WheelEvent) => {
       const deltaY = event.deltaY;
@@ -92,14 +82,14 @@ export function DetailView() {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile, lightbox.index]);
+  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
 
   useEffect(() => {
     // Touch screens on this layout (tablets, a phone turned sideways) have no
     // wheel, so a vertical swipe switches the project instead. Sideways swipes
     // stay with the strip, and swipes that start in the description are left
     // to it, since on a short screen it scrolls.
-    if (isMobile || lightbox.index !== null) return;
+    if (isMobile) return;
 
     let start: { x: number; y: number } | null = null;
 
@@ -137,31 +127,13 @@ export function DetailView() {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile, lightbox.index]);
+  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
 
   if (!active) return null;
-
-  const handleImageClick = (
-    project: Project,
-    index: number,
-    event: React.MouseEvent<HTMLElement>,
-  ) => {
-    if (!project.images[index]) return;
-    // Hand the clicked image's aspect ratio to the lightbox so the hero has its
-    // final edge-to-edge size on mount and the morph doesn't jump at the end.
-    setOpenAspect(aspectOf(event.currentTarget));
-    setLightboxSlug(project.slug);
-    lightbox.open(index);
-  };
 
   const handleProjectSelect = (slug: string) => {
     setSearchParams({ project: slug }, { replace: true });
   };
-
-  const lightboxImage =
-    lightboxProject && lightbox.index !== null
-      ? lightboxProject.images[lightbox.index]
-      : undefined;
 
   const goToIndex = () => {
     // The router basename already supplies the deploy subpath.
@@ -196,13 +168,11 @@ export function DetailView() {
           activeIndex={activeIndex}
           onActiveChange={handleProjectSelect}
           onSelectProject={handleProjectSelect}
-          onImageClick={handleImageClick}
         />
       ) : (
         <ScrollStrip
           projects={projects}
           activeIndex={activeIndex}
-          onImageClick={handleImageClick}
         />
       )}
 
@@ -213,35 +183,6 @@ export function DetailView() {
           active={active}
         />
       )}
-
-      <AnimatePresence>
-        {lightboxProject && lightboxImage && lightbox.index !== null && (
-          <Lightbox
-            key="lightbox"
-            slug={lightboxProject.slug}
-            title={lightboxProject.title}
-            image={lightboxImage}
-            indexInProject={lightbox.index}
-            total={lightboxProject.images.length}
-            openAspect={openAspect}
-            onClose={lightbox.close}
-            onNext={lightbox.next}
-            onPrev={lightbox.prev}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
-}
-
-function aspectOf(el: HTMLElement): number | undefined {
-  if (el instanceof HTMLImageElement && el.naturalWidth && el.naturalHeight) {
-    return el.naturalWidth / el.naturalHeight;
-  }
-  if (el instanceof HTMLVideoElement && el.videoWidth && el.videoHeight) {
-    return el.videoWidth / el.videoHeight;
-  }
-  // Strip width already follows the natural aspect ratio.
-  const rect = el.getBoundingClientRect();
-  return rect.width && rect.height ? rect.width / rect.height : undefined;
 }

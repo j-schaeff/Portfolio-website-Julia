@@ -54,7 +54,7 @@
    inverts against the image behind, in either theme.
    It doubles as the bottom safe zone: a full-width band (the top padding
    extends it above the title) that swallows taps and swipes, so missing
-   "Next" doesn't open the lightbox or scroll. */
+   "Next" doesn't scroll. */
 .caption {
   position: absolute;
   left: 0;

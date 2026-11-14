@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repo. Read this before makin
 
 ## What this is
 
-A React + TypeScript + Vite single-page portfolio site. Projects are authored as Markdown files with YAML frontmatter and rendered through three views: a grid, a per-project detail strip, and a full-screen lightbox. Transitions between them use Framer Motion shared-element animations.
+A React + TypeScript + Vite single-page portfolio site. Projects are authored as Markdown files with YAML frontmatter and rendered through two views: a grid and a per-project detail strip. Transitions between them use Framer Motion animations. Strip images aren't clickable (there is no lightbox).
 
 ## Commands
 
@@ -33,24 +33,21 @@ src/
     ProjectsContext.tsx    exposes the parsed projects to the tree
   hooks/
     useProjects.ts         read ProjectsContext
-    useLightbox.ts         index into the current project's images; ← → Esc keys; wraps around
-    useBodyScrollLock.ts   lock body scroll (detail page, lightbox open)
+    useBodyScrollLock.ts   lock body scroll (detail page)
     useIsMobile.ts         tracks the 560px mobile breakpoint
     useJustifiedRows.ts    picks the index grid's rows and gives each cell a width
     useRowReveal.ts        logo loading screen + row-by-row reveal on first load
     useFallbackSrc.ts      show a web-sized copy, falling back to the original if it fails
   utils/
-    layoutId.ts            imageLayoutId() shared id for strip ↔ lightbox morphs
     imageSize.ts           clampImageSize() + size (1–5) → grid/strip heights
     slug.ts                filename → URL slug
     media.ts               isVideo() extension check, dropboxDirect() share-link rewrite, optimizedSrc()
-    motion.ts              shared transition timings (grid fade, strip rise, lightbox morph)
+    motion.ts              shared transition timings (grid fade, strip rise)
     intro.ts               once-per-page-load flag for the logo + reveal intro
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
     detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta
-    lightbox/              Lightbox
     about/                 AboutView
     JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)
     CornerNav.tsx          corner controls: About link top-left (index only) + ThemeToggle top-right
@@ -74,12 +71,10 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 - Uploaded videos go in an entry's `video` field, not `image`: the CMS `image` field type shows thumbnails but rejects video extensions. Precedence is `videoUrl` → `video` → `image`.
 - `videoUrl` on an image entry overrides the uploaded `image`: it lets large videos stream from external hosting (e.g. Dropbox) instead of being committed through the CMS. `dropboxDirect()` rewrites Dropbox share links to a playable form (`raw=1`); such entries are always treated as video.
 - Legacy image entries may be plain strings instead of objects; `toImage()` handles both. Preserve that fallback.
-- **Web-sized copies:** the CMS uploads in `public/images/` are often several MB, so components never show them directly. `scripts/optimize-media.mjs` (run by `predev`/`prebuild`, needs `sharp` and `ffmpeg`) writes `<file>.thumb.webp` (600px tall, grid), `<file>.full.webp` (2400px long edge, strip + lightbox), and for videos `<file>.opt.mp4` + `<file>.poster.webp` into `public/optimized/`. Work is skipped by content hash (`.manifest.json`), and the deploy workflow caches the folder. `toImage()` fills `ProjectImage.thumb`/`full`/`poster` via `optimizedSrc()`; `src` stays the original, and `useFallbackSrc()` switches to it if a copy fails to load. External sources (`videoUrl`) and SVGs have no copies and pass through unchanged. If you change the file naming, update both the script and `optimizedSrc()`. The script also writes each copy's aspect ratio to `src/generated/media-aspects.json` (gitignored); `toImage()` sets it as `ProjectImage.aspect`, so the index lays out its rows before any image loads. Media without one (external `videoUrl`s) is measured on load instead.
-- The lightbox pages only through the clicked project's `images` and wraps within that project.
+- **Web-sized copies:** the CMS uploads in `public/images/` are often several MB, so components never show them directly. `scripts/optimize-media.mjs` (run by `predev`/`prebuild`, needs `sharp` and `ffmpeg`) writes `<file>.thumb.webp` (600px tall, grid), `<file>.full.webp` (2400px long edge, detail strip), and for videos `<file>.opt.mp4` + `<file>.poster.webp` into `public/optimized/`. Work is skipped by content hash (`.manifest.json`), and the deploy workflow caches the folder. `toImage()` fills `ProjectImage.thumb`/`full`/`poster` via `optimizedSrc()`; `src` stays the original, and `useFallbackSrc()` switches to it if a copy fails to load. External sources (`videoUrl`) and SVGs have no copies and pass through unchanged. If you change the file naming, update both the script and `optimizedSrc()`. The script also writes each copy's aspect ratio to `src/generated/media-aspects.json` (gitignored); `toImage()` sets it as `ProjectImage.aspect`, so the index lays out its rows before any image loads. Media without one (external `videoUrl`s) is measured on load instead.
 
 ## Key conventions & gotchas
 
-- **Shared layout ids:** `imageLayoutId(slug, index)` must be identical between the detail strip and the lightbox — that's what lets Framer Motion morph between them. Grid images deliberately have none. Don't change the format without updating every call site.
 - **Grid → detail transition:** the grid fades out quickly while the detail page (fixed over the viewport, so it's in place during the `mode="sync"` crossfade) plays a staggered rise: each strip image slides up from below, then the metadata fades in. Timings live in [src/utils/motion.ts](src/utils/motion.ts). The rise only plays on the page's first render, not on project switches. The logo loading screen + row-by-row reveal play once per page load; the logo waits only for the media in the viewport and for those cells to reveal (cells below the fold reveal with the last visible one and finish loading afterwards). They play on first entry or refresh, tracked by [src/utils/intro.ts](src/utils/intro.ts); returning to the index from a project just fades the grid in.
 - **Image sizing:** width follows the image's natural aspect ratio; only height scales, via the `size` field (1–5) → `imageHeight()`. Shared transition timings (the `[0.22, 1, 0.36, 1]` easing, `ZOOM_TRANSITION` at 0.6s, the rise) live once in [src/utils/motion.ts](src/utils/motion.ts). Every image stores an explicit `size` in its frontmatter. New images saved without one are filled by [scripts/assign-sizes.mjs](scripts/assign-sizes.mjs) (`npm run sizes`), which the deploy workflow runs and commits back to `main`: a slug-seeded mix of 2–5 where no two neighbours match. Existing 1–5 values are never touched, so after that they are adjusted by hand in the CMS. Until the fill lands, `clampImageSize()` renders a missing size as 3.
 - **Video support:** assets can be video; use `isVideo(src)` rather than assuming `<img>`. On the index, a video with a poster doesn't load or play until the reveal starts; the loading screen waits on its poster instead. A video can be an uploaded file or an external `videoUrl` (see the data layer above) — by the time it reaches a component the source is already resolved into `ProjectImage.src` with `isVideo` set, so components don't need to know which it was.

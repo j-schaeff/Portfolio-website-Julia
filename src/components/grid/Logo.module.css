@@ -1,5 +1,5 @@
 /* Full-viewport loading logo layered over the index. z-index sits above
-   everything else on the page (theme toggle is 30, lightbox 1000).
+   everything else on the page (theme toggle is 30).
    pointer-events: none lets clicks fall through. */
 .overlay {
   --overlay-pad: 24px;

@@ -7,17 +7,11 @@ import styles from "./ScrollStrip.module.css";
 interface ScrollStripProps {
   projects: Project[];
   activeIndex: number;
-  onImageClick: (
-    project: Project,
-    index: number,
-    event: React.MouseEvent<HTMLElement>,
-  ) => void;
 }
 
 export function ScrollStrip({
   projects,
   activeIndex,
-  onImageClick,
 }: ScrollStripProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   const activeProject = projects[activeIndex] ?? projects[0];
@@ -46,13 +40,10 @@ export function ScrollStrip({
 
   return (
     <div ref={stripRef} className={styles.strip}>
-      {/* Keep strip images out of the route's AnimatePresence. Their layoutId
-          makes each one register for presence, and in framer-motion 11 an image
-          that unmounts (every project switch re-keys the group) never
-          unregisters — so its stale id would block the detail route's exit
-          forever and the Index button would leave this page stuck on screen.
-          The strip has no exit animation, and layoutId morphs don't rely on
-          presence, so nothing visible changes. */}
+      {/* Keep strip images out of the route's AnimatePresence. The strip has
+          no exit animation, and an image that unmounts on a project switch
+          (the group is re-keyed) must never hold up the detail route's exit,
+          or the Index button would leave this page stuck on screen. */}
       <PresenceContext.Provider value={null}>
       <div
         key={activeProject.slug}
@@ -62,7 +53,6 @@ export function ScrollStrip({
         {activeProject.images.map((img, i) => (
           <StripImage
             key={img.src + i}
-            slug={activeProject.slug}
             index={i}
             src={img.full}
             original={img.src}
@@ -73,7 +63,6 @@ export function ScrollStrip({
             largest={largest}
             isVideo={img.isVideo}
             rise={intro}
-            onClick={(e) => onImageClick(activeProject, i, e)}
           />
         ))}
         {/* Phone landscape only (hidden otherwise, see the CSS): the info

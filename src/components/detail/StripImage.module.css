@@ -1,6 +1,5 @@
 .image {
   object-fit: contain;
-  cursor: pointer;
   background: var(--hairline);
   box-shadow: 0 8px 22px var(--shadow);
   flex: 0 0 auto;

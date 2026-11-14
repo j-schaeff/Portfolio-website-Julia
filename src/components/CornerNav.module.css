@@ -1,5 +1,4 @@
-/* Mirrors the detail view's "Index" button. Sits below the lightbox
-   (z-index 1000) so its close button stays on top. */
+/* Mirrors the detail view's "Index" button. */
 .item {
   position: fixed;
   top: 20px;

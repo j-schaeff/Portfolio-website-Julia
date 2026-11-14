@@ -20,11 +20,6 @@ interface ProjectPagerProps {
   onActiveChange: (slug: string) => void;
   // The "Next" link at the bottom of a project's page.
   onSelectProject: (slug: string) => void;
-  onImageClick: (
-    project: Project,
-    index: number,
-    event: React.MouseEvent<HTMLElement>,
-  ) => void;
 }
 
 // Mobile detail view: every project is a full-screen page in one vertical,
@@ -59,7 +54,6 @@ export function ProjectPager({
   activeIndex,
   onActiveChange,
   onSelectProject,
-  onImageClick,
 }: ProjectPagerProps) {
   const pagerRef = useRef<HTMLDivElement>(null);
   const active = projects[activeIndex] ?? projects[0];
@@ -238,9 +232,8 @@ export function ProjectPager({
 
   return (
     <div ref={pagerRef} className={styles.pager}>
-      {/* Keep strip images out of the route's AnimatePresence: their
-          layoutId makes each one register for presence, which can block the
-          detail route's exit (see ScrollStrip). */}
+      {/* Keep strip images out of the route's AnimatePresence, so they can't
+          block the detail route's exit (see ScrollStrip). */}
       <PresenceContext.Provider value={null}>
         {pages.map(({ project, copy }) => {
           // The project's largest image sets the scale for the rest.
@@ -268,7 +261,6 @@ export function ProjectPager({
                   {project.images.map((img, i) => (
                     <Fragment key={img.src + i}>
                       <StripImage
-                        slug={project.slug}
                         index={i}
                         src={img.full}
                         original={img.src}
@@ -279,8 +271,6 @@ export function ProjectPager({
                         largest={largest}
                         isVideo={img.isVideo}
                         rise={rise}
-                        shared={!copy}
-                        onClick={(e) => onImageClick(project, i, e)}
                         onReady={i === 0 ? () => markSized(project.slug) : undefined}
                       />
                       {i === 0 && (
