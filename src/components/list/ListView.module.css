@@ -53,10 +53,13 @@
 }
 
 /* The title switches to the real Bold (index.css). It's centred, so the
-   wider bold grows evenly to both sides. */
-.row:hover > .title,
-.row:focus-visible > .title {
-  font-weight: 700;
+   wider bold grows evenly to both sides. Desktop only: on phones a tap would
+   flash it, and the wider bold could cut a full-width title short. */
+@media (min-width: 561px) {
+  .row:hover > .title,
+  .row:focus-visible > .title {
+    font-weight: 700;
+  }
 }
 
 .row:hover > .type:not(.year),
@@ -112,6 +115,13 @@
 
   .title {
     text-align: left;
+  }
+
+  /* With no year, the title holds the left edge, so it takes the year's
+     inward indent; the type still indents from the right. */
+  .row:hover > .title,
+  .row:focus-visible > .title {
+    translate: 24px 0;
   }
 
   /* Scales with the screen so the longest line fits; capped at the desktop
