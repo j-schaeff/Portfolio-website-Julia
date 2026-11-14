@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { LOGO_PAD_LEFT, LOGO_WIDTH } from "../../hooks/useJustifiedRows";
 import cellStyles from "./GridItem.module.css";
 import logoMask from "./logo-mask.svg";
@@ -71,7 +72,7 @@ interface LogoCellProps {
 
 // The grid's final slot. Mirrors a GridItem cell (same reserved label band) so
 // it shares the row's baseline, but isn't a data-grid-cell: the row reveal
-// never hides it.
+// never hides it. Once shown, the logo is the link to the About page.
 export function LogoCell({ width, showMark }: LogoCellProps) {
   const cellWidth = width ?? LOGO_WIDTH + LOGO_PAD_LEFT;
   const style = {
@@ -80,8 +81,14 @@ export function LogoCell({ width, showMark }: LogoCellProps) {
   } as CSSProperties;
 
   return (
-    <div className={`${cellStyles.cell} ${styles.cell}`} style={style} aria-hidden="true">
-      <div className={styles.cellMark}>{showMark && <LogoMark />}</div>
+    <div className={`${cellStyles.cell} ${styles.cell}`} style={style}>
+      {showMark ? (
+        <Link to="/about" className={styles.cellMark} aria-label="About">
+          <LogoMark />
+        </Link>
+      ) : (
+        <div className={styles.cellMark} aria-hidden="true" />
+      )}
       <div className={cellStyles.label} />
     </div>
   );

@@ -9,10 +9,11 @@
   padding: 96px 14px 48px;
 }
 
-/* Same as About's "Index" button. */
+/* Same spot as the index's "List" link (CornerNav), so switching between
+   the two views keeps the label in place. */
 .back {
   position: fixed;
-  top: 18px;
+  top: 20px;
   left: 14px;
   z-index: 10;
   padding: 0;
@@ -30,25 +31,31 @@
   padding: 0;
 }
 
-/* Title | type | client | year. */
+/* Title on the left, type against the right edge. */
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 24px;
   padding: 0;
   line-height: 1.15;
 }
 
-/* Hover indents the row like the About text's first-line indent. The year
-   stays put on the right edge, so nothing slides off the page. */
+/* Hover indents both ends of the row towards the centre, by the About text's
+   first-line indent: the title moves right, the type (flush with the right
+   edge) moves left. */
 .row > span {
   transition: translate var(--transition);
 }
 
-.row:hover > span:not(.year),
-.row:focus-visible > span:not(.year) {
+.row:hover > .title,
+.row:focus-visible > .title {
   translate: 24px 0;
+}
+
+.row:hover > .type,
+.row:focus-visible > .type {
+  translate: -24px 0;
 }
 
 /* Title and type match the index's InfoBlock. */
@@ -61,20 +68,18 @@
 .type {
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg);
-}
-
-.year {
   text-align: right;
 }
 
 @media (max-width: 560px) {
   .list {
-    padding: 72px 12px 32px;
+    /* Same 8px side margins as the index grid on phones. */
+    padding: 72px 8px 32px;
   }
 
   .back {
@@ -82,28 +87,26 @@
     left: 12px;
   }
 
-  /* Title over type on phones; client drops out, year stays right. */
+  /* One line per project on phones. */
   .row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "title year"
-      "type year";
-    gap: 2px 16px;
+    gap: 10px;
+  }
+
+  /* Scales with the screen so the longest line fits; capped at the desktop
+     sizes. A title too long even then is cut with an ellipsis rather than
+     wrapping. */
+  .row > span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .title {
-    grid-area: title;
+    font-size: min(14px, 3.8vw);
   }
 
-  .row > .type:nth-child(2) {
-    grid-area: type;
-  }
-
-  .row > .type:nth-child(3) {
-    display: none;
-  }
-
-  .year {
-    grid-area: year;
+  .type {
+    font-size: min(11px, 2.9vw);
   }
 }

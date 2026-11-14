@@ -91,6 +91,7 @@
 }
 
 .cellMark {
+  display: block;
   width: 100%;
   aspect-ratio: 122 / 45.83;
 }

@@ -26,11 +26,6 @@
   right: 14px;
 }
 
-.center {
-  left: 50%;
-  translate: -50% 0;
-}
-
 @media (max-width: 560px) {
   .item {
     top: 12px;

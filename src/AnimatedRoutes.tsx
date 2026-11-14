@@ -16,7 +16,7 @@ export function AnimatedRoutes() {
         <Route path="/about" element={<AboutView />} />
         <Route path="/list" element={<ListView />} />
         {/* Unknown paths land on the index's own URL, so CornerNav (which
-            keys off "/") still shows the About link. */}
+            keys off "/") still shows the List link. */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

@@ -40,10 +40,6 @@ export function ListView() {
             >
               <span className={styles.title}>{project.title}</span>
               <span className={styles.type}>{project.type}</span>
-              <span className={styles.type}>{project.client}</span>
-              <span className={`${styles.type} ${styles.year}`}>
-                {project.year || ""}
-              </span>
             </Link>
           </li>
         ))}
