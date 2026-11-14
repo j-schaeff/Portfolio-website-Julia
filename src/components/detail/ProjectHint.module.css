@@ -1,88 +1,42 @@
-/* Right edge, on the page's 14px margin, centred on the image strip (its 28px
-   top margin + half of its two-thirds height, ScrollStrip.module.css) rather
-   than on the whole page. White + difference inverts against whatever sits
-   behind it — images or the page — in either theme, like the other controls. */
-.rail {
+/* Bottom-left corner, on the page's 14px margin. White + difference inverts
+   against whatever sits behind it — images or the page — in either theme,
+   like the other controls. */
+.arrows {
   position: fixed;
-  right: 14px;
-  top: calc(28px + 100vh / 3);
-  top: calc(28px + 100dvh / 3);
-  transform: translateY(-50%);
+  left: 14px;
+  bottom: 14px;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   color: #fff;
   mix-blend-mode: difference;
 }
 
-/* A larger click target than the 1px line; the 3px top/bottom padding sets
-   the 6px spacing between ticks. */
-.item {
-  position: relative;
+/* A larger click target than the chevron itself; the padding sets the
+   spacing between the two. The negative margin keeps the chevron's left edge
+   on the 14px margin. */
+.arrow {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  padding: 3px 0 3px 12px;
+  justify-content: center;
+  padding: 3px 4px;
+  margin-left: -4px;
   color: inherit;
   cursor: pointer;
-}
-
-.tick {
-  display: block;
-  height: 1px;
-  background: currentColor;
-}
-
-/* The project's title, shown beside its tick on hover. */
-.label,
-.scroll {
-  font-family: var(--font-sans);
-  font-feature-settings: "ss02";
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.label {
-  position: absolute;
-  right: 28px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
+  opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 
-.item:hover .label,
-.item:focus-visible .label {
+.arrow:hover,
+.arrow:focus-visible {
   opacity: 1;
 }
 
-/* One-time cue, set vertically beside the rail (ProjectHint). */
-.scroll {
-  position: absolute;
-  right: 30px;
-  top: 50%;
-  transform: translateY(-50%) rotate(180deg);
-  writing-mode: vertical-rl;
-}
-
-/* Tablet: the strip sits 40px down (ScrollStrip.module.css). */
-@media (min-width: 561px) and (max-width: 880px) {
-  .rail {
-    top: calc(40px + 100vh / 3);
-    top: calc(40px + 100dvh / 3);
-  }
-}
-
-/* Phone turned sideways: the images fill the screen, so the rail stays out
+/* Phone turned sideways: the images fill the screen, so the arrows stay out
    of the way. */
 @media (orientation: landscape) and (max-height: 500px) {
-  .rail {
+  .arrows {
     display: none;
   }
 }

@@ -188,7 +188,7 @@ export function DetailView() {
         />
       )}
 
-      {/* Desktop/tablet: project rail + "scroll to switch" hint. */}
+      {/* Desktop/tablet: up/down project arrows + "scroll to switch" hint. */}
       {!isMobile && (
         <ProjectHint
           projects={projects}

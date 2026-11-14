@@ -47,7 +47,7 @@ src/
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
-    detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop project rail + scroll hint)
+    detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop up/down project arrows + scroll hint)
     about/                 AboutView
     list/                  ListView (every project as one line: year, title, type; no year on phones)
     JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)

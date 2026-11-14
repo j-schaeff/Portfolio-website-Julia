@@ -1,4 +1,8 @@
 .meta {
+  /* Space kept under the description on tablet/desktop for the project
+     arrows: they reach 42px up from the screen's bottom edge, this block
+     ends 18px up, and 8px more keeps the text clear of them. */
+  --arrows-clear: 32px;
   position: absolute;
   left: 0;
   right: 0;
@@ -171,8 +175,11 @@
     min-height: 0;
   }
 
+  /* Ends above the project arrows in the bottom-left corner
+     (ProjectHint.module.css), so a long description scrolls instead of
+     running into them. Shorter ones never reach that far down. */
   .intro {
-    max-height: 100%;
+    max-height: calc(100% - var(--arrows-clear));
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -199,9 +206,10 @@
     align-content: flex-start;
   }
 
+  /* Ends above the project arrows, as on desktop. */
   .intro {
     order: 1;
-    max-height: 100%;
+    max-height: calc(100% - var(--arrows-clear));
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
