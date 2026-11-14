@@ -284,6 +284,31 @@ export function ProjectPager({
                           style={firstSized ? undefined : { visibility: "hidden" }}
                         >
                           <JustifiedText className={styles.description} text={project.description} />
+                          {/* The desktop metadata row (DetailMeta): client,
+                              type and year, below the text. */}
+                          <div className={styles.meta}>
+                            {project.client && (
+                              <span className={styles.label}>
+                                {project.clientUrl ? (
+                                  <a
+                                    href={project.clientUrl}
+                                    target={
+                                      project.clientUrl.startsWith("mailto:") ? undefined : "_blank"
+                                    }
+                                    rel="noreferrer"
+                                    className={styles.clientLink}
+                                    tabIndex={copy ? -1 : undefined}
+                                  >
+                                    {project.client}
+                                  </a>
+                                ) : (
+                                  project.client
+                                )}
+                              </span>
+                            )}
+                            <span className={styles.label}>{project.type}</span>
+                            <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
+                          </div>
                         </motion.div>
                       )}
                     </Fragment>

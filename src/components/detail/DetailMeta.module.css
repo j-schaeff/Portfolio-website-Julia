@@ -36,9 +36,12 @@
 
 .title {
   margin: 0;
-  /* Styled like the description text, not as a heading. */
-  font-size: 14px;
-  font-weight: inherit;
+  /* Same type as the mobile title (ProjectPager.module.css). */
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   line-height: 1.35;
 }
 
