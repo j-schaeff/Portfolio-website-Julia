@@ -25,7 +25,7 @@ src/
   main.tsx                 entry point (imports polyfills first, then App)
   polyfills.ts             defines global `Buffer` — gray-matter needs it at runtime
   App.tsx                  providers: BrowserRouter → ProjectsProvider
-  AnimatedRoutes.tsx       routes: "/" → GridView, "/project?project=<slug>" → DetailView, "/about" → AboutView
+  AnimatedRoutes.tsx       routes: "/" → GridView, "/project?project=<slug>" → DetailView, "/about" → AboutView, "/list" → ListView
   data/projects.ts         loads & parses all Markdown at build time (the data layer)
   data/about.ts            parses content/about.md (bio paragraphs + links)
   types/project.ts         Project / ProjectImage / Frontmatter / ImageSize types
@@ -49,8 +49,9 @@ src/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
     detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop project rail + scroll hint)
     about/                 AboutView
+    list/                  ListView (every project as one line: title, type, client, year)
     JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)
-    CornerNav.tsx          corner controls: About link top-left (index only) + ThemeToggle top-right
+    CornerNav.tsx          corner controls: About link top-left + List link top-centre (index only) + ThemeToggle top-right
     ThemeToggle.tsx        light/dark switch, saved to localStorage
   styles/                  index.css, variables.css (CSS custom properties)
 content/projects/*.md      project content (one file per project)
