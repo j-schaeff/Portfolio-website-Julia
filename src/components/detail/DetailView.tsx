@@ -147,9 +147,12 @@ export function DetailView() {
       // Lets the strip CSS end its images just above the metadata block.
       style={{ "--meta-h": `${metaHeight(projects)}px` } as React.CSSProperties}
       // The page has an opaque background (see the CSS), so fade it in in step
-      // with the grid's exit to keep the handoff a crossfade.
+      // with the grid's exit to keep the handoff a crossfade. Fade out the
+      // same way on the way back, so the page doesn't vanish in one frame
+      // and leave a blank screen before the grid fades in beneath it.
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={GRID_EXIT_TRANSITION}
     >
       {/* Mobile: a still band behind the top controls (see the CSS). */}

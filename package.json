@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
-    "framer-motion": "^11.3.0",
+    "framer-motion": "^12.43.0",
     "gray-matter": "^4.0.3",
     "hyphen": "^1.10.6",
     "react": "^18.3.1",
