@@ -62,6 +62,7 @@ export function ScrollStrip({
             size={img.size}
             largest={largest}
             isVideo={img.isVideo}
+            hasAudio={img.hasAudio}
             rise={intro}
           />
         ))}

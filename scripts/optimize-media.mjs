@@ -10,7 +10,8 @@
 // For each video:  <name>.<ext>.opt.mp4     H.264, 1280px long edge, faststart
 //                  <name>.<ext>.poster.webp first frame, 600px tall
 // Keep these names in sync with optimizedSrc() in src/utils/media.ts.
-// Each copy's aspect ratio also goes to src/generated/media-aspects.json.
+// Each copy's aspect ratio also goes to src/generated/media-aspects.json, and
+// the videos with an audible soundtrack to src/generated/media-audio.json.
 import { execFile } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -25,6 +26,10 @@ const OUT = "public/optimized";
 const MANIFEST = path.join(OUT, ".manifest.json");
 // Read by src/data/projects.ts (gitignored, like the copies).
 const ASPECTS = "src/generated/media-aspects.json";
+const AUDIO = "src/generated/media-audio.json";
+// Peak level below which a soundtrack counts as silent (an empty track that an
+// editor exported anyway), so it gets no sound button.
+const SILENT_DB = -60;
 // Bump when the settings below change, so every copy is regenerated.
 const VERSION = 1;
 
@@ -53,10 +58,25 @@ function hashFile(file) {
 function readManifest() {
   try {
     const data = JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
-    return data.version === VERSION ? data.files : {};
+    return data.version === VERSION ? { files: data.files ?? {}, audio: data.audio ?? {} } : { files: {}, audio: {} };
   } catch {
-    return {};
+    return { files: {}, audio: {} };
   }
+}
+
+// True when the video has an audio stream that isn't silence.
+async function hasAudio(src) {
+  const { stdout } = await run("ffprobe", [
+    "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", src,
+  ]);
+  if (!stdout.trim()) return false;
+  // volumedetect reports on stderr; -f null decodes without writing anything.
+  const { stderr } = await run("ffmpeg", [
+    "-hide_banner", "-i", src, "-map", "0:a:0", "-af", "volumedetect", "-f", "null", "-",
+  ], { maxBuffer: 16 * 1024 * 1024 });
+  const match = stderr.match(/max_volume:\s*(-?[\d.]+|-inf) dB/);
+  if (!match) return true;
+  return match[1] !== "-inf" && Number(match[1]) > SILENT_DB;
 }
 
 async function hasFfmpeg() {
@@ -115,8 +135,9 @@ const outputsFor = (base, isVid) =>
   isVid ? [`${base}.opt.mp4`, `${base}.poster.webp`] : [`${base}.thumb.webp`, `${base}.full.webp`];
 
 async function main() {
-  const previous = readManifest();
+  const { files: previous, audio: previousAudio } = readManifest();
   const next = {};
+  const audio = {};
   const expected = new Set([MANIFEST]);
   const ffmpeg = await hasFfmpeg();
   if (!ffmpeg) console.warn("optimize-media: ffmpeg not found, videos will use the originals");
@@ -136,6 +157,13 @@ async function main() {
     const hash = hashFile(src);
     if (previous[rel] === hash && outputs.every((o) => fs.existsSync(o))) {
       next[rel] = hash;
+      if (isVid) {
+        try {
+          audio[rel] = previousAudio[rel] ?? (await hasAudio(src));
+        } catch {
+          audio[rel] = false;
+        }
+      }
       continue;
     }
 
@@ -143,6 +171,7 @@ async function main() {
     try {
       await (isVid ? optimizeVideo(src, base) : optimizeImage(src, base));
       next[rel] = hash;
+      if (isVid) audio[rel] = await hasAudio(src).catch(() => false);
       made++;
     } catch (err) {
       // Leave it to the original: the app falls back when a copy is missing.
@@ -158,7 +187,7 @@ async function main() {
   }
 
   fs.mkdirSync(OUT, { recursive: true });
-  fs.writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, files: next }, null, 2));
+  fs.writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, files: next, audio }, null, 2));
 
   // Every copy's aspect ratio, so the index can lay out its rows (and the
   // loading screen can tell which images are on screen) before any image has
@@ -177,6 +206,8 @@ async function main() {
   }
   fs.mkdirSync(path.dirname(ASPECTS), { recursive: true });
   fs.writeFileSync(ASPECTS, JSON.stringify(aspects, null, 2));
+  const withSound = Object.keys(audio).filter((rel) => audio[rel]).sort();
+  fs.writeFileSync(AUDIO, JSON.stringify(withSound, null, 2));
   console.log(`optimize-media: ${made} updated, ${Object.keys(next).length - made} unchanged, ${failed} skipped`);
 }
 

@@ -24,3 +24,15 @@
   text-transform: uppercase;
   color: var(--fg);
 }
+
+/* Mobile: tighter leading between title and type in the project heading. */
+@media (max-width: 560px) {
+  .info {
+    gap: 0;
+  }
+
+  .title,
+  .type {
+    line-height: 1.15;
+  }
+}

@@ -16,6 +16,9 @@ export interface ProjectImage {
   hideInGrid: boolean;
   alt: string;
   isVideo: boolean;
+  // A video with an audible soundtrack (found at build time); the detail
+  // strip shows a sound toggle beneath it.
+  hasAudio: boolean;
 }
 
 export interface Frontmatter {

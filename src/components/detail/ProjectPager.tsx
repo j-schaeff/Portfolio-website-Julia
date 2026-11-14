@@ -277,6 +277,7 @@ export function ProjectPager({
                         size={img.size}
                         largest={largest}
                         isVideo={img.isVideo}
+                        hasAudio={img.hasAudio}
                         rise={rise}
                         onReady={i === 0 ? () => markSized(project.slug) : undefined}
                       />

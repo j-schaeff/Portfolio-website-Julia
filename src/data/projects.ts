@@ -31,9 +31,27 @@ const aspectFiles = import.meta.glob("../generated/media-aspects.json", {
 }) as Record<string, Record<string, number>>;
 const aspects = Object.values(aspectFiles)[0] ?? {};
 
-function aspectOf(src: string): number | undefined {
+// Videos with an audible soundtrack, from the same script.
+const audioFiles = import.meta.glob("../generated/media-audio.json", {
+  import: "default",
+  eager: true,
+}) as Record<string, string[]>;
+const withSound = new Set(Object.values(audioFiles)[0] ?? []);
+
+// Path under public/images, or undefined for an external source.
+function uploadPath(src: string): string | undefined {
   const images = import.meta.env.BASE_URL + "images/";
-  return src.startsWith(images) ? aspects[src.slice(images.length)] : undefined;
+  return src.startsWith(images) ? src.slice(images.length) : undefined;
+}
+
+function aspectOf(src: string): number | undefined {
+  const rel = uploadPath(src);
+  return rel ? aspects[rel] : undefined;
+}
+
+function hasAudio(src: string): boolean {
+  const rel = uploadPath(src);
+  return rel ? withSound.has(rel) : false;
 }
 
 // Point at the web-sized copies from scripts/optimize-media.mjs. External
@@ -43,9 +61,24 @@ function withCopies(src: string, video: boolean) {
   if (video) {
     const opt = optimizedSrc(src, "opt.mp4");
     const poster = optimizedSrc(src, "poster.webp");
-    return { src, isVideo: true, thumb: opt, full: opt, poster: poster === src ? undefined : poster, aspect };
+    return {
+      src,
+      isVideo: true,
+      hasAudio: hasAudio(src),
+      thumb: opt,
+      full: opt,
+      poster: poster === src ? undefined : poster,
+      aspect,
+    };
   }
-  return { src, isVideo: false, thumb: optimizedSrc(src, "thumb.webp"), full: optimizedSrc(src, "full.webp"), aspect };
+  return {
+    src,
+    isVideo: false,
+    hasAudio: false,
+    thumb: optimizedSrc(src, "thumb.webp"),
+    full: optimizedSrc(src, "full.webp"),
+    aspect,
+  };
 }
 
 function toImage(entry: unknown): ProjectImage | null {
