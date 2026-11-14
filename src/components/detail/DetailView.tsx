@@ -9,6 +9,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { ScrollStrip } from "./ScrollStrip";
 import { ProjectPager } from "./ProjectPager";
 import { DetailMeta, metaHeight } from "./DetailMeta";
+import { ProjectHint } from "./ProjectHint";
 import styles from "./DetailView.module.css";
 
 export function DetailView() {
@@ -181,6 +182,15 @@ export function DetailView() {
         <DetailMeta
           projects={projects}
           active={active}
+        />
+      )}
+
+      {/* Desktop/tablet: project rail + "scroll to switch" hint. */}
+      {!isMobile && (
+        <ProjectHint
+          projects={projects}
+          activeIndex={activeIndex}
+          onSelect={handleProjectSelect}
         />
       )}
     </motion.div>

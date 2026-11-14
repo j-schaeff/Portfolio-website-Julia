@@ -3,16 +3,17 @@
   z-index: 0;
   display: block;
   width: calc(100% + 28px);
-  /* Runs from 40px down to the top of the metadata: viewport minus the top
-     margin, the meta's 18px bottom offset and its height (--meta-h, set by
-     DetailView). The group's padding inside it keeps the images 56px from the
-     top and 32px above the metadata, and leaves room for their drop shadow —
-     a scrolling box clips anything that overflows it. */
-  height: calc(100vh - 40px - 18px - var(--meta-h, 112px));
+  /* Two thirds of the screen, from 28px down; the metadata fills the space
+     beneath it (DetailMeta.module.css). The group's padding inside it keeps
+     the images 42px from the top (just clear of the Index button) and 24px
+     above the metadata, and leaves room for their drop shadow — a scrolling
+     box clips anything that overflows it. */
+  height: calc(100vh * 2 / 3);
+  height: calc(100dvh * 2 / 3);
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0;
-  margin-top: 40px;
+  margin-top: 28px;
   margin-left: -14px;
   margin-right: -14px;
   pointer-events: none;
@@ -38,9 +39,9 @@
   min-width: max-content;
   height: 100%;
   box-sizing: border-box;
-  /* Top: room for the shadow's upward spread; bottom: the 32px gap to the
-     metadata, which the shadow (8px offset + 22px blur) falls into. */
-  padding: 16px 14px 32px;
+  /* Top: room for the shadow's upward spread (22px blur − 8px offset); bottom:
+     the 24px gap to the metadata, which the shadow falls into. */
+  padding: 14px 14px 24px;
   pointer-events: auto;
 }
 
@@ -65,6 +66,8 @@
   .strip {
     height: calc(100vh * 2 / 3);
     height: calc(100dvh * 2 / 3);
+    /* DetailMeta's tablet layout places the metadata at 40px + 2/3. */
+    margin-top: 40px;
   }
 }
 

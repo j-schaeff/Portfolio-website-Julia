@@ -159,6 +159,32 @@
   }
 }
 
+/* Desktop: the metadata fills the space below the strip (ScrollStrip's 28px
+   top margin + two thirds of the screen). A description too long for it
+   scrolls. The !important beats the inline metaHeight() height. */
+@media (min-width: 881px) {
+  .meta {
+    top: calc(28px + 100vh * 2 / 3);
+    top: calc(28px + 100dvh * 2 / 3);
+    bottom: 18px;
+    height: auto !important;
+    min-height: 0;
+  }
+
+  .intro {
+    max-height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    pointer-events: auto;
+  }
+
+  .intro::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Tablet: the metadata fills the third below the strip (ScrollStrip's 40px
    top margin + two thirds of the screen). Title, client, type and year share
    the first row; the description follows beneath and scrolls if it's long.

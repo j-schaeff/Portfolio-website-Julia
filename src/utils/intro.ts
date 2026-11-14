@@ -12,3 +12,14 @@ export const introPending = () => !played;
 export const markIntroPlayed = () => {
   played = true;
 };
+
+// Desktop detail view: the "Scroll" hint beside the project counter shows
+// until the visitor first switches project, then stays hidden for the rest of
+// the page load (ProjectHint). Same module-state pattern as above.
+let scrollHintSeen = false;
+
+export const scrollHintPending = () => !scrollHintSeen;
+
+export const markScrollHintSeen = () => {
+  scrollHintSeen = true;
+};

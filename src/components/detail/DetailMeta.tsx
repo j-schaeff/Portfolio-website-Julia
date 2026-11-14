@@ -10,8 +10,9 @@ interface DetailMetaProps {
 }
 
 // Height of the metadata block: tall enough for the title line plus the longest
-// description so the layout doesn't jump between projects. The detail strip
-// also uses it to sit its images just above the metadata.
+// description so the layout doesn't jump between projects. On desktop and
+// tablet the CSS overrides it: the strip takes two thirds of the screen and
+// the metadata fills the rest (DetailMeta.module.css).
 export function metaHeight(projects: Project[]): number {
   const longestDescription = projects.reduce(
     (max, project) =>

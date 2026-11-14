@@ -43,11 +43,11 @@ src/
     slug.ts                filename → URL slug
     media.ts               isVideo() extension check, dropboxDirect() share-link rewrite, optimizedSrc()
     motion.ts              shared transition timings (grid fade, strip rise)
-    intro.ts               once-per-page-load flag for the logo + reveal intro
+    intro.ts               once-per-page-load flags: logo + reveal intro, desktop scroll hint
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
-    detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta
+    detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop project rail + scroll hint)
     about/                 AboutView
     JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)
     CornerNav.tsx          corner controls: About link top-left (index only) + ThemeToggle top-right
