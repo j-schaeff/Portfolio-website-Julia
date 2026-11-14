@@ -31,30 +31,43 @@
   padding: 0;
 }
 
-/* Title on the left, type against the right edge. */
+/* Year against the left edge, title centred, type against the right edge. */
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: baseline;
   gap: 24px;
   padding: 0;
   line-height: 1.15;
 }
 
-/* Hover indents both ends of the row towards the centre, by the About text's
-   first-line indent: the title moves right, the type (flush with the right
-   edge) moves left. */
+/* Hover indents both ends of the row towards the title, by the About text's
+   first-line indent: the year moves right, the type moves left. */
 .row > span {
   transition: translate var(--transition);
 }
 
-.row:hover > .title,
-.row:focus-visible > .title {
+.row:hover > .year,
+.row:focus-visible > .year {
   translate: 24px 0;
 }
 
-.row:hover > .type,
-.row:focus-visible > .type {
+/* The title gets heavier. Only the Light weight of Montagu Slab is loaded, so
+   a font-weight change would be a browser-faked bold that also widens the
+   line; a stroke in the text colour thickens the letters in place and
+   animates smoothly. */
+.row > .title {
+  -webkit-text-stroke: 0 currentColor;
+  transition: -webkit-text-stroke-width var(--transition);
+}
+
+.row:hover > .title,
+.row:focus-visible > .title {
+  -webkit-text-stroke-width: 0.9px;
+}
+
+.row:hover > .type:not(.year),
+.row:focus-visible > .type:not(.year) {
   translate: -24px 0;
 }
 
@@ -63,6 +76,7 @@
   font-family: var(--font-serif);
   font-size: 14px;
   font-weight: 300;
+  text-align: center;
 }
 
 .type {
@@ -76,6 +90,11 @@
   text-align: right;
 }
 
+/* Set like the type. */
+.year {
+  text-align: left;
+}
+
 @media (max-width: 560px) {
   .list {
     /* Same 8px side margins as the index grid on phones. */
@@ -87,9 +106,19 @@
     left: 12px;
   }
 
-  /* One line per project on phones. */
+  /* One line per project on phones: title on the left, type on the right;
+     the year is desktop-only. */
   .row {
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
+  }
+
+  .year {
+    display: none;
+  }
+
+  .title {
+    text-align: left;
   }
 
   /* Scales with the screen so the longest line fits; capped at the desktop

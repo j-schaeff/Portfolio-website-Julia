@@ -38,6 +38,9 @@ export function ListView() {
               to={`/project?project=${encodeURIComponent(project.slug)}`}
               className={styles.row}
             >
+              <span className={`${styles.type} ${styles.year}`}>
+                {project.year || ""}
+              </span>
               <span className={styles.title}>{project.title}</span>
               <span className={styles.type}>{project.type}</span>
             </Link>

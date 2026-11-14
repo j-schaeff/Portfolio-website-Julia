@@ -49,7 +49,7 @@ src/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
     detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop project rail + scroll hint)
     about/                 AboutView
-    list/                  ListView (every project as one line: title and type)
+    list/                  ListView (every project as one line: year, title, type; no year on phones)
     JustifiedText.tsx      justified paragraph without wide word gaps (detail descriptions)
     CornerNav.tsx          corner controls: List link top-left (index only; About is the grid's logo) + ThemeToggle top-right
     ThemeToggle.tsx        light/dark switch, saved to localStorage
