@@ -33,6 +33,8 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
   const info = (
     <div
       className={styles.infoButton}
+      // Stable hook for the reveal's label slide (GridView.module.css).
+      data-grid-label
       role="link"
       tabIndex={0}
       onClick={go}

@@ -6,7 +6,11 @@
   z-index: 1;
   background: var(--bg);
   overflow-y: auto;
-  padding: 96px 14px 48px;
+  padding: 72px 14px;
+  /* The list sits in the vertical middle (auto margins on .rows); a list
+     taller than the screen starts at the top and scrolls instead. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Same spot as the index's "List" link (CornerNav), so switching between
@@ -27,7 +31,7 @@
 
 .rows {
   list-style: none;
-  margin: 0;
+  margin: auto 0;
   padding: 0;
 }
 
@@ -52,13 +56,13 @@
   translate: 24px 0;
 }
 
-/* The title switches to the real Bold (index.css). It's centred, so the
-   wider bold grows evenly to both sides. Desktop only: on phones a tap would
-   flash it, and the wider bold could cut a full-width title short. */
+/* The title switches to the real Medium (index.css). It's centred, so the
+   wider weight grows evenly to both sides. Desktop only: on phones a tap would
+   flash it, and the wider weight could cut a full-width title short. */
 @media (min-width: 561px) {
   .row:hover > .title,
   .row:focus-visible > .title {
-    font-weight: 700;
+    font-weight: 500;
   }
 }
 
@@ -78,7 +82,7 @@
 .type {
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -94,7 +98,7 @@
 @media (max-width: 560px) {
   .list {
     /* Same 8px side margins as the index grid on phones. */
-    padding: 72px 8px 32px;
+    padding: 56px 8px;
   }
 
   .back {
@@ -139,6 +143,6 @@
   }
 
   .type {
-    font-size: min(11px, 2.9vw);
+    font-size: min(9px, 2.4vw);
   }
 }

@@ -15,28 +15,59 @@
 
 /* Row-by-row reveal on first load, behind the logo loading screen. The hook measures cell positions, orders them
    row by row, left→right, and stamps each cell with a staggered --reveal-delay;
-   these rules hide the cells up front and then fade/rise them in on that delay.
-   data-grid-cell is a stable hook (the .cell class lives in another CSS module),
-   so it stays unscoped here while .grid is module-scoped. */
-.grid[data-reveal="loading"] [data-grid-cell] {
-  opacity: 0;
-  /* Grow from a small seed at the cell's baseline into full size. */
+   these rules hide the cells' contents up front and then bring them in on that
+   delay. data-grid-cell / data-grid-label are stable hooks (the classes live
+   in other CSS modules), so they stay unscoped here while .grid is
+   module-scoped.
+
+   The image and its label animate separately, so the text is never scaled
+   with the image. The label inherits its cell's --reveal-delay (on mobile the
+   heading is a cell of its own). */
+.grid[data-reveal] [data-grid-cell] > :first-child:not([data-grid-label]) {
+  /* Grow from a small seed at the image's baseline into full size. */
   transform-origin: bottom center;
-  transform: scale(0.5);
 }
 
-.grid[data-reveal="run"] [data-grid-cell] {
+.grid[data-reveal="loading"] [data-grid-cell] > :first-child:not([data-grid-label]) {
+  opacity: 0;
+  /* The individual scale property, so it never fights the desktop hover
+     lift, which uses transform (GridItem.module.css). */
+  scale: 0.5;
+}
+
+.grid[data-reveal="run"] [data-grid-cell] > :first-child:not([data-grid-label]) {
   opacity: 1;
-  transform: scale(1);
-  transform-origin: bottom center;
+  scale: 1;
   transition:
     opacity 0.9s ease var(--reveal-delay, 0ms),
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+    scale 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    /* This rule outranks the hover's own transition; keep its lift easing. */
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Hanging cells (mobile rows after a project's first) grow from the seam. */
-.grid[data-reveal] [data-hang] {
+/* Hanging images (mobile rows after a project's first) grow from the seam. */
+.grid[data-reveal] [data-hang] > :first-child {
   transform-origin: top center;
+}
+
+/* Title and type fade in while sliding 24px from the left, the List page's
+   hover indent, just after their image starts growing; the type a beat after
+   the title. Keep the offsets in sync with LABEL_LAG_MS in useRowReveal.ts. */
+.grid[data-reveal="loading"] [data-grid-label] span {
+  opacity: 0;
+  translate: -24px 0;
+}
+
+.grid[data-reveal="run"] [data-grid-label] span {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.9s ease calc(var(--reveal-delay, 0ms) + 200ms),
+    translate 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-delay, 0ms) + 200ms);
+}
+
+.grid[data-reveal="run"] [data-grid-label] span:last-child {
+  transition-delay: calc(var(--reveal-delay, 0ms) + 280ms);
 }
 
 @media (max-width: 560px) {
@@ -59,9 +90,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* Belt-and-braces: the hook already opts out, but never leave cells hidden. */
-  .grid[data-reveal] [data-grid-cell] {
+  .grid[data-reveal] [data-grid-cell] > *,
+  .grid[data-reveal] [data-grid-label] span {
     opacity: 1;
-    transform: none;
+    scale: none;
+    translate: none;
     transition: none;
   }
 }

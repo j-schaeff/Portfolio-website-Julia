@@ -31,6 +31,9 @@ const STEP_MS = 120;
 // Each cell's own fade/rise. Keep in sync with the transition in
 // GridView.module.css.
 const REVEAL_MS = 900;
+// How much later than its image a label finishes sliding in (the type's
+// delay in GridView.module.css). Keep in sync with the CSS.
+const LABEL_LAG_MS = 280;
 // Rows are detected by vertical overlap; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
 // The on-screen media should be loaded before the reveal, so this is only a
@@ -48,7 +51,7 @@ function prefersReducedMotion(): boolean {
 }
 
 // Order cells in reading order: rows top to bottom, each row left→right.
-// Measures layout boxes (offset*), not client rects: the cells are scaled down
+// Measures layout boxes (offset*), not client rects: the images are scaled down
 // while the loading screen is up, which would shift their tops. A cell joins
 // the current row while it overlaps it vertically; a row's cells needn't share
 // a top or a bottom edge.
@@ -207,7 +210,7 @@ export function useRowReveal(
       cells.forEach((cell, i) => {
         cell.style.setProperty("--reveal-delay", `${Math.min(i, lastVisible) * STEP_MS}ms`);
       });
-      revealMs.current = lastVisible * STEP_MS + REVEAL_MS;
+      revealMs.current = lastVisible * STEP_MS + REVEAL_MS + LABEL_LAG_MS;
 
       const media = visible.flatMap((cell) =>
         Array.from(cell.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video")),

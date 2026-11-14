@@ -3,18 +3,21 @@
 @font-face {
   font-family: "Montagu Slab";
   src: url("/fonts/MontaguSlab_120pt-Light.ttf") format("truetype");
-  font-weight: 300;
+  /* Also claims 400, the weight of text that sets none (descriptions, About).
+     Otherwise the browser would pick the Medium below for it, since for 400
+     it prefers 500 over 300. */
+  font-weight: 300 400;
   font-style: normal;
   font-display: swap;
 }
 
 /* The List page's hover weight. Cut from the official variable font
-   (github.com/floriankarsten/montagu-slab) at opsz 120, wght 700, so it pairs
+   (github.com/floriankarsten/montagu-slab) at opsz 120, wght 500, so it pairs
    with the 120pt Light above. */
 @font-face {
   font-family: "Montagu Slab";
-  src: url("/fonts/MontaguSlab_120pt-Bold.ttf") format("truetype");
-  font-weight: 700;
+  src: url("/fonts/MontaguSlab_120pt-Medium.ttf") format("truetype");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
