@@ -1,6 +1,10 @@
 ---
 title: Modeklasse 26
 type: Identity
+description: "Many styles, emotions and personalities share one department, and
+  every difference shapes the whole. This project captures the individuality of
+  the Modeklasse at the University of Applied Arts: diverse, ever-changing and
+  united through expression."
 year: 2025
 client: Modekalsse Angewandte
 images:
