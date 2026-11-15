@@ -292,7 +292,7 @@ export function ProjectPager({
                           transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
                           style={firstSized ? undefined : { visibility: "hidden" }}
                         >
-                          <JustifiedText className={styles.description} text={project.description} />
+                          <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
                           {/* The desktop metadata row (DetailMeta): client,
                               type and year, below the text. */}
                           <div className={styles.meta}>

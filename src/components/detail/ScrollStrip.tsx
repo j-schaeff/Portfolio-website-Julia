@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
+import { renderRuns } from "../../utils/richText";
 import { StripImage } from "./StripImage";
 import styles from "./ScrollStrip.module.css";
 
@@ -89,7 +90,9 @@ export function ScrollStrip({
           )}
           <span className={styles.endLabel}>{activeProject.type}</span>
           <span className={styles.endLabel}>{activeProject.year}</span>
-          <p className={styles.endDescription}>{activeProject.description}</p>
+          <p className={styles.endDescription}>
+            {renderRuns(activeProject.description, activeProject.descriptionLinks)}
+          </p>
         </div>
       </div>
       </PresenceContext.Provider>

@@ -25,9 +25,16 @@ content:
       - name: type
         label: Type
         type: string
+      # Stored as Markdown; the site renders links only and shows any other
+      # formatting as plain text (src/utils/richText.ts).
       - name: description
         label: Description
-        type: text
+        type: rich-text
+        description: Select text and use the link button to add a link. Other formatting (bold, lists, headings) is shown as plain text.
+        options:
+          format: markdown
+          media: false
+          switcher: false
       - name: year
         label: Year
         type: number

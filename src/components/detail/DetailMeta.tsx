@@ -49,7 +49,7 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
       <div className={styles.intro} data-meta-scroll>
-        <JustifiedText className={styles.description} text={active.description} />
+        <JustifiedText className={styles.description} text={active.description} links={active.descriptionLinks} />
       </div>
 
       <div className={styles.titleCol}>

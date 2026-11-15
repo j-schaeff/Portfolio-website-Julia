@@ -3,6 +3,7 @@ import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize } from "../utils/imageSize";
 import { dropboxDirect, isVideo, optimizedSrc } from "../utils/media";
+import { parseDescription } from "../utils/richText";
 
 const files = import.meta.glob("/content/projects/*.md", {
   query: "?raw",
@@ -113,12 +114,15 @@ function toProject(path: string, raw: string): Project {
   const { data } = matter(raw);
   const fm = data as Record<string, unknown>;
   const slug = slugFromPath(path);
+  // The CMS stores the description as Markdown; only its links are kept.
+  const description = parseDescription(String(fm.description ?? ""));
 
   return {
     slug,
     title: String(fm.title ?? "Untitled"),
     type: String(fm.type ?? "Uncategorized"),
-    description: String(fm.description ?? ""),
+    description: description.text,
+    descriptionLinks: description.links,
     year: Number(fm.year ?? 0),
     client: String(fm.client ?? "").trim(),
     clientUrl: String(fm.clientUrl ?? "").trim(),

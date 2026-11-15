@@ -1,8 +1,11 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { justifyLines, type Line } from "../utils/justify";
+import { renderRuns, type TextLink } from "../utils/richText";
 
 interface JustifiedTextProps {
   text: string;
+  // Links as offsets into `text` (see utils/richText.ts).
+  links?: TextLink[];
   className?: string;
 }
 
@@ -13,7 +16,7 @@ let canvas: HTMLCanvasElement | null = null;
 // as its own justified row. Font, size and indent come from `className`, so
 // the CSS stays the source of truth. Until it has measured (or if it can't),
 // it shows the plain text, which the CSS justifies the browser's way.
-export function JustifiedText({ text, className }: JustifiedTextProps) {
+export function JustifiedText({ text, links, className }: JustifiedTextProps) {
   const ref = useRef<HTMLParagraphElement>(null);
   const [lines, setLines] = useState<Line[] | null>(null);
 
@@ -57,7 +60,7 @@ export function JustifiedText({ text, className }: JustifiedTextProps) {
   if (!lines) {
     return (
       <p ref={ref} className={className} style={{ contain: "inline-size" }}>
-        {text}
+        {renderRuns(text, links)}
       </p>
     );
   }
@@ -66,8 +69,9 @@ export function JustifiedText({ text, className }: JustifiedTextProps) {
     // inline-size containment keeps the unwrapping rows from widening the
     // column: its width comes from the layout around it, never from the text.
     <p ref={ref} className={className} style={{ contain: "inline-size" }}>
-      {/* Screen readers get the text without line-end hyphens. */}
-      <span style={visuallyHidden}>{text}</span>
+      {/* Screen readers and keyboard users get the text (and real links)
+          without line-end hyphens; the visible rows' links are mouse-only. */}
+      <span style={visuallyHidden}>{renderRuns(text, links)}</span>
       {lines.map((line, i) => (
         <span
           key={i}
@@ -85,7 +89,14 @@ export function JustifiedText({ text, className }: JustifiedTextProps) {
             wordSpacing: line.wordSpacing < 0 ? `${(line.wordSpacing - 0.1).toFixed(3)}px` : undefined,
           }}
         >
-          {line.text}
+          {links?.length ? (
+            <>
+              {renderRuns(text, links, line.from, line.to, { tabIndex: -1 })}
+              {line.text.endsWith("-") && !text.slice(line.from, line.to).endsWith("-") ? "-" : null}
+            </>
+          ) : (
+            line.text
+          )}
         </span>
       ))}
     </p>

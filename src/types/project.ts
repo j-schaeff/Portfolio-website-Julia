@@ -1,3 +1,5 @@
+import type { TextLink } from "../utils/richText";
+
 export type ImageSize = 1 | 2 | 3 | 4 | 5;
 
 export interface ProjectImage {
@@ -24,7 +26,9 @@ export interface ProjectImage {
 export interface Frontmatter {
   title: string;
   type: string;
+  // Plain text; links from the CMS's Markdown are offsets into it.
   description: string;
+  descriptionLinks: TextLink[];
   year: number;
   // Optional; empty strings when not set. `clientUrl` makes the client a link.
   client: string;

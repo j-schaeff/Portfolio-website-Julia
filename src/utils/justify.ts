@@ -29,6 +29,11 @@ const HYPHEN_PENALTY = 30;
 
 export interface Line {
   text: string;
+  // Character range of the line in the source text (words joined by single
+  // spaces), without an inserted hyphen, so rows can be mapped back to it
+  // (e.g. for links).
+  from: number;
+  to: number;
   // Spacing (px) to add between letters and between words. Positive word
   // spacing is left to text-align: justify, which also absorbs rounding.
   letterSpacing: number;
@@ -78,6 +83,9 @@ export function justifyLines(
   const space = measure(" ");
   const hyphen = measure("-");
   const track = MAX_TRACKING * fontSize;
+  // Where each word starts in the words joined by single spaces.
+  const starts: number[] = [];
+  raw.reduce((at, w, i) => ((starts[i] = at), at + w.length + 1), 0);
   const words: Piece[][] = raw.map((w) =>
     [...hyphenationPoints(w), w.length].map((end) => ({ width: measure(w.slice(0, end)), text: w.slice(0, end) })),
   );
@@ -187,8 +195,10 @@ export function justifyLines(
     prev = j;
     const { natural, gaps, chars } = stats(from, to);
     const text = lineText(from, to);
-    if (last && natural <= lineWidth) return { text, letterSpacing: 0, wordSpacing: 0, last };
+    const start = isFull(from) ? starts[from.w + 1] : starts[from.w] + words[from.w][from.p].text.length;
+    const range = { from: start, to: starts[to.w] + words[to.w][to.p].text.length };
+    if (last && natural <= lineWidth) return { text, ...range, letterSpacing: 0, wordSpacing: 0, last };
     const { letterSpacing, wordSpacing } = fit(natural, gaps, chars, lineWidth);
-    return { text, letterSpacing, wordSpacing, last };
+    return { text, ...range, letterSpacing, wordSpacing, last };
   });
 }

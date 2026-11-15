@@ -165,3 +165,16 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Links inside the description (from the CMS's rich-text field): underlined
+   so they stand out from the text, in the text's own color. */
+.description a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.description a:hover {
+  text-decoration-thickness: 2px;
+}
