@@ -4,9 +4,9 @@ type: Identity
 description: "Many styles, emotions and personalities share one department, and
   every difference shapes the whole. This project captures the individuality of
   the Modeklasse at the University of Applied Arts: diverse, ever-changing and
-  united through expression."
+  united through expression. Completed with Marie-Therese Blecha and Daria
+  Peshnyuk "
 year: 2025
-client: Modekalsse Angewandte
 images:
   - image: /images/uploads/10_modeklasse_26/poster-in-situ.jpg
     size: "5"
