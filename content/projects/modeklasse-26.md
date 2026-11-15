@@ -16,7 +16,7 @@ images:
     hideInGrid: false
   - video: /images/uploads/10_modeklasse_26/show-screen-01.mp4
     size: "5"
-    hideInGrid: false
+    hideInGrid: true
   - video: /images/uploads/10_modeklasse_26/buehne-01.mp4
     size: "3"
     hideInGrid: false
