@@ -28,7 +28,7 @@ images:
     hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/poster-overview.jpg
     size: "3"
-    hideInGrid: true
+    hideInGrid: false
   - image: /images/uploads/10_modeklasse_26/poster-01.jpg
     size: "5"
     hideInGrid: false
