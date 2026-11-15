@@ -13,14 +13,14 @@
   color: var(--fg);
 }
 
-/* The largest box with the logo's 122 × 45.83 ratio that fits the viewport.
+/* The largest box with the logo's 806.18 × 380.08 ratio that fits the viewport.
    Sized to the logo's own shape, so it can slide out as one compact layer. */
 .overlayMark {
   width: min(
     100vw - 2 * var(--overlay-pad),
-    (100vh - 2 * var(--overlay-pad)) * 122 / 45.83
+    (100vh - 2 * var(--overlay-pad)) * 806.18 / 380.08
   );
-  aspect-ratio: 122 / 45.83;
+  aspect-ratio: 806.18 / 380.08;
   position: relative;
   will-change: transform;
 }
@@ -93,7 +93,7 @@
 .cellMark {
   display: block;
   width: 100%;
-  aspect-ratio: 122 / 45.83;
+  aspect-ratio: 806.18 / 380.08;
 }
 
 .svg {
@@ -112,12 +112,12 @@
     --overlay-pad: 12px;
     --logo-len: min(
       100dvh - 2 * var(--overlay-pad),
-      (100vw - 2 * var(--overlay-pad)) * 122 / 45.83
+      (100vw - 2 * var(--overlay-pad)) * 806.18 / 380.08
     );
   }
 
   .overlayMark {
-    width: calc(var(--logo-len) * 45.83 / 122);
+    width: calc(var(--logo-len) * 380.08 / 806.18);
     height: var(--logo-len);
     aspect-ratio: auto;
   }
@@ -127,7 +127,7 @@
     top: 50%;
     left: 50%;
     width: var(--logo-len);
-    height: calc(var(--logo-len) * 45.83 / 122);
+    height: calc(var(--logo-len) * 380.08 / 806.18);
     transform: translate(-50%, -50%) rotate(-90deg);
   }
 

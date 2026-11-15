@@ -37,7 +37,7 @@ export const cellKey = (slug: string, index: number) => `${slug}:${index}`;
 export const LOGO_KEY = "logo";
 // The SVG viewBox, cropped to the lettering so its bottom edge is the
 // baseline that lines up with the images.
-const LOGO_ASPECT = 122 / 45.83;
+const LOGO_ASPECT = 806.18 / 380.08;
 // 55.2% of the smallest image height (size 1).
 const LOGO_HEIGHT = imageHeight(1) * 0.552;
 export const LOGO_WIDTH = LOGO_HEIGHT * LOGO_ASPECT;
