@@ -22,7 +22,7 @@ images:
     hideInGrid: true
   - video: /images/uploads/10_modeklasse_26/reel-idee-3.mp4
     size: "4"
-    hideInGrid: false
+    hideInGrid: true
   - video: /images/uploads/10_modeklasse_26/praesentation.mp4
     size: "5"
     hideInGrid: true
