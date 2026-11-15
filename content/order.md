@@ -9,4 +9,5 @@ projects:
   - content/projects/catalog-of-comfort.md
   - content/projects/Bread Scape.md
   - content/projects/spring.md
+  - content/projects/modeklasse-26.md
 ---
