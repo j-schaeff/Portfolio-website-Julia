@@ -22,25 +22,6 @@ column2: >-
   +43 6641290193
 
 
-  Unternehmensgegenstand: Grafik- und Kommunikationsdesign
-
-  Gewerbe: [Werbegrafik-Designer, freies Gewerbe]
-
-  Gewerbebehörde: [Bezirkshauptmannschaft oder Magistrat]
-
-  Mitgliedschaft: [Wirtschaftskammer Bundesland, Fachgruppe Werbung und
-  Marktkommunikation]
-
-  Berufsrecht: Gewerbeordnung, abrufbar unter ris.bka.gv.at
-
-  UID-Nummer: [ATU00000000, oder: Umsatzsteuerbefreit, Kleinunternehmerin gemäß
-  § 6 Abs 1 Z 27 UStG]
-
-
-  Medieninhaberin und Herausgeberin: Julia Schäffler. Grundlegende Richtung:
-  Präsentation der eigenen Arbeiten und Leistungen.
-
-
   Alle Inhalte dieser Website sind urheberrechtlich geschützt. Für die Inhalte
   externer Links sind ausschließlich deren Betreiber verantwortlich.
 
@@ -54,9 +35,9 @@ column2: >-
   1. Geltungsbereich
 
   Diese AGB gelten für alle Verträge über Designleistungen zwischen Julia
-  Schaeffler (Designerin) und ihren Auftraggeber:innen, soweit nichts anderes
-  schriftlich vereinbart ist. Zwingende Rechte von Verbraucher:innen,
-  insbesondere nach dem KSchG und dem FAGG, bleiben unberührt.
+  Schäffler und ihren Auftraggeber:innen, soweit nichts anderes schriftlich
+  vereinbart ist. Zwingende Rechte von Verbraucher:innen, insbesondere nach dem
+  KSchG und dem FAGG, bleiben unberührt.
 
 
   2. Angebot und Auftrag
