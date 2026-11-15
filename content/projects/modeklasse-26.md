@@ -19,6 +19,12 @@ images:
   - video: /images/uploads/10_modeklasse_26/reel-idee-3.mp4
     size: "4"
     hideInGrid: true
+  - video: /images/uploads/10_modeklasse_26/praesentation.mp4
+    size: "5"
+    hideInGrid: true
+  - image: /images/uploads/10_modeklasse_26/poster-overview.jpg
+    size: "3"
+    hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/poster-01.jpg
     size: "5"
     hideInGrid: false
