@@ -4,6 +4,21 @@ type: Identity
 year: 2025
 client: Modekalsse Angewandte
 images:
+  - image: /images/uploads/10_modeklasse_26/poster-in-situ.jpg
+    size: "5"
+    hideInGrid: true
+  - image: /images/uploads/10_modeklasse_26/flyer-folded.jpg
+    size: "3"
+    hideInGrid: true
+  - video: /images/uploads/10_modeklasse_26/show-screen-01.mp4
+    size: "5"
+    hideInGrid: true
+  - video: /images/uploads/10_modeklasse_26/buehne-01.mp4
+    size: "3"
+    hideInGrid: true
+  - video: /images/uploads/10_modeklasse_26/reel-idee-3.mp4
+    size: "4"
+    hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/poster-01.jpg
     size: "5"
     hideInGrid: false
