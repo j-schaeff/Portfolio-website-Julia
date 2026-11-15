@@ -10,4 +10,5 @@ projects:
   - content/projects/Bread Scape.md
   - content/projects/spring.md
   - content/projects/modeklasse-26.md
+  - content/projects/untitled.md
 ---

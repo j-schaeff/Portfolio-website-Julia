@@ -32,7 +32,8 @@ interface ProjectPagerProps {
 // stay put while the strip scrolls sideways and move with the page between
 // projects. The description is the strip's second item, a card right after
 // the full-screen first image, so swiping on reads it before the rest of the
-// images.
+// images. A project with only one media item shows it again after the
+// description, at strip size, so it can be seen whole.
 //
 // The first image fills the screen, so a cropped edge alone doesn't say
 // there's more to the right. Once the entrance rise is done, the strip nudges:
@@ -321,6 +322,27 @@ export function ProjectPager({
                       )}
                     </Fragment>
                   ))}
+                  {/* A project with a single media item would end at the
+                      description, and the full-screen first item can run past
+                      the screen, so it's never seen whole. Show it again after
+                      the description, at strip size (index 1 isn't the
+                      full-screen leading item). */}
+                  {project.images.length === 1 && project.images[0] && (
+                    <StripImage
+                      key="repeat"
+                      index={1}
+                      src={project.images[0].full}
+                      original={project.images[0].src}
+                      aspect={project.images[0].aspect}
+                      placeholder={project.images[0].isVideo ? project.images[0].poster : project.images[0].thumb}
+                      alt={project.images[0].alt || `${project.title} — 1`}
+                      size={project.images[0].size}
+                      largest={largest}
+                      isVideo={project.images[0].isVideo}
+                      hasAudio={project.images[0].hasAudio}
+                      rise={rise}
+                    />
+                  )}
                 </div>
               </div>
               {/* Outside the strip, so it doesn't scroll sideways. Fades in
