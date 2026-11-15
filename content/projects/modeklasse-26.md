@@ -13,7 +13,7 @@ images:
     hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/flyer-folded.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - video: /images/uploads/10_modeklasse_26/show-screen-01.mp4
     size: "5"
     hideInGrid: true
@@ -28,7 +28,7 @@ images:
     hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/poster-overview.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/10_modeklasse_26/poster-01.jpg
     size: "5"
     hideInGrid: false
