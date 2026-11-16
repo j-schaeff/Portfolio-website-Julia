@@ -1,6 +1,6 @@
 ---
 bio: |-
-  julia achäffler
+  julia schäffler
 
   Creative culinary concepts, Art Direction, Graphic & Web Design 
 column2: >-
@@ -10,7 +10,7 @@ column2: >-
   Informationen gemäß § 5 ECG, § 14 UGB und Offenlegung gemäß § 25 MedienG
 
 
-  > Julia Schäffler
+  > julia schäffler
 
   1020, Österreich
 
