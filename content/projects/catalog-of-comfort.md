@@ -8,7 +8,7 @@ description: Consumer culture has made authenticity an aesthetic. Manufactured
 year: 2026
 images:
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-4.jpg
-    size: "5"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/7_catalog_of_comfort/catalog-of-comfort-1.jpg
     size: "3"
