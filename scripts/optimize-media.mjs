@@ -8,7 +8,8 @@
 // For each image:  <name>.<ext>.thumb.webp  600px tall, for the index grid
 //                  <name>.<ext>.full.webp   2400px long edge, detail + lightbox
 // For each video:  <name>.<ext>.opt.mp4     H.264, 1280px long edge, faststart
-//                  <name>.<ext>.poster.webp first frame, 600px tall
+//                  <name>.<ext>.poster.webp first frame (or a middle one if
+//                                           the first is blank), 600px tall
 // Keep these names in sync with optimizedSrc() in src/utils/media.ts.
 // Each copy's aspect ratio also goes to src/generated/media-aspects.json, and
 // the videos with an audible soundtrack to src/generated/media-audio.json.
@@ -31,7 +32,8 @@ const AUDIO = "src/generated/media-audio.json";
 // editor exported anyway), so it gets no sound button.
 const SILENT_DB = -60;
 // Bump when the settings below change, so every copy is regenerated.
-const VERSION = 1;
+// 2: posters skip a blank opening frame.
+const VERSION = 2;
 
 // 2× the tallest grid image (size 5 ≈ 237px), so thumbnails stay sharp on retina.
 const THUMB_HEIGHT = 600;
@@ -103,6 +105,28 @@ async function optimizeImage(src, base) {
     .toFile(`${base}.full.webp`);
 }
 
+async function grabFrame(src, seconds) {
+  const { stdout } = await run(
+    "ffmpeg",
+    ["-loglevel", "error", "-ss", String(seconds), "-i", src, "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-"],
+    { encoding: "buffer", maxBuffer: 64 * 1024 * 1024 },
+  );
+  return stdout;
+}
+
+async function videoDuration(src) {
+  const { stdout } = await run("ffprobe", [
+    "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src,
+  ]);
+  return Number(stdout.trim()) || 0;
+}
+
+// A single flat colour: every channel spans only a few levels.
+async function isBlank(png) {
+  const { channels } = await sharp(png).stats();
+  return channels.slice(0, 3).every((c) => c.max - c.min < 8);
+}
+
 async function optimizeVideo(src, base) {
   const out = `${base}.opt.mp4`;
   await run("ffmpeg", [
@@ -120,12 +144,15 @@ async function optimizeVideo(src, base) {
     await run("ffmpeg", ["-y", "-loglevel", "error", "-i", src, "-c", "copy", "-movflags", "+faststart", out]);
   }
 
-  const { stdout } = await run(
-    "ffmpeg",
-    ["-loglevel", "error", "-i", src, "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-"],
-    { encoding: "buffer", maxBuffer: 64 * 1024 * 1024 },
-  );
-  await sharp(stdout)
+  // The poster is what shows until the video plays. A video that opens on an
+  // empty frame (e.g. text building up on white) would leave a blank box, so
+  // use a frame from the middle instead.
+  let frame = await grabFrame(src, 0);
+  if (await isBlank(frame)) {
+    const duration = await videoDuration(src);
+    if (duration > 0) frame = await grabFrame(src, duration / 2);
+  }
+  await sharp(frame)
     .resize({ height: THUMB_HEIGHT, withoutEnlargement: true })
     .webp({ quality: 78 })
     .toFile(`${base}.poster.webp`);
