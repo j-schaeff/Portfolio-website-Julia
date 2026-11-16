@@ -9,7 +9,7 @@ images:
     size: "5"
     hideInGrid: false
   - video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
-    size: "3"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_Black.jpg
     size: "4"
