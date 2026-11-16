@@ -5,7 +5,8 @@ description: "Many styles, emotions and personalities share one department, and
   every difference shapes the whole. This project captures the individuality of
   the Modeklasse at the University of Applied Arts: diverse, ever-changing and
   united through expression. Completed with [Marie-Therese
-  Blecha](https://mariethereseblecha.com/) and Daria Peshnyuk "
+  Blecha](https://mariethereseblecha.com/) and [Daria
+  Peshnyuk](https://www.instagram.com/dariapeshnyuk/) "
 year: 2025
 images:
   - image: /images/uploads/10_modeklasse_26/flyer-folded.jpg
