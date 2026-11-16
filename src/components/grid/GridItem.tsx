@@ -72,6 +72,7 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
           src={img.thumb}
           original={img.src}
           poster={img.poster}
+          aspect={img.aspect}
           play={playVideos}
           alt={img.alt || `${project.title} — ${i + 1}`}
           size={img.size}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
@@ -15,6 +15,10 @@ interface GridImageProps {
   // Videos hold off until the reveal starts, so they don't compete with the
   // images for bandwidth while the loading screen is up.
   play: boolean;
+  // Width ÷ height from the build, if known. Sizes the box before the file
+  // arrives, so a cell doesn't start at the browser's default video shape (or
+  // zero height for an image) and jump once the media loads.
+  aspect?: number;
   alt: string;
   size: ImageSize;
   isVideo: boolean;
@@ -26,26 +30,36 @@ interface GridImageProps {
 
 // No layoutId here: opening a project doesn't morph the clicked image. The
 // detail strip rises in from the bottom on its own instead.
-export function GridImage({ src: preferred, original, poster, play, alt, size, isVideo, onActivate, onAspect }: GridImageProps) {
+export function GridImage({ src: preferred, original, poster, play, aspect, alt, size, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
   // Height goes through a CSS variable so the mobile layout can override it.
   const style = { "--img-h": `${imageHeight(size)}px` } as CSSProperties;
+
+  // Media without a build-time ratio (external videoUrls) keeps the first one
+  // it measures, so it too holds its shape once known.
+  const [measured, setMeasured] = useState<number>();
+  const onAspect = (value: number) => {
+    setMeasured((prev) => prev ?? value);
+    reportUp?.(value);
+  };
+  const ratio = aspect ?? measured;
+  if (ratio) style.aspectRatio = ratio;
 
   const mediaRef = useRef<HTMLImageElement & HTMLVideoElement>(null);
   const reportAspect = () => {
     const el = mediaRef.current;
-    if (!el || !onAspect) return;
+    if (!el) return;
     const [w, h] = isVideo ? [el.videoWidth, el.videoHeight] : [el.naturalWidth, el.naturalHeight];
     if (w && h) onAspect(w / h);
   };
 
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   // A broken asset still needs a ratio, or the mobile layout would wait forever.
-  const reportBroken = () => (isOriginal ? onAspect?.(1) : fallBack());
+  const reportBroken = () => (isOriginal ? onAspect(1) : fallBack());
 
   // The poster has the video's proportions, so the layout needn't wait for
   // the video's own metadata. If it fails, onLoadedMetadata still reports.
   useEffect(() => {
-    if (!isVideo || !poster || !onAspect) return;
+    if (!isVideo || !poster) return;
     const img = new Image();
     img.onload = () => img.naturalHeight && onAspect(img.naturalWidth / img.naturalHeight);
     img.src = poster;
