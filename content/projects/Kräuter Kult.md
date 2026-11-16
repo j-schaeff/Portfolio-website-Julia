@@ -1,10 +1,10 @@
 ---
 title: Kräuter Kult
 type: Poster
-description: A typographic poster for a fictional creative culinary experience
-  celebrating the local herbs of Switzerlands Glarus region. The design echoes
-  the movement and forms of growing herbs, embodying the delicate, airy
-  atmosphere of an open-air event.
+description: "A letterpress typographic poster completed at [Typographic
+  Printing Program](https://www.typographic-printing-program.com/) under [Dafi
+  Kühne](https://www.babyinktwice.ch/). Poster design for a creative culinary
+  experience celebrating the local herbs of Switzerlands Glarus region. "
 year: 2025
 images:
   - image: /images/uploads/2_kraueterkult/Krauter_kult_1.jpg
@@ -18,11 +18,11 @@ images:
     hideInGrid: false
   - image: /images/uploads/2_kraueterkult/Krauter_kult_11.jpg
     size: "3"
-    hideInGrid: false
+    hideInGrid: true
   - image: /images/uploads/2_kraueterkult/Krauter_kult_detail.jpg
-    size: "3"
+    size: "4"
     hideInGrid: true
   - image: /images/uploads/2_kraueterkult/Krauter_kult_grass.jpg
-    size: "4"
+    size: "3"
     hideInGrid: true
 ---
