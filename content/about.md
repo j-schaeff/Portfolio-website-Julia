@@ -1,8 +1,5 @@
 ---
-bio: |-
-  Julia Schäffler
-
-  Creative culinary concepts, Art Direction, Graphic & Web Design 
+bio: "Creative culinary concepts, Art Direction, Graphic & Web Design "
 column2: >-
   # Impressum
 
@@ -10,9 +7,7 @@ column2: >-
   Informationen gemäß § 5 ECG, § 14 UGB und Offenlegung gemäß § 25 MedienG
 
 
-  > Julia Schaeffler
-
-  Mühlfeldgasse 6
+  > julia schäffler
 
   1020, Österreich
 
