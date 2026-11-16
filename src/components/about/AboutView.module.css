@@ -35,6 +35,18 @@
   padding: 96px 0 48px;
 }
 
+/* The site logo heads the first column, as wide as the column. */
+.logo {
+  margin: 0 0 32px;
+  color: var(--fg);
+}
+
+.logoSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* Long words hyphenate rather than overflow; the wrap is a fallback for words
    the browser has no hyphenation for. */
 .text {

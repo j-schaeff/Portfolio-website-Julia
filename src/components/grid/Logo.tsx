@@ -38,10 +38,12 @@ function OverlayMark() {
 }
 
 // Inlined (not an <img>) so the fill can follow the theme via currentColor.
-function LogoMark() {
+// Also used at the top of the About page; `className` replaces the default
+// full-size fill.
+export function LogoMark({ className = styles.svg }: { className?: string }) {
   return (
     <svg
-      className={styles.svg}
+      className={className}
       viewBox="0 0 806.18 380.08"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"

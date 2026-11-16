@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { about } from "../../data/about";
+import { LogoMark } from "../grid/Logo";
 import { markIntroPlayed } from "../../utils/intro";
 import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import styles from "./AboutView.module.css";
@@ -43,6 +44,12 @@ export function AboutView() {
 
       {about.columns.map((paragraphs, column) => (
         <div key={column} className={styles.column}>
+          {column === 0 && (
+            <h1 className={styles.logo} aria-label="julia schäffler">
+              <LogoMark className={styles.logoSvg} />
+            </h1>
+          )}
+
           {paragraphs.length > 0 && (
             // The legal text is German; hyphenation follows this language.
             <div className={styles.text} lang={column === 1 ? "de" : undefined}>
