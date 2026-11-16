@@ -10,9 +10,7 @@ column2: >-
   Informationen gemäß § 5 ECG, § 14 UGB und Offenlegung gemäß § 25 MedienG
 
 
-  > Julia Schaeffler
-
-  Mühlfeldgasse 6
+  > Julia Schäffler
 
   1020, Österreich
 
