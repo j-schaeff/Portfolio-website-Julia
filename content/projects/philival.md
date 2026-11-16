@@ -7,7 +7,7 @@ description: Visual identity for Café phil’s 20th anniversary, celebrating it
 year: 2024
 images:
   - image: /images/uploads/IMG_6677.jpeg
-    size: "5"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/Stickers-book.jpg
     size: "2"
