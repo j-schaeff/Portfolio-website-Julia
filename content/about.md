@@ -1,8 +1,5 @@
 ---
-bio: |-
-  julia schäffler
-
-  Creative culinary concepts, Art Direction, Graphic & Web Design 
+bio: "Creative culinary concepts, Art Direction, Graphic & Web Design "
 column2: >-
   # Impressum
 
