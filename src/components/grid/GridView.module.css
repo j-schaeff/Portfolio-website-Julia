@@ -80,7 +80,8 @@
        full-width logo row (see Logo.module.css), which is pinned to the page's
        bottom edge so it always ends on the bottom of the screen, even when the
        grid is shorter than the viewport. */
-    --logo-row-h: calc((100vw - 16px) * 380.08 / 806.18);
+    /* The loading screen's lettering (Logo.module.css), 122 × 45.83. */
+    --logo-row-h: calc((100vw - 16px) * 45.83 / 122);
     position: relative;
     min-height: 100dvh;
     align-content: flex-start;

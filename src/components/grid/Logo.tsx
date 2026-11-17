@@ -17,7 +17,8 @@ const EXIT = { duration: 0.8, ease: [0.55, 0, 0.75, 0] } as const;
 // which stuttered on phones.
 const shimmerMask = { "--logo-mask": `url(${logoMask})` } as CSSProperties;
 
-// The original logo, kept for the loading screen (the grid uses LogoMark).
+// The original, lighter logo: the loading screen, and the grid's logo on
+// phones (wider screens use LogoMark).
 // Same paths as logo-mask.svg, which shapes the loading shimmer.
 function OverlayMark() {
   return (
@@ -101,7 +102,14 @@ export function LogoCell({ width, showMark }: LogoCellProps) {
     <div className={`${cellStyles.cell} ${styles.cell}`} style={style}>
       {showMark ? (
         <Link to="/about" className={styles.cellMark} aria-label="About">
-          <LogoMark />
+          {/* Phones show the loading screen's lighter lettering; CSS picks
+              which one is displayed (see Logo.module.css). */}
+          <span className={styles.wideMark}>
+            <LogoMark />
+          </span>
+          <span className={styles.mobileMark}>
+            <OverlayMark />
+          </span>
         </Link>
       ) : (
         <div className={styles.cellMark} aria-hidden="true" />
