@@ -1,7 +1,8 @@
 ---
 title: Room & Board
 type: Art Direction & Video
-description: "A visual connecting architechture with a meal "
+description: A series pairing houses with dishes. The colors and character of
+  each structure shap the table setting, the food and the menu.
 year: 2026
 images:
   - video: /images/uploads/4_room_board/Test_green_House.mp4
