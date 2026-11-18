@@ -9,7 +9,7 @@ description: |-
 year: 2026
 images:
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-34.jpg
-    size: "4"
+    size: "5"
     hideInGrid: false
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-13.jpg
     size: "2"
