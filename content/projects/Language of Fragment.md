@@ -6,14 +6,13 @@ description: "From necessity grows a language of fragments where chaos forms
 year: 2026
 images:
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_White.jpg
-    video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
-    size: "5"
+    size: "4"
     hideInGrid: false
   - image: /images/uploads/1_fragments/Rythm_of_Fragments_Black.jpg
     video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
     size: "3"
     hideInGrid: false
   - video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
-    size: "4"
+    size: "5"
     hideInGrid: false
 ---
