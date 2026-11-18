@@ -3,25 +3,30 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
   white-space: nowrap;
   user-select: none;
   text-align: left;
 }
 
+/* On the index the name is set in the bold sans, in its authored case (the
+   detail and List pages use the serif). */
 .title {
-  font-family: var(--font-serif);
-  font-size: 12px;
-  font-weight: 300;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss02";
+  font-size: 13px;
+  font-weight: 700;
   line-height: 1.1;
 }
 
+/* Matches the type on the detail page (DetailMeta.module.css), with slightly
+   tighter letter spacing. */
 .type {
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--fg);
   line-height: 1.1;
