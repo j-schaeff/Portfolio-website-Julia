@@ -30,6 +30,17 @@
   font-display: swap;
 }
 
+/* The index's project names and types (InfoBlock.module.css). Black is the cut one step
+   below Ultra — Faucet's own weight 600. Text set at 700 still gets Ultra,
+   since for weights above 500 the browser looks heavier first. */
+@font-face {
+  font-family: "A2Z Faucet";
+  src: url("/fonts/A2Z-Faucet-Black.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {

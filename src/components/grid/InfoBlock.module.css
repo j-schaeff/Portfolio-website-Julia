@@ -15,17 +15,17 @@
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
 }
 
 /* Matches the type on the detail page (DetailMeta.module.css), with slightly
-   tighter letter spacing. */
+   tighter letter spacing and the lighter Black cut, like the name. */
 .type {
   font-family: var(--font-sans);
   font-feature-settings: "ss02";
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--fg);
