@@ -18,6 +18,17 @@ export function clampImageSize(value: unknown): ImageSize {
   return 3;
 }
 
+// PREVIEW (temporary): "?cascade" in the URL makes each project's first index
+// image the largest (5), each next one a size smaller, down to 1; every
+// project starts over at 5. `rank` is the image's position among the
+// project's grid images.
+const CASCADE_PREVIEW =
+  typeof window !== "undefined" && new URLSearchParams(window.location.search).has("cascade");
+
+export function gridImageHeight(size: ImageSize, rank: number): number {
+  return imageHeight(CASCADE_PREVIEW ? (Math.max(1, 5 - rank) as ImageSize) : size);
+}
+
 export function imageHeight(size: ImageSize): number {
   return Math.round(BASE_HEIGHT * MULTIPLIER[size]);
 }

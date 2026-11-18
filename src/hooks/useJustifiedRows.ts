@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type RefObject } from "react";
 import type { Project } from "../types/project";
-import { imageHeight } from "../utils/imageSize";
+import { gridImageHeight, imageHeight } from "../utils/imageSize";
 import { useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
@@ -170,7 +170,8 @@ export function useJustifiedRows(
         const aspect = img.aspect ?? aspects[key];
         // The row fill needs every width, so wait for any unknown media.
         if (!aspect) return null;
-        cells.push({ key, group: project.slug, width: imageHeight(img.size) * aspect });
+        const rank = cells.length;
+        cells.push({ key, group: project.slug, width: gridImageHeight(img.size, rank) * aspect });
       }
       if (!cells.length) continue;
       if (isMobile || !groups.length) groups.push(cells);

@@ -52,6 +52,7 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
   const renderCell = (
     { img, i }: (typeof visibleImages)[number],
     isLead: boolean,
+    rank: number,
   ) => {
     const key = cellKey(project.slug, i);
     const width = cellWidths?.[key];
@@ -76,6 +77,7 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
           play={playVideos}
           alt={img.alt || `${project.title} — ${i + 1}`}
           size={img.size}
+          rank={rank}
           isVideo={img.isVideo}
           onActivate={go}
           onAspect={(aspect) => onAspect(key, aspect)}
@@ -94,7 +96,7 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
           {info}
         </div>
       )}
-      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0))}
+      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0, idx))}
     </>
   );
 }
