@@ -1,6 +1,10 @@
 ---
 title: Bread Scape
 type: Food Design
+description: Concept and production of the [Steine
+  Und](https://www.steineund.info/) atelier opening, in collaboration with Anna
+  Dornstädter. Captured on analog film by [Katharina
+  Liebl](https://www.instagram.com/katharinaliebl/).
 year: 2026
 images:
   - video: /images/uploads/9_bread_scape/bread-scape-video-hero-4.mp4
