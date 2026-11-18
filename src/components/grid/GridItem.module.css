@@ -26,12 +26,19 @@
   cursor: pointer;
 }
 
-/* Mobile only: a full-width line in the flat flex stream, so it also forces
-   each project onto a new row. The top margin is what separates projects;
-   the images within one sit a plain grid gap apart. */
+/* Mobile only: a full-width line in the flat flex stream after a project's
+   images, so it also ends the project's rows. The negative top margin pulls
+   it close to the images above (5px instead of the 8px grid gap); the bottom
+   margin is what separates it from the next project. */
 .heading {
   flex: 0 0 100%;
-  margin-top: 24px;
+  margin-top: -3px;
+  margin-bottom: 16px;
+}
+
+/* The info spans the line so InfoBlock can push the type to the right edge. */
+.heading > .infoButton {
+  width: 100%;
 }
 
 /* Justified rows: useJustifiedRows picks the rows (2–4 images on mobile, up
@@ -61,17 +68,18 @@
   }
 }
 
-/* Hover lifts the image out of the row, leaving a notch in the flow. A
-   transform so neighbours stay put. Triggered from the cell, which doesn't
-   move: on the image itself, the lift would pull its bottom edge out from
-   under the cursor and flicker. Mouse only and above the mobile breakpoint,
+/* Hover lifts the project's images out of the row, leaving notches in the
+   flow: hovering any one of them sets data-hover on every cell of that
+   project (GridItem.tsx). A transform so neighbours stay put. Triggered from
+   the cells, which don't move: on the image itself, the lift would pull its
+   bottom edge out from under the cursor and flicker. Mouse only and above the mobile breakpoint,
    so taps don't leave it stuck and narrow windows match phones. */
 @media (min-width: 561px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .cell > :first-child {
     transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .cell:hover > :first-child {
+  .cell[data-hover] > :first-child {
     transform: translateY(-10px);
   }
 }

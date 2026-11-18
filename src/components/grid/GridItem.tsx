@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
 import { cellKey } from "../../hooks/useJustifiedRows";
@@ -22,6 +22,21 @@ interface GridItemProps {
 export function GridItem({ project, cellWidths, hangingCells, onAspect, playVideos }: GridItemProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  // Hovering any of the project's images lifts all of them (see the hover
+  // rule in GridItem.module.css). Leaving waits a beat, so crossing the gap
+  // between two of the project's images doesn't drop and re-lift the set.
+  const [hovered, setHovered] = useState(false);
+  const leaveTimer = useRef<number>();
+  const enter = () => {
+    window.clearTimeout(leaveTimer.current);
+    setHovered(true);
+  };
+  const leave = () => {
+    window.clearTimeout(leaveTimer.current);
+    leaveTimer.current = window.setTimeout(() => setHovered(false), 80);
+  };
+  useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
+
   const go = () => {
     navigate(`/project?project=${encodeURIComponent(project.slug)}`);
   };
@@ -66,6 +81,9 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
         data-grid-cell
         data-justify={width ? "" : undefined}
         data-hang={hangingCells?.has(key) ? "" : undefined}
+        data-hover={hovered ? "" : undefined}
+        onMouseEnter={enter}
+        onMouseLeave={leave}
         style={justify}
         key={img.src + i}
       >
@@ -90,13 +108,14 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
 
   return (
     <>
-      {/* Mobile: the info heads the project, so its images read as one group. */}
+      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0, idx))}
+      {/* Mobile: the info sits right under the project's images, with the
+          space between projects below it, so it reads as that project's. */}
       {isMobile && visibleImages.length > 0 && (
         <div className={styles.heading} data-grid-cell>
           {info}
         </div>
       )}
-      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0, idx))}
     </>
   );
 }

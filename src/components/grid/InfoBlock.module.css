@@ -26,3 +26,26 @@
   color: var(--fg);
   line-height: 1.1;
 }
+
+/* Mobile: name and type on one line across the project's full width, name
+   on the left, type on the right, sharing a baseline. A long name gives way
+   (ellipsis) before it can run into the type. */
+@media (max-width: 560px) {
+  .info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .type {
+    flex: none;
+  }
+}
