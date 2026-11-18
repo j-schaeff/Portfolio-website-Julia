@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
-import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
 import { gridImageHeight } from "../../utils/imageSize";
 import styles from "./GridImage.module.css";
@@ -20,8 +19,7 @@ interface GridImageProps {
   // zero height for an image) and jump once the media loads.
   aspect?: number;
   alt: string;
-  size: ImageSize;
-  // Position among the project's grid images (for the ?cascade preview).
+  // Position among the project's grid images; sets its cascading height.
   rank: number;
   isVideo: boolean;
   onActivate: (event: React.MouseEvent<HTMLElement>) => void;
@@ -32,9 +30,9 @@ interface GridImageProps {
 
 // No layoutId here: opening a project doesn't morph the clicked image. The
 // detail strip rises in from the bottom on its own instead.
-export function GridImage({ src: preferred, original, poster, play, aspect, alt, size, rank, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
+export function GridImage({ src: preferred, original, poster, play, aspect, alt, rank, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
   // Height goes through a CSS variable so the mobile layout can override it.
-  const style = { "--img-h": `${gridImageHeight(size, rank)}px` } as CSSProperties;
+  const style = { "--img-h": `${gridImageHeight(rank)}px` } as CSSProperties;
 
   // Media without a build-time ratio (external videoUrls) keeps the first one
   // it measures, so it too holds its shape once known.

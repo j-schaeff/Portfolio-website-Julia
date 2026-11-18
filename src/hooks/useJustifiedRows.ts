@@ -171,7 +171,7 @@ export function useJustifiedRows(
         // The row fill needs every width, so wait for any unknown media.
         if (!aspect) return null;
         const rank = cells.length;
-        cells.push({ key, group: project.slug, width: gridImageHeight(img.size, rank) * aspect });
+        cells.push({ key, group: project.slug, width: gridImageHeight(rank) * aspect });
       }
       if (!cells.length) continue;
       if (isMobile || !groups.length) groups.push(cells);
