@@ -2,8 +2,8 @@
 title: Philival
 type: Identity
 description: Visual identity for [Café phil’s](https://www.cafephil.at/) 20th
-  anniversary, celebrating its unique blend of café, bar, and bookstore and the
-  vibrant community that has grown around it.
+  anniversary celebration. Capturing the unique blend of café, bar, and
+  bookstore and the vibrant community that has grown around it.
 year: 2024
 images:
   - image: /images/uploads/IMG_6677.jpeg
