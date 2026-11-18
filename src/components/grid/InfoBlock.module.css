@@ -11,8 +11,9 @@
 
 .title {
   font-family: var(--font-serif);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 300;
+  line-height: 1.1;
 }
 
 .type {
@@ -23,16 +24,5 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg);
-}
-
-/* Mobile: tighter leading between title and type in the project heading. */
-@media (max-width: 560px) {
-  .info {
-    gap: 0;
-  }
-
-  .title,
-  .type {
-    line-height: 1.15;
-  }
+  line-height: 1.1;
 }

@@ -51,7 +51,7 @@
 
 .description {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.35;
   text-indent: 24px;
   /* Justified. JustifiedText sets the lines itself to avoid wide word gaps;
