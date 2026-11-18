@@ -19,6 +19,6 @@ images:
     size: "5"
     hideInGrid: true
   - video: /images/uploads/8_philival/philival-showreel.mp4
-    size: "2"
+    size: "4"
     hideInGrid: true
 ---
