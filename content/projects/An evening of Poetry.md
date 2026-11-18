@@ -1,10 +1,9 @@
 ---
 title: An evening of Poetry
 type: Identity
-description: An intimate event created by friends, for friends, centered around
-  sharing poetry and personal experiences. Inspired by hole-punched tickets, the
-  invitation and booklet put a modern spin on a familiar event symbol, blending
-  nostalgia with a fresh, contemporary design.
+description: Concept, invitation and booklet for an intimate poetry reading,
+  made by friends for friends and centered on sharing poems and personal
+  experiences.
 year: 2023
 images:
   - image: /images/uploads/3_poetry/Booklet4.png
