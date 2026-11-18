@@ -33,7 +33,7 @@ images:
     size: "4"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-24.jpg
-    size: "2"
+    size: "4"
     hideInGrid: true
   - image: /images/uploads/6_taste_the_gap/taste-the-gap-29.jpg
     size: "5"
