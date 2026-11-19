@@ -15,8 +15,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObje
 
 // Fresh loads double as the loading screen: the logo covers the page while
 // the images and videos on screen load ("loading"), the reveal then plays
-// behind it ("run"), and once the on-screen cells have revealed and a short
-// pause has passed the logo slides down out of the viewport, leaving its small
+// behind it ("run"), and once the first row has revealed and a short pause
+// has passed the logo slides down out of the viewport, leaving its small
 // copy in the grid's last slot. Media below the fold keeps loading after that;
 // waiting for it would hold the logo up for things the visitor can't see.
 // null skips all of it (returning from a project, or reduced motion).
@@ -31,9 +31,6 @@ const STEP_MS = 120;
 // Each cell's own fade/rise. Keep in sync with the transition in
 // GridView.module.css.
 const REVEAL_MS = 900;
-// How much later than its image a label finishes sliding in (the type's
-// delay in GridView.module.css). Keep in sync with the CSS.
-const LABEL_LAG_MS = 280;
 // Rows are detected by vertical overlap; allow for sub-pixel rounding.
 const ROW_TOLERANCE_PX = 10;
 // The on-screen media should be loaded before the reveal, so this is only a
@@ -55,7 +52,7 @@ function prefersReducedMotion(): boolean {
 // while the loading screen is up, which would shift their tops. A cell joins
 // the current row while it overlaps it vertically; a row's cells needn't share
 // a top or a bottom edge.
-function readingOrder(cells: HTMLElement[]): HTMLElement[] {
+function readingOrder(cells: HTMLElement[]): HTMLElement[][] {
   const measured = cells
     .map((el) => ({
       el,
@@ -76,7 +73,7 @@ function readingOrder(cells: HTMLElement[]): HTMLElement[] {
     }
   }
 
-  return rows.flatMap((row) => {
+  return rows.map((row) => {
     row.items.sort((a, b) => a.left - b.left);
     return row.items.map((i) => i.el);
   });
@@ -183,7 +180,7 @@ export function useRowReveal(
   const [logo, setLogo] = useState<LogoPhase>(() =>
     state === "loading" ? "overlay" : "gone",
   );
-  // How long the on-screen part of the reveal takes, measured when it starts.
+  // How long the first row takes to reveal, measured when it starts.
   const revealMs = useRef(0);
 
   useLayoutEffect(() => {
@@ -199,9 +196,10 @@ export function useRowReveal(
     // One more frame so flex-wrap has settled before we read positions.
     let cancelWait = () => {};
     const raf = requestAnimationFrame(() => {
-      const cells = readingOrder(
+      const rows = readingOrder(
         Array.from(container.querySelectorAll<HTMLElement>("[data-grid-cell]")),
       );
+      const cells = rows.flat();
       // Reading order runs top to bottom, so the visible cells are one stretch.
       const visible = cells.filter(onScreen);
       const lastVisible = visible.length ? cells.indexOf(visible[visible.length - 1]) : 0;
@@ -210,7 +208,10 @@ export function useRowReveal(
       cells.forEach((cell, i) => {
         cell.style.setProperty("--reveal-delay", `${Math.min(i, lastVisible) * STEP_MS}ms`);
       });
-      revealMs.current = lastVisible * STEP_MS + REVEAL_MS + LABEL_LAG_MS;
+      // The logo leaves as soon as the first row's images have grown in; the
+      // rest of the reveal carries on as it slides away.
+      const firstRowLast = Math.min((rows[0]?.length ?? 1) - 1, lastVisible);
+      revealMs.current = firstRowLast * STEP_MS + REVEAL_MS;
 
       const media = visible.flatMap((cell) =>
         Array.from(cell.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img, video")),
@@ -223,8 +224,7 @@ export function useRowReveal(
     };
   }, [state, layoutReady, ref]);
 
-  // Once the on-screen cells have finished revealing, pause, then send the
-  // logo off.
+  // Once the first row has finished revealing, pause, then send the logo off.
   useEffect(() => {
     if (state !== "run" || logo !== "overlay") return;
     const timer = window.setTimeout(() => setLogo("leaving"), revealMs.current + LOGO_DELAY_MS);
