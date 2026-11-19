@@ -23,3 +23,13 @@ export const scrollHintPending = () => !scrollHintSeen;
 export const markScrollHintSeen = () => {
   scrollHintSeen = true;
 };
+
+// List view: the row cascade plays on the first visit to the list per page
+// load; later visits only fade the page in (ListView). Same pattern as above.
+let listIntroPlayed = false;
+
+export const listIntroPending = () => !listIntroPlayed;
+
+export const markListIntroPlayed = () => {
+  listIntroPlayed = true;
+};

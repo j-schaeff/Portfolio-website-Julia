@@ -43,7 +43,7 @@ src/
     slug.ts                filename → URL slug
     media.ts               isVideo() extension check, dropboxDirect() share-link rewrite, optimizedSrc()
     motion.ts              shared transition timings (grid fade, strip rise)
-    intro.ts               once-per-page-load flags: logo + reveal intro, desktop scroll hint
+    intro.ts               once-per-page-load flags: logo + reveal intro, desktop scroll hint, list row cascade
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
     richText.ts            description Markdown → plain text + link offsets; renderRuns() draws the links
   components/

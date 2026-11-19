@@ -22,3 +22,17 @@ export const NUDGE_TRANSITION = {
   times: [0, 0.4, 1],
   ease: [[...EASE], [0.45, 0, 0.55, 1]] as [number, number, number, number][],
 };
+
+// List view entrance, bottom to top after a short beat so it starts as the
+// page fade settles: each title fades in and rises a little, then its year and
+// type slide out from beside the title to the row's edges, where they rest.
+// The stagger stops growing after LIST_ROW_STAGGER_CAP rows, so a long list
+// doesn't keep the lines far below the fold waiting.
+export const LIST_ROW_RISE = 8;
+export const LIST_ROW_TRANSITION = { duration: 0.8, ease: EASE } as const;
+export const LIST_EDGE_TRANSITION = { duration: 2.2, ease: EASE } as const;
+// How far after its title the year and type start moving.
+export const LIST_EDGE_DELAY = 0.15;
+export const LIST_ROW_DELAY = 0.1;
+export const LIST_ROW_STAGGER = 0.15;
+export const LIST_ROW_STAGGER_CAP = 20;

@@ -95,6 +95,19 @@
   text-align: left;
 }
 
+/* On desktop the year and type shrink to their text, holding the row's outer
+   edges, so the entrance (ListView) can measure how far each sits from its
+   title. */
+@media (min-width: 561px) {
+  .year {
+    justify-self: start;
+  }
+
+  .type:not(.year) {
+    justify-self: end;
+  }
+}
+
 @media (max-width: 560px) {
   .list {
     /* Same 8px side margins as the index grid on phones. */
@@ -117,8 +130,13 @@
     display: none;
   }
 
+  /* Shrinks to its text, so the entrance (ListView) can slide the type out
+     from right beside it; max-width keeps a long title inside its column,
+     where it's cut with an ellipsis below. */
   .title {
     text-align: left;
+    justify-self: start;
+    max-width: 100%;
   }
 
   /* With no year, the title holds the left edge, so it takes the year's
