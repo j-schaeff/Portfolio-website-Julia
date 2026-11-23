@@ -48,16 +48,16 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       animate={{ opacity: 1 }}
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
-      <div className={styles.intro} data-meta-scroll>
+      <div className={styles.intro} data-meta-scroll data-contrast>
         <JustifiedText className={styles.description} text={active.description} links={active.descriptionLinks} />
       </div>
 
-      <div className={styles.titleCol}>
+      <div className={styles.titleCol} data-contrast>
         <h2 className={styles.title}>{active.title}</h2>
       </div>
 
       {active.client && (
-        <div className={styles.client}>
+        <div className={styles.client} data-contrast>
           {active.clientUrl ? (
             <a
               href={active.clientUrl}
@@ -73,7 +73,7 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
         </div>
       )}
 
-      <div className={styles.specs}>
+      <div className={styles.specs} data-contrast>
         <span className={styles.type}>{active.type}</span>
         <span className={styles.date}>{active.year}</span>
       </div>

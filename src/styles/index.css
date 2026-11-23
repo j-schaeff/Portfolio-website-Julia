@@ -81,3 +81,10 @@ button {
   border: none;
   cursor: pointer;
 }
+
+/* Text whose colour follows what's behind it (utils/contrast.ts): eases
+   between black and white instead of flicking. */
+[data-contrast] {
+  transition: color 0.25s ease;
+}
+

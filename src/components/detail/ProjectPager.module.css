@@ -50,8 +50,9 @@
 }
 
 /* Title + "Next" at the bottom of the page, over whatever the strip shows
-   there; it stays put while the strip scrolls sideways. White + difference
-   inverts against the image behind, in either theme.
+   there; it stays put while the strip scrolls sideways. Its title, info and
+   "Next" turn black or white to suit the image behind (utils/contrast.ts),
+   as does the Index button above.
    It doubles as the bottom safe zone: a full-width band (the top padding
    extends it above the title) that swallows taps and swipes, so missing
    "Next" doesn't scroll. */
@@ -67,8 +68,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  color: #fff;
-  mix-blend-mode: difference;
+  color: var(--fg);
   touch-action: none;
 }
 
@@ -96,8 +96,8 @@
 /* The project's info in the focused view, inside the caption under the
    title. The caption grows up from the bottom no further than just below the
    focused images (their 44px top + 60svh, FOCUS_HEIGHT_VH); past that a long
-   description scrolls inside the panel. It takes the caption's colour, so it
-   inverts against the background like the title, in either theme. Lines stay
+   description scrolls inside the panel. It takes the caption's colour, like the
+   title. Lines stay
    a comfortable length on larger phones. */
 .focused .caption {
   max-height: calc(100% - 44px - 60svh - 8px);
@@ -196,8 +196,9 @@
   appearance: none;
   border: 0;
   background: transparent;
-  color: inherit;
-  padding: 0;
+  /* The theme colour until utils/contrast.ts picks black or white, like
+     the title. */
+  color: var(--fg);
   /* A larger tap target; the negative margin keeps the label in place. */
   margin: 0 -16px -10px;
   padding: 10px 16px;

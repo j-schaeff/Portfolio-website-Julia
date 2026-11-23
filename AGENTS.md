@@ -46,6 +46,7 @@ src/
     intro.ts               once-per-page-load flags: logo + reveal intro, desktop scroll hint, list row cascade
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
     richText.ts            description Markdown → plain text + link offsets; renderRuns() draws the links
+    contrast.ts            [data-contrast] text turns black or white from the pixels behind it (started in App); the theme switch, List link and desktop arrows keep the theme colour
   components/
     grid/                  GridView, GridItem, GridImage, InfoBlock, Logo
     detail/                DetailView, ScrollStrip (desktop), ProjectPager (mobile), StripImage, DetailMeta, ProjectHint (desktop up/down project arrows + scroll hint)

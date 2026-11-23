@@ -3,11 +3,8 @@
    static page would render below it — off screen if the grid was scrolled —
    and only jump into view once the grid unmounts. Fixed, the strip's rise
    plays in place over the fading grid. Body scroll is locked here anyway.
-   Fixed also makes this a stacking context, so the metadata's
-   mix-blend-mode: difference can only blend with what's inside it — hence the
-   explicit background; without it the white text blends with nothing and
-   vanishes on a light page. DetailView fades the page in to keep the
-   crossfade. */
+   The explicit background covers the fading grid. DetailView fades the page
+   in to keep the crossfade. */
 .detail {
   position: fixed;
   inset: 0;
@@ -63,17 +60,14 @@
     /* A larger tap target; the negative margin keeps the label in place. */
     padding: 12px;
     margin: -12px;
-    /* White + difference inverts against what's behind it, in either theme. */
-    color: #fff;
-    mix-blend-mode: difference;
+    color: var(--fg);
   }
 }
 
-/* Phone turned sideways: the images fill the screen, so the Index button sits
-   over them and inverts against them like the theme switch. */
+/* Phone turned sideways: the images fill the screen and the Index button sits
+   over them, in the theme's text colour like the other controls. */
 @media (orientation: landscape) and (max-height: 500px) {
   .back {
-    color: #fff;
-    mix-blend-mode: difference;
+    color: var(--fg);
   }
 }

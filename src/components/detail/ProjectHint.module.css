@@ -1,5 +1,4 @@
-/* Bottom-left corner, on the page's 14px margin. White + difference inverts
-   against whatever sits behind it — images or the page — in either theme,
+/* Bottom-left corner, on the page's 14px margin, in the theme's text colour
    like the other controls. */
 .arrows {
   position: fixed;
@@ -9,8 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  color: #fff;
-  mix-blend-mode: difference;
+  color: var(--fg);
 }
 
 /* A larger click target than the chevron itself; the padding sets the

@@ -18,10 +18,9 @@
   min-height: 112px;
   padding: 0 14px 0 14px;
   box-sizing: border-box;
-  /* Always white, not var(--bg): difference-blending white is what inverts
-     the text against whatever sits behind it, in either theme. */
-  color: #fff;
-  mix-blend-mode: difference;
+  /* The theme's text colour; each block (data-contrast) then turns black or
+     white to suit what's behind it (utils/contrast.ts). */
+  color: var(--fg);
   pointer-events: none;
 }
 

@@ -10,11 +10,8 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* White + difference inverts against what's behind it, like the Index
-     button and the metadata: dark on a light page, light on a dark one, and
-     readable over images. */
-  color: #fff;
-  mix-blend-mode: difference;
+  /* Always the theme's text colour. */
+  color: var(--fg);
 }
 
 /* Both line up with the grid's 14px side padding. */
@@ -37,6 +34,12 @@
 
   .right {
     right: 12px;
+  }
+
+  /* Project pages: hidden (outright, no fade) until the strip is slid until
+     its full-screen first image is entirely out of view; see ProjectPager. */
+  :global(:root[data-hide-theme-switch]) .right {
+    display: none;
   }
 
   /* Larger tap targets; the negative margin keeps the labels in place. */

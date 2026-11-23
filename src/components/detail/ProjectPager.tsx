@@ -64,8 +64,14 @@ export function ProjectPager({
   useEffect(() => setIntro(false), []);
   // The tapped image, while its project's focused view is open.
   const [focus, setFocus] = useState<{ slug: string; index: number } | null>(null);
-  const toggleFocus = (slug: string, index: number) =>
+  // The image the strip keeps in view while sizes ease: the one just tapped,
+  // whether that opens the focused view or closes it. Closing on another
+  // image than the one that opened it (after swiping) stays on that image.
+  const anchorRef = useRef<{ slug: string; index: number } | null>(null);
+  const toggleFocus = (slug: string, index: number) => {
+    anchorRef.current = { slug, index };
     setFocus((prev) => (prev ? null : { slug, index }));
+  };
 
   const activeSlugRef = useRef(active?.slug);
   activeSlugRef.current = active?.slug;
@@ -240,8 +246,13 @@ export function ProjectPager({
   // it can't pull the strip mid-glide, and a touch hands control back.
   const lastFocusRef = useRef(focus);
   useLayoutEffect(() => {
-    const target = focus ?? lastFocusRef.current;
+    const closing = lastFocusRef.current;
     lastFocusRef.current = focus;
+    // Closed by a tap: hold the tapped image. Closed by moving to another
+    // project: that strip is off screen and rewound, so there's nothing to do.
+    const tapped = anchorRef.current;
+    anchorRef.current = null;
+    const target = focus ?? (tapped && tapped.slug === closing?.slug ? tapped : null);
     if (!target) return;
     const strip = pageFor(target.slug)?.firstElementChild;
     const item = strip?.firstElementChild?.children[target.index];
@@ -271,6 +282,52 @@ export function ProjectPager({
       strip.removeEventListener("touchstart", stop);
     };
   }, [focus]);
+
+  // The theme switch only shows once the project in view has been slid
+  // sideways until its full-screen first image is entirely off screen: before
+  // that, and while swiping between projects, there's little or no page
+  // showing for it to change. CornerNav hides it while <html> has
+  // data-hide-theme-switch, which this keeps up to date. A layout effect, so
+  // it's hidden before the first paint.
+  useLayoutEffect(() => {
+    const pager = pagerRef.current;
+    if (!pager) return;
+    const root = document.documentElement;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      // Only a page the pager rests on counts; mid-swipe it stays hidden.
+      const page = Array.from(
+        pager.querySelectorAll<HTMLElement>("[data-project-slug]"),
+      ).find((el) => Math.abs(el.offsetTop - pager.scrollTop) < 2);
+      const firstImage = page?.querySelector<HTMLElement>(`.${styles.group} > *`);
+      let show = false;
+      if (page && firstImage) {
+        const r = firstImage.getBoundingClientRect();
+        show = r.right <= 0;
+      }
+      if (show) delete root.dataset.hideThemeSwitch;
+      else root.dataset.hideThemeSwitch = "";
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    root.dataset.hideThemeSwitch = "";
+    schedule();
+    // Capture: the strips scroll inside the pager. Opening or closing the
+    // focused view scrolls the strip every frame as the heights ease, so
+    // that's caught here too.
+    pager.addEventListener("scroll", schedule, { capture: true, passive: true });
+    pager.addEventListener("transitionend", schedule, true);
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      pager.removeEventListener("scroll", schedule, true);
+      pager.removeEventListener("transitionend", schedule, true);
+      window.removeEventListener("resize", schedule);
+      delete root.dataset.hideThemeSwitch;
+    };
+  }, []);
 
   if (!active) return null;
 
@@ -343,7 +400,7 @@ export function ProjectPager({
                 animate={{ opacity: 1 }}
                 transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
               >
-                <h2 className={styles.title}>{project.title}</h2>
+                <h2 className={styles.title} data-contrast>{project.title}</h2>
                   {/* The focused view's info, right under the title. It grows
                       from no height, in step with the images, so the title
                       rises with it, and fades in a beat behind; closing runs
@@ -353,6 +410,7 @@ export function ProjectPager({
                       <motion.div
                         key="info"
                         className={styles.info}
+                        data-contrast
                         initial={{ height: 0, opacity: 0 }}
                         animate={{
                           height: "auto",
@@ -403,6 +461,7 @@ export function ProjectPager({
                   <button
                     type="button"
                     className={styles.next}
+                    data-contrast
                     onClick={() => onSelectProject(next.slug)}
                     aria-label={`View ${next.title}`}
                     tabIndex={copy ? -1 : undefined}

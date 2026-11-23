@@ -161,6 +161,9 @@ export function DetailView() {
       <button
         type="button"
         className={styles.back}
+        // Mobile: black or white to suit the image behind, like the
+        // project title in the caption (utils/contrast.ts).
+        data-contrast={isMobile ? "" : undefined}
         onClick={goToIndex}
       >
         Index
