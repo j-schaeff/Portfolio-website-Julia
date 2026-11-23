@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
-import { useIsMobile } from "../../hooks/useIsMobile";
+import { useIsLandscapePhone, useIsMobile } from "../../hooks/useIsMobile";
 import {
   detailFillHeight,
   detailFocusHeight,
@@ -25,6 +25,9 @@ interface StripImageProps {
   placeholder?: string;
   alt: string;
   size: ImageSize;
+  // Horizontal focal point, 0–100: the part of the first image on a phone
+  // that stays in view while it's cropped to fill the screen.
+  focus?: number;
   // Largest size in the project; on tablet/desktop it fills the strip height.
   largest: ImageSize;
   isVideo: boolean;
@@ -41,8 +44,13 @@ interface StripImageProps {
   onTap?: () => void;
 }
 
-export function StripImage({ index, src: preferred, original, alt, size, largest, isVideo, hasAudio = false, rise, onReady, aspect, placeholder, focused = false, onTap }: StripImageProps) {
+export function StripImage({ index, src: preferred, original, alt, size, focus = 50, largest, isVideo, hasAudio = false, rise, onReady, aspect, placeholder, focused = false, onTap }: StripImageProps) {
+  // A phone held sideways sizes its images like desktop: a share of the strip
+  // height (its pager shows the desktop metadata band beneath, see
+  // ProjectPager), so nothing fills the screen.
   const isMobile = useIsMobile();
+  const isLandscapePhone = useIsLandscapePhone();
+  const isPhonePortrait = isMobile && !isLandscapePhone;
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   const onError = isOriginal ? undefined : fallBack;
   const [loaded, setLoaded] = useState(false);
@@ -51,8 +59,27 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
     onReady?.();
   };
 
-  const isLeadingMobileImage = isMobile && index === 0;
-  const style: CSSProperties = focused
+  const isLeadingMobileImage = isPhonePortrait && index === 0;
+  // The first image on a phone fills the screen, cropped around its focal
+  // point (the whole image is a tap away, in the focused view). The box is
+  // the screen, not the image's shape, and cover fills it from the focus.
+  // Focused, the box takes the image's own shape, so cover shows it whole;
+  // both sizes are explicit lengths, so width and height ease together and it
+  // uncrops smoothly. Without a known ratio the crop can't be undone
+  // smoothly, so such an image keeps its natural width instead.
+  const crops = isLeadingMobileImage && Boolean(aspect);
+  const position = `${focus}% 50%`;
+  const style: CSSProperties = crops
+    ? focused
+      ? {
+          height: detailFocusHeight(aspect),
+          width: `calc(${detailFocusHeight(aspect)} * ${aspect!.toFixed(4)})`,
+          objectFit: "cover",
+          objectPosition: position,
+        }
+      : // Fills the strip exactly (it's the pager's height, see ProjectPager).
+        { width: "100vw", height: "100%", objectFit: "cover", objectPosition: position }
+    : focused
     ? {
         width: "auto",
         height: detailFocusHeight(aspect),
@@ -61,20 +88,20 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
         objectFit: "contain",
       }
     : isLeadingMobileImage
-    ? // Fills the strip exactly (it's the pager's height, see ProjectPager).
-      { width: "auto", height: "100%", objectFit: "contain" }
+    ? { width: "auto", height: "100%", objectFit: "contain" }
     : {
         width: "auto",
-        height: isMobile ? detailImageHeight(size) : detailFillHeight(size, largest),
+        height: isPhonePortrait ? detailImageHeight(size) : detailFillHeight(size, largest),
         objectFit: "contain",
       };
-  if (aspect) style.aspectRatio = aspect;
-  // The placeholder fills the box exactly (it has the same aspect ratio), and
-  // is dropped once the real image is in so it can't show through
-  // transparent areas.
+  if (aspect && !crops) style.aspectRatio = aspect;
+  // The placeholder fills the box exactly (it has the same aspect ratio, or
+  // the same crop), and is dropped once the real image is in so it can't
+  // show through transparent areas.
   if (placeholder && !isVideo && !loaded) {
     style.backgroundImage = `url("${placeholder}")`;
-    style.backgroundSize = "100% 100%";
+    style.backgroundSize = crops ? "cover" : "100% 100%";
+    if (crops) style.backgroundPosition = position;
   }
 
   // Start a full viewport down so every image, whatever its height, begins
@@ -103,6 +130,7 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
           poster={placeholder}
           alt={alt}
           inset={isLeadingMobileImage}
+          fit={crops ? { objectFit: "cover", objectPosition: position } : undefined}
           onReady={handleReady}
           onError={onError}
         />
@@ -151,11 +179,13 @@ interface SoundVideoProps {
   poster?: string;
   alt: string;
   inset: boolean;
+  // The wrapper's crop (StripImage's cropped first image), for the video.
+  fit?: CSSProperties;
   onReady: () => void;
   onError?: () => void;
 }
 
-function SoundVideo({ src, poster, alt, inset, onReady, onError }: SoundVideoProps) {
+function SoundVideo({ src, poster, alt, inset, fit, onReady, onError }: SoundVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
 
@@ -195,6 +225,7 @@ function SoundVideo({ src, poster, alt, inset, onReady, onError }: SoundVideoPro
       <video
         ref={videoRef}
         className={styles.soundVideo}
+        style={fit}
         src={src}
         poster={poster}
         aria-label={alt}

@@ -30,11 +30,3 @@
 .arrow:focus-visible {
   opacity: 1;
 }
-
-/* Phone turned sideways: the images fill the screen, so the arrows stay out
-   of the way. */
-@media (orientation: landscape) and (max-height: 500px) {
-  .arrows {
-    display: none;
-  }
-}

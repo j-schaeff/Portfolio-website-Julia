@@ -51,12 +51,13 @@ export function detailImageHeight(size: ImageSize): string {
 // room below for the project's info. An image too wide for the screen at that
 // height shrinks to fit the width (8px gutter either side) instead of being
 // cut off. Without a known aspect ratio StripImage caps the width instead.
-// svh, not vh: the visible height with the browser toolbars showing, so the
-// info below (ProjectPager.module.css, .info) fits on screen.
-export const FOCUS_HEIGHT_VH = 60;
+// The height itself is the --focus-h CSS variable (variables.css: 60svh, a
+// little less on a phone held sideways), which the caption's max-height in
+// ProjectPager.module.css also reads, so the two stay in step.
+export const FOCUS_HEIGHT = "var(--focus-h)";
 export const FOCUS_SIDE_GUTTER = 8;
 
 export function detailFocusHeight(aspect?: number): string {
-  if (!aspect) return `${FOCUS_HEIGHT_VH}svh`;
-  return `min(${FOCUS_HEIGHT_VH}svh, calc((100vw - ${FOCUS_SIDE_GUTTER * 2}px) / ${aspect.toFixed(4)}))`;
+  if (!aspect) return FOCUS_HEIGHT;
+  return `min(${FOCUS_HEIGHT}, calc((100vw - ${FOCUS_SIDE_GUTTER * 2}px) / ${aspect.toFixed(4)}))`;
 }

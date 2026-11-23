@@ -107,7 +107,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .list {
     /* Same 8px side margins as the index grid on phones. */
     padding: 56px 8px;

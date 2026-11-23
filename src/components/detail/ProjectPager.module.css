@@ -95,12 +95,12 @@
 
 /* The project's info in the focused view, inside the caption under the
    title. The caption grows up from the bottom no further than just below the
-   focused images (their 44px top + 60svh, FOCUS_HEIGHT_VH); past that a long
+   focused images (their 44px top + --focus-h, variables.css); past that a long
    description scrolls inside the panel. It takes the caption's colour, like the
    title. Lines stay
    a comfortable length on larger phones. */
 .focused .caption {
-  max-height: calc(100% - 44px - 60svh - 8px);
+  max-height: calc(100% - 44px - var(--focus-h) - 8px);
 }
 
 .info {
@@ -207,6 +207,43 @@
 
 /* Links inside the description (from the CMS's rich-text field): underlined
    so they stand out from the text, in the text's own color. */
+/* A phone held sideways (see ProjectPager): the desktop layout on each page.
+   The strip takes two thirds of the screen from a 44px top that clears the
+   corner controls (ScrollStrip.module.css does the same on desktop), its
+   images bottom-aligned on desktop's padding; the metadata band
+   (DetailMeta.module.css, .paged) fills the space beneath. The gap stays the
+   8px of the index on phones (GridView.module.css), sideways too. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .strip {
+    height: calc(44px + (100% - 44px) * 2 / 3);
+  }
+
+  .group {
+    gap: 8px;
+    align-items: flex-end;
+    box-sizing: border-box;
+    /* Top: the corner controls; bottom: the gap to the band, which the
+       images' shadow falls into. */
+    padding: 44px 14px 24px;
+  }
+
+  /* The band and the corner arrow, filling the page beneath the strip. */
+  .band {
+    position: absolute;
+    inset: calc(44px + (100% - 44px) * 2 / 3) 0 0 0;
+  }
+
+  /* Bottom-left, on the page's 14px margin, like desktop's project arrows
+     (ProjectHint.module.css), in the theme's text colour. */
+  .cornerNext {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    margin: -10px -16px;
+    opacity: 0.7;
+  }
+}
+
 .description a {
   color: inherit;
   text-decoration: underline;

@@ -15,6 +15,10 @@ export interface ProjectImage {
   // media loads. Missing for external links; the grid measures those instead.
   aspect?: number;
   size: ImageSize;
+  // Horizontal focal point, 0–100 (0 = left edge, 50 = middle). Only the
+  // first image on a phone uses it: cropped to fill the screen, it keeps this
+  // part in view (StripImage).
+  focus: number;
   hideInGrid: boolean;
   alt: string;
   isVideo: boolean;

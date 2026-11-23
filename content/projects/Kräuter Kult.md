@@ -9,6 +9,7 @@ year: 2025
 images:
   - image: /images/uploads/2_kraueterkult/Krauter_kult_5.jpg
     size: "4"
+    focus: 40
     hideInGrid: false
   - image: /images/uploads/2_kraueterkult/Krauter_kult_9.jpg
     size: "5"

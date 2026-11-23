@@ -16,7 +16,7 @@ export function GridView() {
   // refreshes); coming back from a project just fades the grid in.
   const [freshLoad] = useState(introPending);
   useEffect(markIntroPlayed, []);
-  const { widths, hanging, reportAspect } = useJustifiedRows(gridRef, projects);
+  const { widths, hanging, labelWidths, reportAspect } = useJustifiedRows(gridRef, projects);
   const { state: reveal, logo, logoGone } = useRowReveal(gridRef, freshLoad, widths !== null);
 
   return (
@@ -44,6 +44,7 @@ export function GridView() {
           project={project}
           cellWidths={widths}
           hangingCells={hanging}
+          labelWidth={labelWidths?.[project.slug]}
           onAspect={reportAspect}
           playVideos={reveal !== "loading"}
         />

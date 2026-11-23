@@ -7,7 +7,9 @@ import {
   NUDGE_TRANSITION,
   ZOOM_TRANSITION,
 } from "../../utils/motion";
+import { useIsLandscapePhone } from "../../hooks/useIsMobile";
 import { StripImage } from "./StripImage";
+import { MetaContent, metaClasses } from "./DetailMeta";
 import { JustifiedText } from "../JustifiedText";
 import styles from "./ProjectPager.module.css";
 
@@ -43,6 +45,11 @@ interface ProjectPagerProps {
 // gesture. It plays once per opening of the detail view, not on project
 // switches, and a touch stops it where it is.
 //
+// On a phone held sideways the images sit in a strip over the top two thirds
+// and each page carries the desktop metadata band beneath it (DetailMeta's
+// MetaContent), always showing, so there's no focused view to tap into. The
+// swipes, nudge and loop are the same.
+//
 // The list loops: a copy of the last project sits above the first and a copy
 // of the first below the last. Scrolling onto a copy looks like wrapping
 // around, and once the scroll settles the pager jumps, invisibly, to the real
@@ -58,6 +65,7 @@ export function ProjectPager({
   onSelectProject,
 }: ProjectPagerProps) {
   const pagerRef = useRef<HTMLDivElement>(null);
+  const isLandscapePhone = useIsLandscapePhone();
   const active = projects[activeIndex] ?? projects[0];
   // Only the images on screen when the page opens rise in.
   const [intro, setIntro] = useState(true);
@@ -72,6 +80,11 @@ export function ProjectPager({
     anchorRef.current = { slug, index };
     setFocus((prev) => (prev ? null : { slug, index }));
   };
+
+  // Turned sideways the info is always showing, so a focused view closes.
+  useEffect(() => {
+    if (isLandscapePhone) setFocus(null);
+  }, [isLandscapePhone]);
 
   const activeSlugRef = useRef(active?.slug);
   activeSlugRef.current = active?.slug;
@@ -289,9 +302,11 @@ export function ProjectPager({
   // showing for it to change. CornerNav hides it while <html> has
   // data-hide-theme-switch, which this keeps up to date. A layout effect, so
   // it's hidden before the first paint.
+  // A sideways phone's first image doesn't fill the screen, so there the
+  // switch always shows, as on desktop.
   useLayoutEffect(() => {
     const pager = pagerRef.current;
-    if (!pager) return;
+    if (!pager || isLandscapePhone) return;
     const root = document.documentElement;
     let frame = 0;
     const check = () => {
@@ -327,7 +342,7 @@ export function ProjectPager({
       window.removeEventListener("resize", schedule);
       delete root.dataset.hideThemeSwitch;
     };
-  }, []);
+  }, [isLandscapePhone]);
 
   if (!active) return null;
 
@@ -355,7 +370,7 @@ export function ProjectPager({
           const rise = intro && !copy && project.slug === active.slug;
           // Loop copies never open: they're swapped for the real page as soon
           // as a scroll settles on one.
-          const focused = !copy && focus?.slug === project.slug;
+          const focused = !copy && !isLandscapePhone && focus?.slug === project.slug;
           // The next project, wrapping to the first: the hint says swiping
           // down moves on, and a tap does the same.
           const next = projects.length > 1
@@ -381,81 +396,109 @@ export function ProjectPager({
                       placeholder={img.isVideo ? img.poster : img.thumb}
                       alt={img.alt || `${project.title} — ${i + 1}`}
                       size={img.size}
+                      focus={img.focus}
                       largest={largest}
                       isVideo={img.isVideo}
                       hasAudio={img.hasAudio}
                       rise={rise}
                       focused={focused}
-                      onTap={copy ? undefined : () => toggleFocus(project.slug, i)}
+                      onTap={copy || isLandscapePhone ? undefined : () => toggleFocus(project.slug, i)}
                     />
                   ))}
                 </div>
               </motion.div>
-              {/* Outside the strip, so it doesn't scroll sideways. Fades in
-                  behind the rise. In the focused view it also holds the
-                  project's info, between the title and "Next". */}
-              <motion.div
-                className={styles.caption}
-                initial={rise ? { opacity: 0 } : false}
-                animate={{ opacity: 1 }}
-                transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
-              >
-                <h2 className={styles.title} data-contrast>{project.title}</h2>
-                  {/* The focused view's info, right under the title. It grows
-                      from no height, in step with the images, so the title
-                      rises with it, and fades in a beat behind; closing runs
-                      the other way. */}
-                  <AnimatePresence>
-                    {focused && (
-                      <motion.div
-                        key="info"
-                        className={styles.info}
-                        data-contrast
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{
-                          height: "auto",
-                          opacity: 1,
-                          transition: {
-                            height: ZOOM_TRANSITION,
-                            opacity: { ...ZOOM_TRANSITION, delay: 0.15 },
-                          },
-                        }}
-                        exit={{
-                          height: 0,
-                          opacity: 0,
-                          transition: {
-                            height: ZOOM_TRANSITION,
-                            opacity: { duration: 0.25, ease: ZOOM_TRANSITION.ease },
-                          },
-                        }}
-                      >
-                        <div className={styles.infoInner}>
-                        <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
-                        {/* The desktop metadata row (DetailMeta): type and year,
-                            below the text. */}
-                        <div className={styles.meta}>
-                          <span className={styles.label}>{project.type}</span>
-                          <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
-                        </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                {next && (
-                  <button
-                    type="button"
-                    className={styles.next}
-                    data-contrast
-                    onClick={() => onSelectProject(next.slug)}
-                    aria-label={`View ${next.title}`}
-                    tabIndex={copy ? -1 : undefined}
-                  >
-                    {/* Just the arrow: the cue that swiping down (or a tap)
-                        moves on. The label says where. */}
-                    <span aria-hidden="true">↓</span>
-                  </button>
-                )}
-              </motion.div>
+              {isLandscapePhone ? (
+                // Sideways: the desktop metadata band under the strip, moving
+                // with its page, and the "next" arrow in the bottom-left
+                // corner where desktop's project arrows sit (ProjectHint).
+                <motion.div
+                  className={styles.band}
+                  initial={rise ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
+                >
+                  <div className={`${metaClasses.meta} ${metaClasses.paged}`}>
+                    <MetaContent project={project} />
+                  </div>
+                  {next && (
+                    <button
+                      type="button"
+                      className={`${styles.next} ${styles.cornerNext}`}
+                      onClick={() => onSelectProject(next.slug)}
+                      aria-label={`View ${next.title}`}
+                      tabIndex={copy ? -1 : undefined}
+                    >
+                      <span aria-hidden="true">↓</span>
+                    </button>
+                  )}
+                </motion.div>
+              ) : (
+                // Outside the strip, so it doesn't scroll sideways. Fades in
+                // behind the rise. In the focused view it also holds the
+                // project's info, between the title and "Next".
+                <motion.div
+                  className={styles.caption}
+                  initial={rise ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
+                >
+                  <h2 className={styles.title} data-contrast>{project.title}</h2>
+                    {/* The focused view's info, right under the title. It grows
+                        from no height, in step with the images, so the title
+                        rises with it, and fades in a beat behind; closing runs
+                        the other way. */}
+                    <AnimatePresence>
+                      {focused && (
+                        <motion.div
+                          key="info"
+                          className={styles.info}
+                          data-contrast
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{
+                            height: "auto",
+                            opacity: 1,
+                            transition: {
+                              height: ZOOM_TRANSITION,
+                              opacity: { ...ZOOM_TRANSITION, delay: 0.15 },
+                            },
+                          }}
+                          exit={{
+                            height: 0,
+                            opacity: 0,
+                            transition: {
+                              height: ZOOM_TRANSITION,
+                              opacity: { duration: 0.25, ease: ZOOM_TRANSITION.ease },
+                            },
+                          }}
+                        >
+                          <div className={styles.infoInner}>
+                          <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
+                          {/* The desktop metadata row (DetailMeta): type and year,
+                              below the text. */}
+                          <div className={styles.meta}>
+                            <span className={styles.label}>{project.type}</span>
+                            <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
+                          </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  {next && (
+                    <button
+                      type="button"
+                      className={styles.next}
+                      data-contrast
+                      onClick={() => onSelectProject(next.slug)}
+                      aria-label={`View ${next.title}`}
+                      tabIndex={copy ? -1 : undefined}
+                    >
+                      {/* Just the arrow: the cue that swiping down (or a tap)
+                          moves on. The label says where. */}
+                      <span aria-hidden="true">↓</span>
+                    </button>
+                  )}
+                </motion.div>
+              )}
             </section>
           );
         })}

@@ -62,7 +62,7 @@
    they meet the bottom-aligned first row at one straight seam. Each line is as
    tall as its tallest image, so both rows sit on the line edges, a grid gap
    apart. */
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .cell[data-hang] {
     align-self: flex-start;
   }

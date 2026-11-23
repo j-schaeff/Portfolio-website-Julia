@@ -143,7 +143,11 @@
     height: calc(var(--logo-len) * 45.83 / 122);
     transform: translate(-50%, -50%) rotate(-90deg);
   }
+}
 
+/* Phones, portrait or sideways. (A sideways phone keeps the loading screen's
+   horizontal logo above: across the long edge it's already the larger one.) */
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   /* The logo has its own full-width row here, so no gap from a neighbour.
      It's pinned to the grid's bottom edge (GridView.module.css reserves the
      space), matching the 8px side gutter. */
@@ -169,5 +173,13 @@
   /* No label band: nothing sits below the logo but the screen edge. */
   .cell > :last-child {
     display: none;
+  }
+}
+
+/* Sideways phone: across the full width the lettering would be taller than
+   the screen, so it stops at GridView's --logo-row-h (40% of the height). */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cell {
+    width: min(var(--cell-w), var(--logo-row-h) * 122 / 45.83);
   }
 }

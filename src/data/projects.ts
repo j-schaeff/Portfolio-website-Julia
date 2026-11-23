@@ -82,11 +82,20 @@ function withCopies(src: string, video: boolean) {
   };
 }
 
+// "Crop focus" from the CMS: which part of the image stays in view when it's
+// cropped to fill a phone screen (0 = left edge, 100 = right). Middle when
+// empty or invalid.
+function clampFocus(value: unknown): number {
+  if (value === undefined || value === null || value === "") return 50;
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 50;
+}
+
 function toImage(entry: unknown): ProjectImage | null {
   // Legacy entries were plain path strings; current entries are objects.
   if (typeof entry === "string") {
     const src = normalizeSrc(entry);
-    return { ...withCopies(src, isVideo(src)), size: clampImageSize(undefined), hideInGrid: false, alt: "" };
+    return { ...withCopies(src, isVideo(src)), size: clampImageSize(undefined), focus: clampFocus(undefined), hideInGrid: false, alt: "" };
   }
   if (entry && typeof entry === "object") {
     const e = entry as Record<string, unknown>;
@@ -103,6 +112,7 @@ function toImage(entry: unknown): ProjectImage | null {
     return {
       ...withCopies(src, Boolean(videoUrl) || isVideo(src)),
       size: clampImageSize(e.size),
+      focus: clampFocus(e.focus),
       hideInGrid: Boolean(e.hideInGrid),
       alt: String(e.alt ?? ""),
     };

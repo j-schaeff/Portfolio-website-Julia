@@ -10,9 +10,13 @@
 
 /* Mobile pager: the height eases into and out of the focused view, on the
    site's easing and ZOOM_TRANSITION's 0.6s (src/utils/motion.ts), the same
-   curve ProjectPager slides the strip on. */
+   curve ProjectPager slides the strip on. The cropped first image on a phone
+   eases its width as well (see StripImage); every other image's width is
+   auto, which doesn't animate. */
 .resizes {
-  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    height 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* A video with sound (StripImage's SoundVideo): the wrapper is the box, the
@@ -53,9 +57,8 @@
   opacity: 1;
 }
 
-/* No room beneath (the leading mobile video fills the screen, and a sideways
-   phone fills its height): inside the bottom-left corner, on a light disc so
-   it reads over any frame. */
+/* No room beneath (the leading mobile video fills the screen): inside the
+   bottom-left corner, on a light disc so it reads over any frame. */
 .soundInset {
   top: auto;
   bottom: 8px;
@@ -66,18 +69,4 @@
   border-radius: 50%;
   background: var(--bg);
   opacity: 0.85;
-}
-
-@media (orientation: landscape) and (max-height: 500px) {
-  .soundToggle {
-    top: auto;
-    bottom: 8px;
-    left: 8px;
-    margin-left: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--bg);
-    opacity: 0.85;
-  }
 }

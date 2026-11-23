@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type RefObject } from "react";
 import type { Project } from "../types/project";
 import { gridImageHeight, imageHeight } from "../utils/imageSize";
-import { useIsMobile } from "./useIsMobile";
+import { useIsLandscapePhone, useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
 // grid's width. On mobile every row holds 2–4 images; wider screens let each
@@ -24,6 +24,8 @@ interface RowLimits {
   max: number;
 }
 const MOBILE_ROWS: RowLimits = { min: 2, max: 4 };
+// A phone held sideways: the same per-project rows, with room for more across.
+const LANDSCAPE_PHONE_ROWS: RowLimits = { min: 2, max: 6 };
 // Capped so a row of many narrow images doesn't shrink them too far.
 const WIDE_ROWS: RowLimits = { min: 1, max: 8 };
 // Leave a pixel of slack per row so sub-pixel rounding can't push the last
@@ -128,6 +130,7 @@ export function useJustifiedRows(
 ) {
   const [aspects, setAspects] = useState<Record<string, number>>({});
   const isMobile = useIsMobile();
+  const isLandscapePhone = useIsLandscapePhone();
   const [box, setBox] = useState<{ width: number; gap: number } | null>(null);
 
   // Track the grid's content width and gap (read from CSS, so the stylesheet
@@ -186,7 +189,11 @@ export function useJustifiedRows(
     const widths: Record<string, number> = {};
     // Cells that align to the top of their line (see the header comment).
     const hanging = new Set<string>();
-    const limits = isMobile ? MOBILE_ROWS : WIDE_ROWS;
+    // Wider screens: how far each project's label (under its first image) may
+    // run, the span of that project's images in the row, so a long name stops
+    // short of the next project's label (GridItem). Keyed by project slug.
+    const labelWidths: Record<string, number> = {};
+    const limits = isLandscapePhone ? LANDSCAPE_PHONE_ROWS : isMobile ? MOBILE_ROWS : WIDE_ROWS;
     groups.forEach((group, g) => {
       const isLastGroup = g === groups.length - 1;
       const looseLast = isLastGroup && !isMobile;
@@ -204,10 +211,24 @@ export function useJustifiedRows(
           widths[cell.key] = cell.width * scale;
           if (isMobile && r > 0 && !isLastGroup) hanging.add(cell.key);
         }
+        if (isMobile) return;
+        row.forEach((cell, k) => {
+          if (cell.group === LOGO_KEY || cell.group in labelWidths) return;
+          let span = widths[cell.key];
+          for (let m = k + 1; m < row.length && row[m].group === cell.group; m++) {
+            span += box.gap + widths[row[m].key];
+          }
+          labelWidths[cell.group] = span;
+        });
       });
     });
-    return { widths, hanging };
-  }, [isMobile, box, projects, aspects]);
+    return { widths, hanging, labelWidths };
+  }, [isMobile, isLandscapePhone, box, projects, aspects]);
 
-  return { widths: layout?.widths ?? null, hanging: layout?.hanging ?? null, reportAspect };
+  return {
+    widths: layout?.widths ?? null,
+    hanging: layout?.hanging ?? null,
+    labelWidths: layout?.labelWidths ?? null,
+    reportAspect,
+  };
 }

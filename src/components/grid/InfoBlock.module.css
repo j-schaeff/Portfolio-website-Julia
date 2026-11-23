@@ -19,6 +19,15 @@
   line-height: 1.1;
 }
 
+/* Neither line runs past the label's width (GridItem caps it short of the
+   next project's label): a longer one ends in an ellipsis. */
+.title,
+.type {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Matches the type on the detail page (DetailMeta.module.css), with slightly
    tighter letter spacing and the lighter Black cut, like the name. */
 .type {
@@ -35,7 +44,7 @@
 /* Mobile: name and type on one line across the project's full width, name
    on the left, type on the right, sharing a baseline. A long name gives way
    (ellipsis) before it can run into the type. */
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .info {
     flex-direction: row;
     justify-content: space-between;

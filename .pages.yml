@@ -70,6 +70,10 @@ content:
                 - { value: "3", label: "3" }
                 - { value: "4", label: "4" }
                 - { value: "5", label: "5" }
+          - name: focus
+            label: Crop focus
+            type: number
+            description: "Optional. Only used for a project's first image on phones, where it's cropped to fill the screen: which part stays in view, 0 = left edge, 50 = middle (default), 100 = right edge. Tapping the image still shows it whole."
           - name: hideInGrid
             label: Hide in grid
             type: boolean

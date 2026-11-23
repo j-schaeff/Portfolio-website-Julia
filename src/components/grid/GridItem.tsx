@@ -14,12 +14,15 @@ interface GridItemProps {
   cellWidths: Record<string, number> | null;
   // Mobile: cells after a project's first row, aligned to the top of their line.
   hangingCells: Set<string> | null;
+  // Wider screens: how far the label may run before the next project's
+  // (useJustifiedRows); a longer name ends in an ellipsis.
+  labelWidth?: number;
   onAspect: (key: string, aspect: number) => void;
   // False while the loading screen is up (see GridImage).
   playVideos: boolean;
 }
 
-export function GridItem({ project, cellWidths, hangingCells, onAspect, playVideos }: GridItemProps) {
+export function GridItem({ project, cellWidths, hangingCells, labelWidth, onAspect, playVideos }: GridItemProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   // Hovering any of the project's images lifts all of them (see the hover
@@ -50,6 +53,7 @@ export function GridItem({ project, cellWidths, hangingCells, onAspect, playVide
       className={styles.infoButton}
       // Stable hook for the reveal's label slide (GridView.module.css).
       data-grid-label
+      style={!isMobile && labelWidth ? { width: "max-content", maxWidth: labelWidth } : undefined}
       role="link"
       tabIndex={0}
       onClick={go}

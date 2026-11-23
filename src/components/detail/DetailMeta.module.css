@@ -3,6 +3,8 @@
      arrows: they reach 42px up from the screen's bottom edge, this block
      ends 18px up, and 8px more keeps the text clear of them. */
   --arrows-clear: 32px;
+  /* The least space between two blocks of text side by side. */
+  --text-clear: 24px;
   position: absolute;
   left: 0;
   right: 0;
@@ -46,6 +48,10 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.35;
+  /* A title too long for its column wraps; one unbroken word too long for
+     it breaks rather than running into the type. */
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .description {
@@ -149,31 +155,34 @@
     min-height: 0;
     /* A grid, not the base flex row, so the title stays in the same spot
        between projects: it starts at the page center whatever its length or
-       the type's width. Title and specs share the right half (the specs at
-       its right edge); the one row fills the block's height so the
-       description's max-height below still resolves. */
+       the type's width. The left half holds the description; the title and
+       the specs split the right half, each in its own column, so a long
+       title wraps before it reaches the type instead of running under it.
+       The one row fills the block's height so the description's max-height
+       below still resolves. */
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 50% minmax(0, 1fr) auto;
     grid-template-rows: minmax(0, 1fr);
     column-gap: 0;
   }
 
+  /* --text-clear keeps every block at least that far from the next one. */
   .intro {
     grid-column: 1;
     grid-row: 1;
-    max-width: 32ch;
+    max-width: min(32ch, 100% - var(--text-clear));
   }
 
   .titleCol {
     grid-column: 2;
     grid-row: 1;
     justify-content: flex-start;
+    padding-right: var(--text-clear);
   }
 
   .specs {
-    grid-column: 2;
+    grid-column: 3;
     grid-row: 1;
-    justify-self: end;
   }
 
   /* Ends above the project arrows in the bottom-left corner
@@ -228,11 +237,64 @@
   }
 }
 
-/* Phone turned sideways: the info moves to the end of the image strip
-   (ScrollStrip), so the images can fill the screen. */
+/* A phone held sideways: the band on each page of the mobile pager
+   (ProjectPager), filling its .band beneath the strip. The desktop grid
+   whatever the width — sideways phones fall either side of 880px — so these
+   come after, and outrank, the width rules above. The !important beats the
+   inline metaHeight() height (unused here, but kept consistent). */
 @media (orientation: landscape) and (max-height: 500px) {
-  .meta {
+  /* Laid out like desktop above, each block in its own column. */
+  .meta.paged {
+    top: 0;
+    bottom: 18px;
+    height: auto !important;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 50% minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 0;
+    row-gap: 0;
+    align-items: baseline;
+    padding: 0 14px;
+  }
+
+  .paged .intro {
+    order: 0;
+    grid-column: 1;
+    grid-row: 1;
+    max-width: min(32ch, 100% - var(--text-clear));
+    /* Ends above the "next" arrow in the bottom-left corner; a long
+       description scrolls inside, and a swipe there scrolls it rather than
+       moving to the next project. */
+    max-height: calc(100% - var(--arrows-clear));
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    scrollbar-width: none;
+    pointer-events: auto;
+  }
+
+  .paged .intro::-webkit-scrollbar {
     display: none;
+  }
+
+  .paged .description {
+    max-width: none;
+  }
+
+  .paged .titleCol {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-start;
+    padding-right: var(--text-clear);
+  }
+
+  .paged .specs {
+    grid-column: 3;
+    grid-row: 1;
+    grid-template-columns: 1fr auto;
+    column-gap: 48px;
   }
 }
 

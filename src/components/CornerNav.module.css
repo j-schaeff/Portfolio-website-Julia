@@ -23,7 +23,7 @@
   right: 14px;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .item {
     top: 12px;
   }

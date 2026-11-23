@@ -70,7 +70,7 @@
   transition-delay: calc(var(--reveal-delay, 0ms) + 280ms);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .grid {
     /* No label bands here, so images in a project stay tight; the space between
        projects comes from each project's heading (GridItem.module.css). */
@@ -86,6 +86,14 @@
     min-height: 100dvh;
     align-content: flex-start;
     padding: 38px 8px calc(var(--logo-row-h) + 8px + 72px);
+  }
+}
+
+/* Sideways phone: the full-width lettering would outgrow the short screen,
+   so its row stops at 40% of the height (Logo.module.css narrows it to match). */
+@media (orientation: landscape) and (max-height: 500px) {
+  .grid {
+    --logo-row-h: min((100vw - 16px) * 45.83 / 122, 40dvh);
   }
 }
 

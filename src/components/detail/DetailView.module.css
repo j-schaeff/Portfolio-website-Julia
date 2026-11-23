@@ -35,7 +35,7 @@
   display: none;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .detail {
     padding: 0;
   }
@@ -60,14 +60,6 @@
     /* A larger tap target; the negative margin keeps the label in place. */
     padding: 12px;
     margin: -12px;
-    color: var(--fg);
-  }
-}
-
-/* Phone turned sideways: the images fill the screen and the Index button sits
-   over them, in the theme's text colour like the other controls. */
-@media (orientation: landscape) and (max-height: 500px) {
-  .back {
     color: var(--fg);
   }
 }

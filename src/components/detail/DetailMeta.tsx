@@ -48,19 +48,32 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
       animate={{ opacity: 1 }}
       transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
     >
-      <div className={styles.intro} data-meta-scroll data-contrast>
-        <JustifiedText className={styles.description} text={active.description} links={active.descriptionLinks} />
-      </div>
-
-      <div className={styles.titleCol} data-contrast>
-        <h2 className={styles.title}>{active.title}</h2>
-      </div>
-
-
-      <div className={styles.specs} data-contrast>
-        <span className={styles.type}>{active.type}</span>
-        <span className={styles.date}>{active.year}</span>
-      </div>
+      <MetaContent project={active} />
     </motion.div>
   );
 }
+
+// The three blocks of the metadata band: description, title, then type+date.
+// Shared with the mobile pager on a phone held sideways (ProjectPager), which
+// shows the same band on every project's page.
+export function MetaContent({ project }: { project: Project }) {
+  return (
+    <>
+      <div className={styles.intro} data-meta-scroll data-contrast>
+        <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
+      </div>
+
+      <div className={styles.titleCol} data-contrast>
+        <h2 className={styles.title}>{project.title}</h2>
+      </div>
+
+      <div className={styles.specs} data-contrast>
+        <span className={styles.type}>{project.type}</span>
+        <span className={styles.date}>{project.year}</span>
+      </div>
+    </>
+  );
+}
+
+// The band's class names, for the pager's sideways-phone pages.
+export const metaClasses = { meta: styles.meta, paged: styles.paged };

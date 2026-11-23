@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
-import { renderRuns } from "../../utils/richText";
 import { StripImage } from "./StripImage";
 import styles from "./ScrollStrip.module.css";
 
@@ -67,18 +66,6 @@ export function ScrollStrip({
             rise={intro}
           />
         ))}
-        {/* Phone landscape only (hidden otherwise, see the CSS): the info
-            follows the last image instead of sitting below the strip.
-            data-meta-scroll leaves vertical swipes here to the description
-            instead of switching the project (DetailView). */}
-        <div className={styles.endInfo} data-meta-scroll>
-          <h2 className={styles.endTitle}>{activeProject.title}</h2>
-          <span className={styles.endLabel}>{activeProject.type}</span>
-          <span className={styles.endLabel}>{activeProject.year}</span>
-          <p className={styles.endDescription}>
-            {renderRuns(activeProject.description, activeProject.descriptionLinks)}
-          </p>
-        </div>
       </div>
       </PresenceContext.Provider>
     </div>
