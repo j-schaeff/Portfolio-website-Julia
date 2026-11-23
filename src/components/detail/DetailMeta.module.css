@@ -53,7 +53,6 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.35;
-  text-indent: 24px;
   /* Justified. JustifiedText sets the lines itself to avoid wide word gaps;
      these rules only show until it has measured: hyphenated so long words
      split instead of stretching word spaces, last line left-aligned. */
@@ -136,10 +135,6 @@
 
   .intro {
     flex-basis: 100%;
-  }
-
-  .description {
-    text-indent: 20px;
   }
 
   .titleCol {

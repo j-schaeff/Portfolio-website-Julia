@@ -141,7 +141,6 @@
   margin: 0;
   font-size: 12px;
   line-height: 1.2;
-  text-indent: 24px;
   /* Justified, but hyphenated (English, from <html lang>) so a long word
      can split instead of stretching the line's word spaces into large gaps.
      Only words of 6+ letters split, keeping 3 on each side. Balanced breaks

@@ -45,8 +45,7 @@
   line-height: 1.15;
 }
 
-/* Hover indents both ends of the row towards the title, by the About text's
-   first-line indent: the year moves right, the type moves left. */
+/* Hover indents both ends of the row towards the title, by 24px: the year moves right, the type moves left. */
 .row > span {
   transition: translate var(--transition);
 }
