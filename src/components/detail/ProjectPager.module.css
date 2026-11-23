@@ -62,7 +62,9 @@
   right: 0;
   bottom: 0;
   box-sizing: border-box;
-  padding: 24px 12px 18px;
+  /* Sides: the 8px margin of the focused images (.focused .group), so the
+     info's edges line up with theirs. */
+  padding: 24px 8px 18px;
   /* A column, so the focused view's info can sit between title and "Next". */
   display: flex;
   flex-direction: column;
@@ -97,8 +99,7 @@
    title. The caption grows up from the bottom no further than just below the
    focused images (their 44px top + --focus-h, variables.css); past that a long
    description scrolls inside the panel. It takes the caption's colour, like the
-   title. Lines stay
-   a comfortable length on larger phones. */
+   title, and spans the caption's width, edge to edge with the images above. */
 .focused .caption {
   max-height: calc(100% - 44px - var(--focus-h) - 8px);
 }
@@ -108,8 +109,6 @@
   min-height: 0;
   align-self: stretch;
   width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
   text-align: left;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -122,9 +121,10 @@
   display: none;
 }
 
-/* The spacing lives inside, so the panel can grow from a true 0px. */
+/* The spacing lives inside, so the panel can grow from a true 0px. No side
+   padding: the caption's own sets the margin. */
 .infoInner {
-  padding: 10px 8px 14px;
+  padding: 10px 0 14px;
 }
 
 .title {

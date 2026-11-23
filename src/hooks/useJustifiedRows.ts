@@ -4,15 +4,14 @@ import { gridImageHeight, imageHeight } from "../utils/imageSize";
 import { useIsLandscapePhone, useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
-// grid's width. On mobile every row holds 2–4 images; wider screens let each
-// row take up to 8, however many fill it closest to their authored size, and
-// never split a project so that one of its images sits alone in a row. The
+// grid's width. Rows fill across projects, so one row can hold several. On
+// mobile every row holds 2–8 small images; wider screens let each row take up to 8,
+// however many fill it closest to their authored size, and never split a
+// project so that one of its images sits alone in a row. On wider screens the
 // last row isn't stretched: it keeps its authored size (shrinking only if it
 // would overflow) and sits left-aligned. Every image in a row scales by the
 // same factor, so aspect ratios and the size relationships within a row hold,
-// and the CSS gaps and padding stay fixed. On mobile a project's first row sits
-// on the bottom of its line and the rows after it hang from the top, so the
-// rows meet at one straight seam instead of leaving holes between them.
+// and the CSS gaps and padding stay fixed.
 //
 // Flex-wrap can't enforce a per-row count, so the rows are chosen here and
 // each cell gets an explicit width. The widths of a row sum to the content
@@ -23,9 +22,12 @@ interface RowLimits {
   min: number;
   max: number;
 }
-const MOBILE_ROWS: RowLimits = { min: 2, max: 4 };
-// A phone held sideways: the same per-project rows, with room for more across.
-const LANDSCAPE_PHONE_ROWS: RowLimits = { min: 2, max: 6 };
+const MOBILE_ROWS: RowLimits = { min: 2, max: 8 };
+// A phone held sideways: the same rows, with room for more across.
+const LANDSCAPE_PHONE_ROWS: RowLimits = { min: 2, max: 12 };
+// On mobile the authored grid heights are scaled down before the row fill, so
+// rows aim for small images and several projects share each line.
+const MOBILE_HEIGHT_SCALE = 0.4;
 // Capped so a row of many narrow images doesn't shrink them too far.
 const WIDE_ROWS: RowLimits = { min: 1, max: 8 };
 // Leave a pixel of slack per row so sub-pixel rounding can't push the last
@@ -160,8 +162,8 @@ export function useJustifiedRows(
   const layout = useMemo(() => {
     if (!box) return null;
 
-    // On mobile each project gets its own rows, so a project always starts at
-    // the beginning of a line. Wider screens fill rows across projects.
+    // Every project shares one row fill, so projects follow each other along
+    // a line.
     const groups: Cell[][] = [];
     for (const project of projects) {
       const cells: Cell[] = [];
@@ -174,10 +176,11 @@ export function useJustifiedRows(
         // The row fill needs every width, so wait for any unknown media.
         if (!aspect) return null;
         const rank = cells.length;
-        cells.push({ key, group: project.slug, width: gridImageHeight(rank) * aspect });
+        const height = gridImageHeight(rank) * (isMobile ? MOBILE_HEIGHT_SCALE : 1);
+        cells.push({ key, group: project.slug, width: height * aspect });
       }
       if (!cells.length) continue;
-      if (isMobile || !groups.length) groups.push(cells);
+      if (!groups.length) groups.push(cells);
       else groups[0].push(...cells);
     }
     // On mobile the logo gets a row of its own and fills the full width.
@@ -187,9 +190,7 @@ export function useJustifiedRows(
 
     const available = box.width - ROUNDING_SLACK_PX;
     const widths: Record<string, number> = {};
-    // Cells that align to the top of their line (see the header comment).
-    const hanging = new Set<string>();
-    // Wider screens: how far each project's label (under its first image) may
+    // How far each project's label (under its first image) may
     // run, the span of that project's images in the row, so a long name stops
     // short of the next project's label (GridItem). Keyed by project slug.
     const labelWidths: Record<string, number> = {};
@@ -200,18 +201,15 @@ export function useJustifiedRows(
       const rows = buildRows(group, available, box.gap, limits, looseLast);
       rows.forEach((row, r) => {
         const fill = rowScale(row, available, box.gap);
-        // The grid's last row (except the mobile logo row, which fills the
-        // width), and a project's lone short row (e.g. a single-image
-        // project), aren't justified: authored size, shrunk only to fit.
+        // The grid's last row on wider screens, and a short last row (fewer
+        // than the minimum, e.g. when only one image is left), aren't
+        // justified: authored size, shrunk only to fit. The mobile logo row
+        // always fills the width.
         const isLastRow = r === rows.length - 1;
         const loose =
-          isLastRow && !(isMobile && isLastGroup) && (isLastGroup || row.length < limits.min);
+          isLastRow && !(isMobile && isLastGroup) && (looseLast || row.length < limits.min);
         const scale = loose ? Math.min(1, fill) : fill;
-        for (const cell of row) {
-          widths[cell.key] = cell.width * scale;
-          if (isMobile && r > 0 && !isLastGroup) hanging.add(cell.key);
-        }
-        if (isMobile) return;
+        for (const cell of row) widths[cell.key] = cell.width * scale;
         row.forEach((cell, k) => {
           if (cell.group === LOGO_KEY || cell.group in labelWidths) return;
           let span = widths[cell.key];
@@ -222,12 +220,11 @@ export function useJustifiedRows(
         });
       });
     });
-    return { widths, hanging, labelWidths };
+    return { widths, labelWidths };
   }, [isMobile, isLandscapePhone, box, projects, aspects]);
 
   return {
     widths: layout?.widths ?? null,
-    hanging: layout?.hanging ?? null,
     labelWidths: layout?.labelWidths ?? null,
     reportAspect,
   };

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObje
 // as the projects themselves.
 //
 // The grid is a flex-wrap of variable-width images whose rows sit on their
-// line's bottom (or, on mobile, hang from its top), so which image lands on
+// line's bottom, so which image lands on
 // which row is only known once the browser has laid everything out — and that
 // depends on each image's aspect ratio (known from the build, or measured once
 // it loads). So we wait for the layout, measure the cells, group them into

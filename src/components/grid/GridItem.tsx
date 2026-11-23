@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
 import { cellKey } from "../../hooks/useJustifiedRows";
-import { useIsMobile } from "../../hooks/useIsMobile";
 import { InfoBlock } from "./InfoBlock";
 import { GridImage } from "./GridImage";
 import styles from "./GridItem.module.css";
@@ -12,9 +11,7 @@ interface GridItemProps {
   // Justified-row widths keyed by cellKey(); null until every image has
   // reported its aspect ratio.
   cellWidths: Record<string, number> | null;
-  // Mobile: cells after a project's first row, aligned to the top of their line.
-  hangingCells: Set<string> | null;
-  // Wider screens: how far the label may run before the next project's
+  // How far the label may run before the next project's
   // (useJustifiedRows); a longer name ends in an ellipsis.
   labelWidth?: number;
   onAspect: (key: string, aspect: number) => void;
@@ -22,9 +19,8 @@ interface GridItemProps {
   playVideos: boolean;
 }
 
-export function GridItem({ project, cellWidths, hangingCells, labelWidth, onAspect, playVideos }: GridItemProps) {
+export function GridItem({ project, cellWidths, labelWidth, onAspect, playVideos }: GridItemProps) {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   // Hovering any of the project's images lifts all of them (see the hover
   // rule in GridItem.module.css). Leaving waits a beat, so crossing the gap
   // between two of the project's images doesn't drop and re-lift the set.
@@ -53,7 +49,7 @@ export function GridItem({ project, cellWidths, hangingCells, labelWidth, onAspe
       className={styles.infoButton}
       // Stable hook for the reveal's label slide (GridView.module.css).
       data-grid-label
-      style={!isMobile && labelWidth ? { width: "max-content", maxWidth: labelWidth } : undefined}
+      style={labelWidth ? { width: "max-content", maxWidth: labelWidth } : undefined}
       role="link"
       tabIndex={0}
       onClick={go}
@@ -84,7 +80,6 @@ export function GridItem({ project, cellWidths, hangingCells, labelWidth, onAspe
         className={styles.cell}
         data-grid-cell
         data-justify={width ? "" : undefined}
-        data-hang={hangingCells?.has(key) ? "" : undefined}
         data-hover={hovered ? "" : undefined}
         onMouseEnter={enter}
         onMouseLeave={leave}
@@ -104,21 +99,10 @@ export function GridItem({ project, cellWidths, hangingCells, labelWidth, onAspe
           onAspect={(aspect) => onAspect(key, aspect)}
         />
         {/* Reserved label band keeps every image on a shared baseline. */}
-        {!isMobile && <div className={styles.label}>{isLead ? info : null}</div>}
+        <div className={styles.label}>{isLead ? info : null}</div>
       </div>
     );
   };
 
-  return (
-    <>
-      {visibleImages.map((entry, idx) => renderCell(entry, idx === 0, idx))}
-      {/* Mobile: the info sits right under the project's images, with the
-          space between projects below it, so it reads as that project's. */}
-      {isMobile && visibleImages.length > 0 && (
-        <div className={styles.heading} data-grid-cell>
-          {info}
-        </div>
-      )}
-    </>
-  );
+  return <>{visibleImages.map((entry, idx) => renderCell(entry, idx === 0, idx))}</>;
 }

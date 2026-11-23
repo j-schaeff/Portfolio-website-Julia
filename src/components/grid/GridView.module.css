@@ -21,8 +21,7 @@
    module-scoped.
 
    The image and its label animate separately, so the text is never scaled
-   with the image. The label inherits its cell's --reveal-delay (on mobile the
-   heading is a cell of its own). */
+   with the image. The label inherits its cell's --reveal-delay. */
 .grid[data-reveal] [data-grid-cell] > :first-child:not([data-grid-label]) {
   /* Grow from a small seed at the image's baseline into full size. */
   transform-origin: bottom center;
@@ -43,11 +42,6 @@
     scale 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
     /* This rule outranks the hover's own transition; keep its lift easing. */
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Hanging images (mobile rows after a project's first) grow from the seam. */
-.grid[data-reveal] [data-hang] > :first-child {
-  transform-origin: top center;
 }
 
 /* Title and type fade in while sliding 24px from the left, the List page's
@@ -72,9 +66,9 @@
 
 @media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
   .grid {
-    /* No label bands here, so images in a project stay tight; the space between
-       projects comes from each project's heading (GridItem.module.css). */
-    gap: 8px;
+    /* Each image carries a (tighter) label band, as on wider screens, so the
+       row gap only has to clear it. */
+    gap: 8px 4px;
     /* Toggle sits at top: 12px on mobile; the top padding clears it (the
        project info now sits below the images, so the first row starts here). The bottom padding reserves the
        full-width logo row (see Logo.module.css), which is pinned to the page's

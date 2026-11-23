@@ -26,23 +26,8 @@
   cursor: pointer;
 }
 
-/* Mobile only: a full-width line in the flat flex stream after a project's
-   images, so it also ends the project's rows. The negative top margin pulls
-   it close to the images above (5px instead of the 8px grid gap); the bottom
-   margin is what separates it from the next project. */
-.heading {
-  flex: 0 0 100%;
-  margin-top: -3px;
-  margin-bottom: 24px;
-}
-
-/* The info spans the line so InfoBlock can push the type to the right edge. */
-.heading > .infoButton {
-  width: 100%;
-}
-
-/* Justified rows: useJustifiedRows picks the rows (2–4 images on mobile, up
-   to 8 wider; the last row keeps its authored size) and gives each cell an
+/* Justified rows: useJustifiedRows picks the rows (2–8 small images on
+   mobile, up to 8 wider; the last row keeps its authored size) and gives each cell an
    explicit width (data-justify + --cell-w); a row's widths sum to the content
    width, so the flat flex stream wraps exactly there. The image then fills its cell at its natural aspect
    ratio. Gaps and padding stay as set in GridView.module.css. Until every
@@ -58,13 +43,11 @@
   height: auto;
 }
 
-/* Mobile: rows after a project's first hang from the top of their line, so
-   they meet the bottom-aligned first row at one straight seam. Each line is as
-   tall as its tallest image, so both rows sit on the line edges, a grid gap
-   apart. */
+/* Mobile: a tighter label band, matching the closer rows (GridView.module.css). */
 @media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
-  .cell[data-hang] {
-    align-self: flex-start;
+  .label {
+    height: 22px;
+    margin-top: 3px;
   }
 }
 
