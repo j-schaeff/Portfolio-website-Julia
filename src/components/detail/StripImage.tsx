@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
 import { useIsMobile } from "../../hooks/useIsMobile";
-import { detailFillHeight, detailImageHeight } from "../../utils/imageSize";
+import {
+  detailFillHeight,
+  detailFocusHeight,
+  detailImageHeight,
+  FOCUS_SIDE_GUTTER,
+} from "../../utils/imageSize";
 import { RISE_STAGGER, RISE_TRANSITION } from "../../utils/motion";
 import styles from "./StripImage.module.css";
 
@@ -29,9 +34,14 @@ interface StripImageProps {
   rise: boolean;
   // Fires once the media knows its own dimensions (loaded / metadata).
   onReady?: () => void;
+  // Mobile pager only (ProjectPager): the project's images are tapped into
+  // the focused view, where they all share one height (detailFocusHeight).
+  focused?: boolean;
+  // A tap on the media. Passing it also animates size changes (see below).
+  onTap?: () => void;
 }
 
-export function StripImage({ index, src: preferred, original, alt, size, largest, isVideo, hasAudio = false, rise, onReady, aspect, placeholder }: StripImageProps) {
+export function StripImage({ index, src: preferred, original, alt, size, largest, isVideo, hasAudio = false, rise, onReady, aspect, placeholder, focused = false, onTap }: StripImageProps) {
   const isMobile = useIsMobile();
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   const onError = isOriginal ? undefined : fallBack;
@@ -42,7 +52,15 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
   };
 
   const isLeadingMobileImage = isMobile && index === 0;
-  const style: CSSProperties = isLeadingMobileImage
+  const style: CSSProperties = focused
+    ? {
+        width: "auto",
+        height: detailFocusHeight(aspect),
+        // Without a build-time ratio the height can't adapt, so cap the width.
+        ...(aspect ? {} : { maxWidth: `calc(100vw - ${FOCUS_SIDE_GUTTER * 2}px)` }),
+        objectFit: "contain",
+      }
+    : isLeadingMobileImage
     ? // Fills the strip exactly (it's the pager's height, see ProjectPager).
       { width: "auto", height: "100%", objectFit: "contain" }
     : {
@@ -62,11 +80,16 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
   // Start a full viewport down so every image, whatever its height, begins
   // hidden; the strip clips it, so it emerges from the strip's baseline. The
   // stagger is capped so long projects don't keep trickling in off-screen.
+  // In the mobile pager the media's height eases between the normal and the
+  // focused view (a CSS transition, .resizes), so the real box resizes and
+  // the width follows each frame; ProjectPager slides the strip in step.
   const motionProps = {
     initial: rise ? { y: window.innerHeight } : false,
     animate: { y: 0 },
     transition: { ...RISE_TRANSITION, delay: RISE_STAGGER * Math.min(index, 8) },
+    onClick: onTap,
   } as const;
+  const imageClass = onTap ? `${styles.image} ${styles.resizes}` : styles.image;
 
   if (isVideo && hasAudio) {
     // The wrapper takes the box the video would have (same size, shadow and
@@ -74,7 +97,7 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
     // beneath it without taking space. The leading mobile video fills the
     // screen, so its toggle sits inside the bottom edge instead.
     return (
-      <motion.div {...motionProps} className={`${styles.image} ${styles.soundBox}`} style={style}>
+      <motion.div {...motionProps} className={`${imageClass} ${styles.soundBox}`} style={style}>
         <SoundVideo
           src={src}
           poster={placeholder}
@@ -91,7 +114,7 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
     return (
       <motion.video
         {...motionProps}
-        className={styles.image}
+        className={imageClass}
         src={src}
         poster={placeholder}
         aria-label={alt}
@@ -109,7 +132,7 @@ export function StripImage({ index, src: preferred, original, alt, size, largest
   return (
     <motion.img
       {...motionProps}
-      className={styles.image}
+      className={imageClass}
       src={src}
       alt={alt}
       draggable={false}
@@ -150,7 +173,9 @@ function SoundVideo({ src, poster, alt, inset, onReady, onError }: SoundVideoPro
     if (video) video.muted = muted;
   }, [muted]);
 
-  const toggle = () => {
+  // Its own tap, not the video's: the pager shouldn't toggle its view too.
+  const toggle = (event: MouseEvent) => {
+    event.stopPropagation();
     const video = videoRef.current;
     if (!video) return;
     const next = !muted;

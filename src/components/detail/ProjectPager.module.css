@@ -62,24 +62,69 @@
   bottom: 0;
   box-sizing: border-box;
   padding: 24px 12px 18px;
+  /* A column, so the focused view's info can sit between title and "Next". */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   color: #fff;
   mix-blend-mode: difference;
   touch-action: none;
 }
 
-/* The project's description, the strip's second item. Its text starts at the
-   top, clear of the Index button and the theme switch, with roomy sides so
-   it sits apart from the images either side. Nearly a screen wide (capped on
-   larger phones) so lines stay long enough to read comfortably. On the page
-   background, so plain theme colours rather than difference blending. */
+/* The focused view (an image tapped, see ProjectPager): images share one
+   height (detailFocusHeight), top-aligned below the corner controls, and the
+   strip snaps image by image so each lands whole. Side padding lets the first
+   and last centre too. */
+.focused .strip {
+  scroll-snap-type: x mandatory;
+}
+
+.focused .group {
+  padding: 44px 8px 0;
+}
+
+/* Eases with the images' heights, so they glide down into place too. */
+.group {
+  transition: padding 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focused .group > * {
+  scroll-snap-align: center;
+}
+
+/* The project's info in the focused view, inside the caption under the
+   title. The caption grows up from the bottom no further than just below the
+   focused images (their 44px top + 60svh, FOCUS_HEIGHT_VH); past that a long
+   description scrolls inside the panel. It takes the caption's colour, so it
+   inverts against the background like the title, in either theme. Lines stay
+   a comfortable length on larger phones. */
+.focused .caption {
+  max-height: calc(100% - 44px - 60svh - 8px);
+}
+
 .info {
-  flex: 0 0 auto;
-  width: min(100vw - 24px, 440px);
-  height: 100%;
-  box-sizing: border-box;
-  padding: 44px 20px 0;
-  color: var(--fg);
+  flex: 0 1 auto;
+  min-height: 0;
+  align-self: stretch;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  text-align: left;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* The caption swallows swipes; a long description still scrolls. */
+  touch-action: pan-y;
+  scrollbar-width: none;
+}
+
+.info::-webkit-scrollbar {
+  display: none;
+}
+
+/* The spacing lives inside, so the panel can grow from a true 0px. */
+.infoInner {
+  padding: 10px 8px 14px;
 }
 
 .title {
@@ -136,7 +181,7 @@
   white-space: nowrap;
 }
 
-/* The year ends on the card's right edge. */
+/* The year ends on the panel's right edge. */
 .year {
   margin-left: auto;
   font-variant-numeric: tabular-nums;
@@ -158,12 +203,12 @@
   margin: 0 -16px -10px;
   padding: 10px 16px;
   cursor: pointer;
+  /* The arrow alone, a touch larger than the old "Next" label so it still
+     reads as the cue. */
   font-family: var(--font-sans);
-  font-feature-settings: "ss02";
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  line-height: 1;
 }
 
 /* Links inside the description (from the CMS's rich-text field): underlined

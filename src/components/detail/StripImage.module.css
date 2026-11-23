@@ -8,6 +8,13 @@
   max-height: 100%;
 }
 
+/* Mobile pager: the height eases into and out of the focused view, on the
+   site's easing and ZOOM_TRANSITION's 0.6s (src/utils/motion.ts), the same
+   curve ProjectPager slides the strip on. */
+.resizes {
+  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* A video with sound (StripImage's SoundVideo): the wrapper is the box, the
    video fills it, and the toggle hangs just below without taking space. */
 .soundBox {

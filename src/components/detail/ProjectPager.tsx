@@ -1,12 +1,10 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, PresenceContext } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { animate, AnimatePresence, motion, PresenceContext } from "framer-motion";
 import type { ImageSize, Project } from "../../types/project";
 import {
   NUDGE_DELAY,
   NUDGE_PEEK,
   NUDGE_TRANSITION,
-  RISE_STAGGER,
-  RISE_TRANSITION,
   ZOOM_TRANSITION,
 } from "../../utils/motion";
 import { StripImage } from "./StripImage";
@@ -30,15 +28,18 @@ interface ProjectPagerProps {
 //
 // The project's title and a "Next" hint sit at the bottom of its page: they
 // stay put while the strip scrolls sideways and move with the page between
-// projects. The description is the strip's second item, a card right after
-// the full-screen first image, so swiping on reads it before the rest of the
-// images. A project with only one media item shows it again after the
-// description, at strip size, so it can be seen whole.
+// projects.
+//
+// Tapping an image opens the project's focused view: every image glides up to
+// one shared height (detailFocusHeight), so the tapped one is seen whole and
+// swiping sideways never changes the height, and the description with client,
+// type and year rises in below. Tapping an image again, or moving to another
+// project, closes it.
 //
 // The first image fills the screen, so a cropped edge alone doesn't say
 // there's more to the right. Once the entrance rise is done, the strip nudges:
-// it slides a little to the left, so the description card's edge peeks in,
-// and eases back. It moves the real scroll position, so it shows the actual
+// it slides a little to the left, so the next image's edge peeks in, and eases
+// back. It moves the real scroll position, so it shows the actual
 // gesture. It plays once per opening of the detail view, not on project
 // switches, and a touch stops it where it is.
 //
@@ -61,12 +62,10 @@ export function ProjectPager({
   // Only the images on screen when the page opens rise in.
   const [intro, setIntro] = useState(true);
   useEffect(() => setIntro(false), []);
-  // Projects whose first item has loaded enough to know its size. Until then
-  // a first item without a build-time aspect ratio is 0px wide, which would
-  // leave the description card showing in its place.
-  const [sized, setSized] = useState<ReadonlySet<string>>(() => new Set());
-  const markSized = (slug: string) =>
-    setSized((prev) => (prev.has(slug) ? prev : new Set(prev).add(slug)));
+  // The tapped image, while its project's focused view is open.
+  const [focus, setFocus] = useState<{ slug: string; index: number } | null>(null);
+  const toggleFocus = (slug: string, index: number) =>
+    setFocus((prev) => (prev ? null : { slug, index }));
 
   const activeSlugRef = useRef(active?.slug);
   activeSlugRef.current = active?.slug;
@@ -122,6 +121,8 @@ export function ProjectPager({
       const slug = activeSlugRef.current;
       const strip = slug ? pageFor(slug)?.firstElementChild : null;
       if (!(strip instanceof HTMLElement) || strip.scrollLeft > 0) return;
+      // A lone image has nothing after it to hint at.
+      if ((strip.firstElementChild?.childElementCount ?? 0) < 2) return;
       // Far enough to bring the first image's right edge on screen with a
       // little of what follows it: a landscape image at full height runs well
       // past the screen, and a fixed nudge would only slide its picture.
@@ -184,6 +185,9 @@ export function ProjectPager({
         if (strip && strip.scrollLeft !== 0) strip.scrollLeft = 0;
       }
       inViewRef.current = slug;
+      // Another project's page: its focused view closes (its strip has just
+      // been rewound with the rest).
+      setFocus((prev) => (prev && prev.slug !== slug ? null : prev));
       if (slug !== activeSlugRef.current) onActiveChangeRef.current(slug);
     };
 
@@ -228,6 +232,46 @@ export function ProjectPager({
     };
   }, []);
 
+  // Keep the tapped image in view while the sizes ease (a CSS height
+  // transition on each image, see StripImage): every frame the strip scrolls
+  // so the image glides, on the same curve and timing, from where it was on
+  // screen to its end spot: centred when the focused view opens, its left
+  // edge at the screen's when it closes. Snapping is off until it's done, so
+  // it can't pull the strip mid-glide, and a touch hands control back.
+  const lastFocusRef = useRef(focus);
+  useLayoutEffect(() => {
+    const target = focus ?? lastFocusRef.current;
+    lastFocusRef.current = focus;
+    if (!target) return;
+    const strip = pageFor(target.slug)?.firstElementChild;
+    const item = strip?.firstElementChild?.children[target.index];
+    if (!(strip instanceof HTMLElement) || !(item instanceof HTMLElement)) return;
+    // Opening anchors the image's centre, closing its left edge.
+    const anchor = () => item.offsetLeft + (focus ? item.offsetWidth / 2 : 0);
+    // The transitions start from the old sizes, so this is where it is now.
+    const from = anchor() - strip.scrollLeft;
+    const to = focus ? strip.clientWidth / 2 : 0;
+    strip.style.scrollSnapType = "none";
+    const controls = animate(0, 1, {
+      ...ZOOM_TRANSITION,
+      onUpdate: (p: number) => {
+        strip.scrollLeft = anchor() - (from + (to - from) * p);
+      },
+      onComplete: () => {
+        strip.style.scrollSnapType = "";
+      },
+    });
+    const stop = () => {
+      controls.stop();
+      strip.style.scrollSnapType = "";
+    };
+    strip.addEventListener("touchstart", stop, { passive: true });
+    return () => {
+      stop();
+      strip.removeEventListener("touchstart", stop);
+    };
+  }, [focus]);
+
   if (!active) return null;
 
   const first = projects[0];
@@ -239,7 +283,9 @@ export function ProjectPager({
   ];
 
   return (
-    <div ref={pagerRef} className={styles.pager}>
+    // layoutScroll (here and on each strip): the layout animation measures
+    // through both scroll offsets.
+    <motion.div ref={pagerRef} className={styles.pager} layoutScroll>
       {/* Keep strip images out of the route's AnimatePresence, so they can't
           block the detail route's exit (see ScrollStrip). */}
       <PresenceContext.Provider value={null}>
@@ -250,7 +296,9 @@ export function ProjectPager({
             1,
           );
           const rise = intro && !copy && project.slug === active.slug;
-          const firstSized = !!project.images[0]?.aspect || sized.has(project.slug);
+          // Loop copies never open: they're swapped for the real page as soon
+          // as a scroll settles on one.
+          const focused = !copy && focus?.slug === project.slug;
           // The next project, wrapping to the first: the hint says swiping
           // down moves on, and a tap does the same.
           const next = projects.length > 1
@@ -259,94 +307,36 @@ export function ProjectPager({
           return (
             <section
               key={copy ? `${copy}-${project.slug}` : project.slug}
-              className={styles.page}
+              className={`${styles.page} ${focused ? styles.focused : ""}`}
               data-project-slug={project.slug}
               data-copy={copy}
               aria-hidden={copy ? true : undefined}
             >
-              <div className={styles.strip}>
+              <motion.div className={styles.strip} layoutScroll>
                 <div className={styles.group}>
                   {project.images.map((img, i) => (
-                    <Fragment key={img.src + i}>
-                      <StripImage
-                        index={i}
-                        src={img.full}
-                        original={img.src}
-                        aspect={img.aspect}
-                        placeholder={img.isVideo ? img.poster : img.thumb}
-                        alt={img.alt || `${project.title} — ${i + 1}`}
-                        size={img.size}
-                        largest={largest}
-                        isVideo={img.isVideo}
-                        hasAudio={img.hasAudio}
-                        rise={rise}
-                        onReady={i === 0 ? () => markSized(project.slug) : undefined}
-                      />
-                      {i === 0 && (
-                        // Rises in step with the image slot it takes.
-                        <motion.div
-                          className={styles.info}
-                          data-info="true"
-                          initial={rise ? { y: window.innerHeight } : false}
-                          animate={{ y: 0 }}
-                          transition={{ ...RISE_TRANSITION, delay: RISE_STAGGER }}
-                          style={firstSized ? undefined : { visibility: "hidden" }}
-                        >
-                          <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
-                          {/* The desktop metadata row (DetailMeta): client,
-                              type and year, below the text. */}
-                          <div className={styles.meta}>
-                            {project.client && (
-                              <span className={styles.label}>
-                                {project.clientUrl ? (
-                                  <a
-                                    href={project.clientUrl}
-                                    target={
-                                      project.clientUrl.startsWith("mailto:") ? undefined : "_blank"
-                                    }
-                                    rel="noreferrer"
-                                    className={styles.clientLink}
-                                    tabIndex={copy ? -1 : undefined}
-                                  >
-                                    {project.client}
-                                  </a>
-                                ) : (
-                                  project.client
-                                )}
-                              </span>
-                            )}
-                            <span className={styles.label}>{project.type}</span>
-                            <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
-                          </div>
-                        </motion.div>
-                      )}
-                    </Fragment>
-                  ))}
-                  {/* A project with a single media item would end at the
-                      description, and the full-screen first item can run past
-                      the screen, so it's never seen whole. Show it again after
-                      the description, at strip size (index 1 isn't the
-                      full-screen leading item). */}
-                  {project.images.length === 1 && project.images[0] && (
                     <StripImage
-                      key="repeat"
-                      index={1}
-                      src={project.images[0].full}
-                      original={project.images[0].src}
-                      aspect={project.images[0].aspect}
-                      placeholder={project.images[0].isVideo ? project.images[0].poster : project.images[0].thumb}
-                      alt={project.images[0].alt || `${project.title} — 1`}
-                      size={project.images[0].size}
+                      key={img.src + i}
+                      index={i}
+                      src={img.full}
+                      original={img.src}
+                      aspect={img.aspect}
+                      placeholder={img.isVideo ? img.poster : img.thumb}
+                      alt={img.alt || `${project.title} — ${i + 1}`}
+                      size={img.size}
                       largest={largest}
-                      isVideo={project.images[0].isVideo}
-                      hasAudio={project.images[0].hasAudio}
+                      isVideo={img.isVideo}
+                      hasAudio={img.hasAudio}
                       rise={rise}
+                      focused={focused}
+                      onTap={copy ? undefined : () => toggleFocus(project.slug, i)}
                     />
-                  )}
+                  ))}
                 </div>
-              </div>
+              </motion.div>
               {/* Outside the strip, so it doesn't scroll sideways. Fades in
-                  behind the rise. */}
+                  behind the rise. In the focused view it also holds the
+                  project's info, between the title and "Next". */}
               <motion.div
                 className={styles.caption}
                 initial={rise ? { opacity: 0 } : false}
@@ -354,6 +344,61 @@ export function ProjectPager({
                 transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
               >
                 <h2 className={styles.title}>{project.title}</h2>
+                  {/* The focused view's info, right under the title. It grows
+                      from no height, in step with the images, so the title
+                      rises with it, and fades in a beat behind; closing runs
+                      the other way. */}
+                  <AnimatePresence>
+                    {focused && (
+                      <motion.div
+                        key="info"
+                        className={styles.info}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{
+                          height: "auto",
+                          opacity: 1,
+                          transition: {
+                            height: ZOOM_TRANSITION,
+                            opacity: { ...ZOOM_TRANSITION, delay: 0.15 },
+                          },
+                        }}
+                        exit={{
+                          height: 0,
+                          opacity: 0,
+                          transition: {
+                            height: ZOOM_TRANSITION,
+                            opacity: { duration: 0.25, ease: ZOOM_TRANSITION.ease },
+                          },
+                        }}
+                      >
+                        <div className={styles.infoInner}>
+                        <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
+                        {/* The desktop metadata row (DetailMeta): client, type and
+                            year, below the text. */}
+                        <div className={styles.meta}>
+                          {project.client && (
+                            <span className={styles.label}>
+                              {project.clientUrl ? (
+                                <a
+                                  href={project.clientUrl}
+                                  target={project.clientUrl.startsWith("mailto:") ? undefined : "_blank"}
+                                  rel="noreferrer"
+                                  className={styles.clientLink}
+                                >
+                                  {project.client}
+                                </a>
+                              ) : (
+                                project.client
+                              )}
+                            </span>
+                          )}
+                          <span className={styles.label}>{project.type}</span>
+                          <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
+                        </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 {next && (
                   <button
                     type="button"
@@ -362,7 +407,9 @@ export function ProjectPager({
                     aria-label={`View ${next.title}`}
                     tabIndex={copy ? -1 : undefined}
                   >
-                    Next ↓
+                    {/* Just the arrow: the cue that swiping down (or a tap)
+                        moves on. The label says where. */}
+                    <span aria-hidden="true">↓</span>
                   </button>
                 )}
               </motion.div>
@@ -370,6 +417,6 @@ export function ProjectPager({
           );
         })}
       </PresenceContext.Provider>
-    </div>
+    </motion.div>
   );
 }
