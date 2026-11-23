@@ -73,21 +73,6 @@ export function ScrollStrip({
             instead of switching the project (DetailView). */}
         <div className={styles.endInfo} data-meta-scroll>
           <h2 className={styles.endTitle}>{activeProject.title}</h2>
-          {activeProject.client && (
-            <span className={styles.endLabel}>
-              {activeProject.clientUrl ? (
-                <a
-                  href={activeProject.clientUrl}
-                  target={activeProject.clientUrl.startsWith("mailto:") ? undefined : "_blank"}
-                  rel="noreferrer"
-                >
-                  {activeProject.client}
-                </a>
-              ) : (
-                activeProject.client
-              )}
-            </span>
-          )}
           <span className={styles.endLabel}>{activeProject.type}</span>
           <span className={styles.endLabel}>{activeProject.year}</span>
           <p className={styles.endDescription}>

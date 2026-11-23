@@ -28,8 +28,8 @@ export function metaHeight(projects: Project[]): number {
   return Math.max(112, (longestDescriptionLines + 1) * 20 + 18);
 }
 
-// Only the in-view project's info, in one row: description, title, client
-// (when set; a link when it has a URL), then type+date at the right edge. Scrolling switches the project (see
+// Only the in-view project's info, in one row: description, title, then
+// type+date at the right edge. Scrolling switches the project (see
 // DetailView), and this text follows it. Once the viewport narrows, the other
 // columns wrap beneath the description (on tablets, 561–880px, they sit
 // above it, directly under the strip). `projects` is still needed so metaHeight() can size the block
@@ -56,22 +56,6 @@ export function DetailMeta({ projects, active }: DetailMetaProps) {
         <h2 className={styles.title}>{active.title}</h2>
       </div>
 
-      {active.client && (
-        <div className={styles.client} data-contrast>
-          {active.clientUrl ? (
-            <a
-              href={active.clientUrl}
-              target={active.clientUrl.startsWith("mailto:") ? undefined : "_blank"}
-              rel="noreferrer"
-              className={styles.clientLink}
-            >
-              {active.client}
-            </a>
-          ) : (
-            active.client
-          )}
-        </div>
-      )}
 
       <div className={styles.specs} data-contrast>
         <span className={styles.type}>{active.type}</span>

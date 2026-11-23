@@ -30,9 +30,6 @@ export interface Frontmatter {
   description: string;
   descriptionLinks: TextLink[];
   year: number;
-  // Optional; empty strings when not set. `clientUrl` makes the client a link.
-  client: string;
-  clientUrl: string;
   images: ProjectImage[];
 }
 

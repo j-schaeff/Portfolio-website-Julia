@@ -124,8 +124,6 @@ function toProject(path: string, raw: string): Project {
     description: description.text,
     descriptionLinks: description.links,
     year: Number(fm.year ?? 0),
-    client: String(fm.client ?? "").trim(),
-    clientUrl: String(fm.clientUrl ?? "").trim(),
     images: Array.isArray(fm.images)
       ? fm.images.map(toImage).filter((img): img is ProjectImage => img !== null)
       : [],

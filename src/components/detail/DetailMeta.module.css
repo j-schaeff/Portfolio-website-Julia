@@ -67,26 +67,6 @@
   pointer-events: auto;
 }
 
-/* Set in the same small caps style as type and year. */
-.client {
-  flex: 0 0 auto;
-  font-family: var(--font-sans);
-  font-feature-settings: "ss02";
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.25;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: auto;
-}
-
-/* Underlines on hover so it reads as a link. */
-.clientLink:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 .specs {
   flex: 0 0 auto;
   display: grid;
@@ -167,6 +147,33 @@
     bottom: 18px;
     height: auto !important;
     min-height: 0;
+    /* A grid, not the base flex row, so the title stays in the same spot
+       between projects: it starts at the page center whatever its length or
+       the type's width. Title and specs share the right half (the specs at
+       its right edge); the one row fills the block's height so the
+       description's max-height below still resolves. */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .intro {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 32ch;
+  }
+
+  .titleCol {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-start;
+  }
+
+  .specs {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
   }
 
   /* Ends above the project arrows in the bottom-left corner
@@ -187,7 +194,7 @@
 }
 
 /* Tablet: the metadata fills the third below the strip (ScrollStrip's 40px
-   top margin + two thirds of the screen). Title, client, type and year share
+   top margin + two thirds of the screen). Title, type and year share
    the first row; the description follows beneath and scrolls if it's long.
    The !important beats the inline metaHeight() height. */
 @media (min-width: 561px) and (max-width: 880px) {

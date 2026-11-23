@@ -32,8 +32,8 @@ interface ProjectPagerProps {
 //
 // Tapping an image opens the project's focused view: every image glides up to
 // one shared height (detailFocusHeight), so the tapped one is seen whole and
-// swiping sideways never changes the height, and the description with client,
-// type and year rises in below. Tapping an image again, or moving to another
+// swiping sideways never changes the height, and the description with type
+// and year rises in below. Tapping an image again, or moving to another
 // project, closes it.
 //
 // The first image fills the screen, so a cropped edge alone doesn't say
@@ -431,25 +431,9 @@ export function ProjectPager({
                       >
                         <div className={styles.infoInner}>
                         <JustifiedText className={styles.description} text={project.description} links={project.descriptionLinks} />
-                        {/* The desktop metadata row (DetailMeta): client, type and
-                            year, below the text. */}
+                        {/* The desktop metadata row (DetailMeta): type and year,
+                            below the text. */}
                         <div className={styles.meta}>
-                          {project.client && (
-                            <span className={styles.label}>
-                              {project.clientUrl ? (
-                                <a
-                                  href={project.clientUrl}
-                                  target={project.clientUrl.startsWith("mailto:") ? undefined : "_blank"}
-                                  rel="noreferrer"
-                                  className={styles.clientLink}
-                                >
-                                  {project.client}
-                                </a>
-                              ) : (
-                                project.client
-                              )}
-                            </span>
-                          )}
                           <span className={styles.label}>{project.type}</span>
                           <span className={`${styles.label} ${styles.year}`}>{project.year}</span>
                         </div>

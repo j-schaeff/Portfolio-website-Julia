@@ -158,7 +158,7 @@
   overflow-wrap: break-word;
 }
 
-/* Client, type and year beneath the description, in the small caps style of
+/* Type and year beneath the description, in the small caps style of
    the desktop metadata (DetailMeta.module.css). */
 .meta {
   display: flex;
@@ -184,12 +184,6 @@
 .year {
   margin-left: auto;
   font-variant-numeric: tabular-nums;
-}
-
-.clientLink {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 .next {
