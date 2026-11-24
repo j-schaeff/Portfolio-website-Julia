@@ -56,6 +56,11 @@ jobs:
           key: optimized-media-${{ hashFiles('public/images/**', 'scripts/optimize-media.mjs') }}
           restore-keys: optimized-media-
 
+      # The optimiser needs ffmpeg for the video copies and posters; without
+      # it the site falls back to the full-size uploads for every video.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
       # Served from the custom domain juliaschaeffler.com (set in the repo's
       # Pages settings), so the build uses the default "/" base. Without a
       # custom domain this would need DEPLOY_BASE: /Portfolio-website-Julia/

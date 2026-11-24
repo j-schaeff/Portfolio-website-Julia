@@ -7,7 +7,8 @@
 //
 // For each image:  <name>.<ext>.thumb.webp  600px tall, for the index grid
 //                  <name>.<ext>.full.webp   2400px long edge, detail + lightbox
-// For each video:  <name>.<ext>.opt.mp4     H.264, 1280px long edge, faststart
+// For each video:  <name>.<ext>.thumb.mp4   H.264, 600px tall, silent, for the grid
+//                  <name>.<ext>.opt.mp4     H.264, 1280px long edge, detail strip
 //                  <name>.<ext>.poster.webp first frame (or a middle one if
 //                                           the first is blank), 600px tall
 // Keep these names in sync with optimizedSrc() in src/utils/media.ts.
@@ -33,7 +34,8 @@ const AUDIO = "src/generated/media-audio.json";
 const SILENT_DB = -60;
 // Bump when the settings below change, so every copy is regenerated.
 // 2: posters skip a blank opening frame.
-const VERSION = 2;
+// 3: videos get a small grid copy (thumb.mp4).
+const VERSION = 3;
 
 // 2× the tallest grid image (size 5 ≈ 237px), so thumbnails stay sharp on retina.
 const THUMB_HEIGHT = 600;
@@ -127,13 +129,14 @@ async function isBlank(png) {
   return channels.slice(0, 3).every((c) => c.max - c.min < 8);
 }
 
-async function optimizeVideo(src, base) {
-  const out = `${base}.opt.mp4`;
+// One H.264 encode of the video. `scale` is the ffmpeg scale filter; `audio`
+// is false for the grid copy, which always plays muted.
+async function encodeVideo(src, out, { scale, crf, audio }) {
   await run("ffmpeg", [
     "-y", "-loglevel", "error", "-i", src,
-    "-vf", `scale=${VIDEO_EDGE}:${VIDEO_EDGE}:force_original_aspect_ratio=decrease:force_divisible_by=2`,
-    "-c:v", "libx264", "-preset", "medium", "-crf", "26", "-pix_fmt", "yuv420p",
-    "-c:a", "aac", "-b:a", "128k",
+    "-vf", scale,
+    "-c:v", "libx264", "-preset", "medium", "-crf", String(crf), "-pix_fmt", "yuv420p",
+    ...(audio ? ["-c:a", "aac", "-b:a", "128k"] : ["-an"]),
     // Moves the index to the front so playback starts before the file finishes.
     "-movflags", "+faststart",
     out,
@@ -141,8 +144,24 @@ async function optimizeVideo(src, base) {
   // Already-small originals can come out larger; keep the original stream then,
   // just re-muxed for faststart.
   if (fs.statSync(out).size >= fs.statSync(src).size) {
-    await run("ffmpeg", ["-y", "-loglevel", "error", "-i", src, "-c", "copy", "-movflags", "+faststart", out]);
+    await run("ffmpeg", [
+      "-y", "-loglevel", "error", "-i", src, "-c", "copy", ...(audio ? [] : ["-an"]), "-movflags", "+faststart", out,
+    ]);
   }
+}
+
+async function optimizeVideo(src, base) {
+  await encodeVideo(src, `${base}.opt.mp4`, {
+    scale: `scale=${VIDEO_EDGE}:${VIDEO_EDGE}:force_original_aspect_ratio=decrease:force_divisible_by=2`,
+    crf: 26,
+    audio: true,
+  });
+  // Grid copy: as tall as the image thumbnails (never upscaled), even width.
+  await encodeVideo(src, `${base}.thumb.mp4`, {
+    scale: `scale=-2:'min(${THUMB_HEIGHT},trunc(ih/2)*2)'`,
+    crf: 28,
+    audio: false,
+  });
 
   // The poster is what shows until the video plays. A video that opens on an
   // empty frame (e.g. text building up on white) would leave a blank box, so
@@ -159,7 +178,7 @@ async function optimizeVideo(src, base) {
 }
 
 const outputsFor = (base, isVid) =>
-  isVid ? [`${base}.opt.mp4`, `${base}.poster.webp`] : [`${base}.thumb.webp`, `${base}.full.webp`];
+  isVid ? [`${base}.thumb.mp4`, `${base}.opt.mp4`, `${base}.poster.webp`] : [`${base}.thumb.webp`, `${base}.full.webp`];
 
 async function main() {
   const { files: previous, audio: previousAudio } = readManifest();

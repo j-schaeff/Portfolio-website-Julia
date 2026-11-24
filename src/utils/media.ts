@@ -26,7 +26,7 @@ export function dropboxDirect(url: string): string {
 // Web-sized copies made by scripts/optimize-media.mjs: public/images/<path>
 // becomes public/optimized/<path>.<variant>. Only local uploads have copies;
 // anything else (external links, SVGs) is returned unchanged.
-export type MediaVariant = "thumb.webp" | "full.webp" | "opt.mp4" | "poster.webp";
+export type MediaVariant = "thumb.webp" | "full.webp" | "thumb.mp4" | "opt.mp4" | "poster.webp";
 
 const OPTIMIZABLE = /\.(jpe?g|png|webp|tiff?|avif|mp4|mov|webm|m4v)$/i;
 

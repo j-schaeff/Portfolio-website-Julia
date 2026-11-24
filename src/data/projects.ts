@@ -60,14 +60,15 @@ function hasAudio(src: string): boolean {
 function withCopies(src: string, video: boolean) {
   const aspect = aspectOf(src);
   if (video) {
-    const opt = optimizedSrc(src, "opt.mp4");
     const poster = optimizedSrc(src, "poster.webp");
     return {
       src,
       isVideo: true,
       hasAudio: hasAudio(src),
-      thumb: opt,
-      full: opt,
+      // A small silent copy for the grid tiles, the 1280px one (with sound)
+      // for the detail strip.
+      thumb: optimizedSrc(src, "thumb.mp4"),
+      full: optimizedSrc(src, "opt.mp4"),
       poster: poster === src ? undefined : poster,
       aspect,
     };
