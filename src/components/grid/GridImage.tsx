@@ -18,6 +18,9 @@ interface GridImageProps {
   // arrives, so a cell doesn't start at the browser's default video shape (or
   // zero height for an image) and jump once the media loads.
   aspect?: number;
+  // "Crop focus" (0–100 across): where a cropped image stays anchored (the
+  // mobile rows crop each image to its cell's width).
+  focus?: number;
   alt: string;
   // Position among the project's grid images; sets its cascading height.
   rank: number;
@@ -30,9 +33,12 @@ interface GridImageProps {
 
 // No layoutId here: opening a project doesn't morph the clicked image. The
 // detail strip rises in from the bottom on its own instead.
-export function GridImage({ src: preferred, original, poster, play, aspect, alt, rank, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
+export function GridImage({ src: preferred, original, poster, play, aspect, focus = 50, alt, rank, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
   // Height goes through a CSS variable so the mobile layout can override it.
-  const style = { "--img-h": `${gridImageHeight(rank)}px` } as CSSProperties;
+  const style = {
+    "--img-h": `${gridImageHeight(rank)}px`,
+    objectPosition: `${focus}% 50%`,
+  } as CSSProperties;
 
   // Media without a build-time ratio (external videoUrls) keeps the first one
   // it measures, so it too holds its shape once known.

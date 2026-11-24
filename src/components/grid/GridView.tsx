@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
 import { introPending, markIntroPlayed } from "../../utils/intro";
@@ -16,7 +16,7 @@ export function GridView() {
   // refreshes); coming back from a project just fades the grid in.
   const [freshLoad] = useState(introPending);
   useEffect(markIntroPlayed, []);
-  const { widths, labelWidths, reportAspect } = useJustifiedRows(gridRef, projects);
+  const { widths, labelWidths, mobileRows, reportAspect } = useJustifiedRows(gridRef, projects);
   const { state: reveal, logo, logoGone } = useRowReveal(gridRef, freshLoad, widths !== null);
 
   return (
@@ -24,6 +24,15 @@ export function GridView() {
       ref={gridRef}
       className={styles.grid}
       data-reveal={reveal ?? undefined}
+      // Mobile: the shared row height and the cascade's scale (GridItem.module.css).
+      style={
+        mobileRows
+          ? ({
+              "--row-h": `${mobileRows.height}px`,
+              "--row-scale": mobileRows.scale,
+            } as CSSProperties)
+          : undefined
+      }
       // While the reveal plays, the per-cell reveal is the entrance, so the
       // container must be visible immediately instead of fading in as a block.
       initial={{ opacity: reveal ? 1 : 0 }}

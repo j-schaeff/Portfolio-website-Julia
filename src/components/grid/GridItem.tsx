@@ -91,6 +91,7 @@ export function GridItem({ project, cellWidths, labelWidth, onAspect, playVideos
           original={img.src}
           poster={img.poster}
           aspect={img.aspect}
+          focus={img.focus}
           play={playVideos}
           alt={img.alt || `${project.title} — ${i + 1}`}
           rank={rank}

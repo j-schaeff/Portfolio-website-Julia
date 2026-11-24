@@ -43,8 +43,25 @@
   height: auto;
 }
 
-/* Mobile: a tighter label band, matching the closer rows (GridView.module.css). */
+/* Mobile: a tighter label band, matching the closer rows (GridView.module.css).
+   Each image keeps its cascade step, scaled so the largest equals the shared
+   row height (--row-h, --row-scale from useJustifiedRows), and crops on its
+   focus to its cell's width so each row still fills the line exactly. With
+   width and height both set, the inline aspect-ratio no longer applies. Every
+   cell is the row height plus the label band, with the image pushed down onto
+   the band, so all rows are equally tall even without a first image in them. */
 @media (max-width: 560px), (orientation: landscape) and (max-height: 500px) {
+  .cell[data-justify] {
+    height: calc(var(--row-h) + 22px + 3px);
+    justify-content: flex-end;
+  }
+
+  .cell[data-justify] > :first-child {
+    height: calc(var(--img-h) * var(--row-scale));
+    object-fit: cover;
+  }
+
+  /* Keep in step with the cell height above. */
   .label {
     height: 22px;
     margin-top: 3px;

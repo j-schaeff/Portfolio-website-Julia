@@ -5,7 +5,8 @@ import { useIsLandscapePhone, useIsMobile } from "./useIsMobile";
 
 // Index layout: justified rows, each scaled up or down so it exactly fills the
 // grid's width. Rows fill across projects, so one row can hold several. On
-// mobile every row holds 2–8 small images; wider screens let each row take up to 8,
+// mobile every row holds 2–8 small images and every row is one height (see
+// MOBILE_ROW_HEIGHT); wider screens let each row take up to 8,
 // however many fill it closest to their authored size, and never split a
 // project so that one of its images sits alone in a row. On wider screens the
 // last row isn't stretched: it keeps its authored size (shrinking only if it
@@ -25,9 +26,17 @@ interface RowLimits {
 const MOBILE_ROWS: RowLimits = { min: 2, max: 8 };
 // A phone held sideways: the same rows, with room for more across.
 const LANDSCAPE_PHONE_ROWS: RowLimits = { min: 2, max: 12 };
-// On mobile the authored grid heights are scaled down before the row fill, so
-// rows aim for small images and several projects share each line.
-const MOBILE_HEIGHT_SCALE = 0.4;
+// On mobile every row is this tall, so the rows read as one even rhythm: the
+// size cascade's largest step (a project's first image) fills it, and the
+// smaller steps keep their proportions to it, sitting on the row's bottom
+// line. Rows are still chosen to fill the width as closely as possible; what's
+// left over is taken up by cropping each image a little (object-fit: cover on
+// its crop focus, see GridItem.module.css), so the rows' edges stay straight.
+// The first project's images (its poster) are never cropped: the other images
+// in their row take up the slack, and a row of only those ends short instead.
+const MOBILE_ROW_HEIGHT = 96;
+// Scales the cascade's heights so its largest step equals the row height.
+const MOBILE_SCALE = MOBILE_ROW_HEIGHT / imageHeight(5);
 // Capped so a row of many narrow images doesn't shrink them too far.
 const WIDE_ROWS: RowLimits = { min: 1, max: 8 };
 // Leave a pixel of slack per row so sub-pixel rounding can't push the last
@@ -53,11 +62,34 @@ interface Cell {
   key: string;
   group: string; // the project it belongs to (the logo is its own)
   width: number; // natural width at the image's authored size
+  // Mobile: kept at its natural width (never cropped), see MOBILE_ROW_HEIGHT.
+  locked?: boolean;
 }
 
 function rowScale(row: Cell[], available: number, gap: number): number {
   const total = row.reduce((sum, cell) => sum + cell.width, 0);
   return (available - gap * (row.length - 1)) / total;
+}
+
+// How a row fills the width when some cells are locked: the locked ones keep
+// their natural width and the rest scale to fill what's left. Without locked
+// cells this is just rowScale for every cell. If the locked cells alone fill
+// the row, everything scales together; if the row is all locked, it keeps its
+// natural width (shrinking only to fit) and ends short.
+function fitRow(row: Cell[], available: number, gap: number) {
+  const space = available - gap * (row.length - 1);
+  let locked = 0;
+  let free = 0;
+  for (const cell of row) {
+    if (cell.locked) locked += cell.width;
+    else free += cell.width;
+  }
+  if (!locked || (free && locked >= space)) {
+    const s = space / (locked + free);
+    return { locked: s, free: s, fills: true };
+  }
+  if (!free) return { locked: Math.min(1, space / locked), free: 1, fills: false };
+  return { locked: 1, free: (space - locked) / free, fills: true };
 }
 
 // The rows are chosen together rather than greedily, so a break can be moved
@@ -97,7 +129,15 @@ function buildRows(
   // Squared log scale: how far the row is from its authored size, in either
   // direction. The grid's last row isn't stretched, so only overflow counts.
   const cost = (i: number, j: number) => {
-    const d = Math.log(rowScale(cells.slice(i, j), available, gap));
+    const row = cells.slice(i, j);
+    if (row.some((cell) => cell.locked)) {
+      // Locked rows: the free cells' stretch, or for an all-locked row how
+      // short it ends.
+      const fit = fitRow(row, available, gap);
+      const d = Math.log(fit.fills ? fit.free : rowScale(row, available, gap));
+      return d * d;
+    }
+    const d = Math.log(rowScale(row, available, gap));
     return looseLast && j === n && d > 0 ? 0 : d * d;
   };
 
@@ -176,8 +216,10 @@ export function useJustifiedRows(
         // The row fill needs every width, so wait for any unknown media.
         if (!aspect) return null;
         const rank = cells.length;
-        const height = gridImageHeight(rank) * (isMobile ? MOBILE_HEIGHT_SCALE : 1);
-        cells.push({ key, group: project.slug, width: height * aspect });
+        const height = gridImageHeight(rank) * (isMobile ? MOBILE_SCALE : 1);
+        // Mobile: the first project's images are never cropped.
+        const locked = isMobile && !groups.length;
+        cells.push({ key, group: project.slug, width: height * aspect, locked });
       }
       if (!cells.length) continue;
       if (!groups.length) groups.push(cells);
@@ -208,8 +250,15 @@ export function useJustifiedRows(
         const isLastRow = r === rows.length - 1;
         const loose =
           isLastRow && !(isMobile && isLastGroup) && (looseLast || row.length < limits.min);
-        const scale = loose ? Math.min(1, fill) : fill;
-        for (const cell of row) widths[cell.key] = cell.width * scale;
+        if (row.some((cell) => cell.locked)) {
+          const fit = fitRow(row, available, box.gap);
+          for (const cell of row) {
+            widths[cell.key] = cell.width * (cell.locked ? fit.locked : fit.free);
+          }
+        } else {
+          const scale = loose ? Math.min(1, fill) : fill;
+          for (const cell of row) widths[cell.key] = cell.width * scale;
+        }
         row.forEach((cell, k) => {
           if (cell.group === LOGO_KEY || cell.group in labelWidths) return;
           let span = widths[cell.key];
@@ -220,12 +269,16 @@ export function useJustifiedRows(
         });
       });
     });
-    return { widths, labelWidths };
+    const mobile = isMobile ? { height: MOBILE_ROW_HEIGHT, scale: MOBILE_SCALE } : null;
+    return { widths, labelWidths, mobile };
   }, [isMobile, isLandscapePhone, box, projects, aspects]);
 
   return {
     widths: layout?.widths ?? null,
     labelWidths: layout?.labelWidths ?? null,
+    // Mobile: the height every row shares, and the factor applied to the
+    // cascade's heights (--row-h and --row-scale on the grid).
+    mobileRows: layout?.mobile ?? null,
     reportAspect,
   };
 }
