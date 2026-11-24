@@ -91,11 +91,17 @@ function clampFocus(value: unknown): number {
   return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 50;
 }
 
+// "Video start" in seconds; empty or invalid means from the beginning.
+function clampStart(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 function toImage(entry: unknown): ProjectImage | null {
   // Legacy entries were plain path strings; current entries are objects.
   if (typeof entry === "string") {
     const src = normalizeSrc(entry);
-    return { ...withCopies(src, isVideo(src)), size: clampImageSize(undefined), focus: clampFocus(undefined), hideInGrid: false, alt: "" };
+    return { ...withCopies(src, isVideo(src)), size: clampImageSize(undefined), focus: clampFocus(undefined), hideInGrid: false, alt: "", start: 0 };
   }
   if (entry && typeof entry === "object") {
     const e = entry as Record<string, unknown>;
@@ -115,6 +121,7 @@ function toImage(entry: unknown): ProjectImage | null {
       focus: clampFocus(e.focus),
       hideInGrid: Boolean(e.hideInGrid),
       alt: String(e.alt ?? ""),
+      start: clampStart(e.start),
     };
   }
   return null;

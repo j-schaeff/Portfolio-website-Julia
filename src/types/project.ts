@@ -25,6 +25,9 @@ export interface ProjectImage {
   // A video with an audible soundtrack (found at build time); the detail
   // strip shows a sound toggle beneath it.
   hasAudio: boolean;
+  // Videos only: seconds into the clip where playback opens and each loop
+  // restarts (useLoopFrom). 0 = the beginning, as a plain loop.
+  start: number;
 }
 
 export interface Frontmatter {

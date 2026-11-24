@@ -400,6 +400,7 @@ export function ProjectPager({
                       largest={largest}
                       isVideo={img.isVideo}
                       hasAudio={img.hasAudio}
+                      start={img.start}
                       rise={rise}
                       focused={focused}
                       onTap={copy || isLandscapePhone ? undefined : () => toggleFocus(project.slug, i)}

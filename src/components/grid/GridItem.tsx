@@ -96,6 +96,7 @@ export function GridItem({ project, cellWidths, labelWidth, onAspect, playVideos
           alt={img.alt || `${project.title} — ${i + 1}`}
           rank={rank}
           isVideo={img.isVideo}
+          start={img.start}
           onActivate={go}
           onAspect={(aspect) => onAspect(key, aspect)}
         />

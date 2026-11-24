@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import { motion } from "framer-motion";
 import type { ImageSize } from "../../types/project";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
+import { useLoopFrom } from "../../hooks/useLoopFrom";
 import { useIsLandscapePhone, useIsMobile } from "../../hooks/useIsMobile";
 import {
   detailFillHeight,
@@ -33,6 +34,8 @@ interface StripImageProps {
   isVideo: boolean;
   // A video with sound: gets a toggle beneath it to unmute.
   hasAudio?: boolean;
+  // Video only: seconds where it opens and loops back to (useLoopFrom).
+  start?: number;
   // Play the page-entrance rise from the bottom on mount.
   rise: boolean;
   // Fires once the media knows its own dimensions (loaded / metadata).
@@ -44,7 +47,7 @@ interface StripImageProps {
   onTap?: () => void;
 }
 
-export function StripImage({ index, src: preferred, original, alt, size, focus = 50, largest, isVideo, hasAudio = false, rise, onReady, aspect, placeholder, focused = false, onTap }: StripImageProps) {
+export function StripImage({ index, src: preferred, original, alt, size, focus = 50, largest, isVideo, hasAudio = false, start = 0, rise, onReady, aspect, placeholder, focused = false, onTap }: StripImageProps) {
   // A phone held sideways sizes its images like desktop: a share of the strip
   // height (its pager shows the desktop metadata band beneath, see
   // ProjectPager), so nothing fills the screen.
@@ -53,6 +56,9 @@ export function StripImage({ index, src: preferred, original, alt, size, focus =
   const isPhonePortrait = isMobile && !isLandscapePhone;
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   const onError = isOriginal ? undefined : fallBack;
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // The sound video handles its own start (SoundVideo).
+  useLoopFrom(videoRef, isVideo && !hasAudio ? start : 0, src);
   const [loaded, setLoaded] = useState(false);
   const handleReady = () => {
     setLoaded(true);
@@ -129,6 +135,7 @@ export function StripImage({ index, src: preferred, original, alt, size, focus =
           src={src}
           poster={placeholder}
           alt={alt}
+          start={start}
           inset={isLeadingMobileImage}
           fit={crops ? { objectFit: "cover", objectPosition: position } : undefined}
           onReady={handleReady}
@@ -142,12 +149,13 @@ export function StripImage({ index, src: preferred, original, alt, size, focus =
     return (
       <motion.video
         {...motionProps}
+        ref={videoRef}
         className={imageClass}
         src={src}
         poster={placeholder}
         aria-label={alt}
         muted
-        loop
+        loop={!start}
         autoPlay
         playsInline
         onLoadedMetadata={handleReady}
@@ -178,6 +186,7 @@ interface SoundVideoProps {
   src: string;
   poster?: string;
   alt: string;
+  start: number;
   inset: boolean;
   // The wrapper's crop (StripImage's cropped first image), for the video.
   fit?: CSSProperties;
@@ -185,9 +194,10 @@ interface SoundVideoProps {
   onError?: () => void;
 }
 
-function SoundVideo({ src, poster, alt, inset, fit, onReady, onError }: SoundVideoProps) {
+function SoundVideo({ src, poster, alt, start, inset, fit, onReady, onError }: SoundVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
+  useLoopFrom(videoRef, start, src);
 
   useEffect(() => {
     const onOther = (event: Event) => {
@@ -211,9 +221,9 @@ function SoundVideo({ src, poster, alt, inset, fit, onReady, onError }: SoundVid
     const next = !muted;
     if (!next) {
       // Unmuting is the user's tap, so playback is allowed; start from the top
-      // so the soundtrack is heard from its beginning.
+      // (or the video's set start) so the soundtrack is heard from there.
       video.muted = false;
-      video.currentTime = 0;
+      video.currentTime = start < video.duration ? start : 0;
       void video.play().catch(() => {});
       window.dispatchEvent(new CustomEvent(SOUND_EVENT, { detail: video }));
     }
@@ -230,7 +240,7 @@ function SoundVideo({ src, poster, alt, inset, fit, onReady, onError }: SoundVid
         poster={poster}
         aria-label={alt}
         muted
-        loop
+        loop={!start}
         autoPlay
         playsInline
         onLoadedMetadata={onReady}

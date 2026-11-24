@@ -12,6 +12,7 @@ images:
     size: "3"
     hideInGrid: false
   - video: /images/uploads/1_fragments/BODEGA_SOUND.mp4
+    start: 9.5
     size: "5"
     hideInGrid: false
 ---

@@ -59,6 +59,10 @@ content:
             label: Video link
             type: string
             description: Optional. Paste a link to a video (e.g. a Dropbox share link or any direct video URL) to play it from there instead of uploading. When set, it overrides the file above.
+          - name: start
+            label: Video start
+            type: number
+            description: "Optional, videos only. Seconds into the clip where it starts playing; each loop restarts from this point instead of the beginning. Leave empty to play the whole clip."
           - name: size
             label: Size
             type: select

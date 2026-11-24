@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { useFallbackSrc } from "../../hooks/useFallbackSrc";
+import { useLoopFrom } from "../../hooks/useLoopFrom";
 import { gridImageHeight } from "../../utils/imageSize";
 import styles from "./GridImage.module.css";
 
@@ -25,6 +26,8 @@ interface GridImageProps {
   // Position among the project's grid images; sets its cascading height.
   rank: number;
   isVideo: boolean;
+  // Video only: seconds where it opens and loops back to (useLoopFrom).
+  start?: number;
   onActivate: (event: React.MouseEvent<HTMLElement>) => void;
   // Reports the media's natural aspect ratio once known, so the grid can lay
   // out its justified rows.
@@ -33,7 +36,7 @@ interface GridImageProps {
 
 // No layoutId here: opening a project doesn't morph the clicked image. The
 // detail strip rises in from the bottom on its own instead.
-export function GridImage({ src: preferred, original, poster, play, aspect, focus = 50, alt, rank, isVideo, onActivate, onAspect: reportUp }: GridImageProps) {
+export function GridImage({ src: preferred, original, poster, play, aspect, focus = 50, alt, rank, isVideo, start = 0, onActivate, onAspect: reportUp }: GridImageProps) {
   // Height goes through a CSS variable so the mobile layout can override it.
   const style = {
     "--img-h": `${gridImageHeight(rank)}px`,
@@ -61,6 +64,7 @@ export function GridImage({ src: preferred, original, poster, play, aspect, focu
   const { src, isOriginal, fallBack } = useFallbackSrc(preferred, original);
   // A broken asset still needs a ratio, or the mobile layout would wait forever.
   const reportBroken = () => (isOriginal ? onAspect(1) : fallBack());
+  useLoopFrom(mediaRef, isVideo ? start : 0, src);
 
   // The poster has the video's proportions, so the layout needn't wait for
   // the video's own metadata. If it fails, onLoadedMetadata still reports.
@@ -96,7 +100,7 @@ export function GridImage({ src: preferred, original, poster, play, aspect, focu
         poster={poster}
         aria-label={alt}
         muted
-        loop
+        loop={!start}
         playsInline
         preload={poster ? "metadata" : "auto"}
         onClick={onActivate}
