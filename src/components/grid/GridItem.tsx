@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { Project } from "../../types/project";
 import { cellKey } from "../../hooks/useJustifiedRows";
+import { prefetchProject } from "../../utils/prefetch";
 import { InfoBlock } from "./InfoBlock";
 import { GridImage } from "./GridImage";
 import styles from "./GridItem.module.css";
@@ -29,6 +30,7 @@ export function GridItem({ project, cellWidths, labelWidth, onAspect, playVideos
   const enter = () => {
     window.clearTimeout(leaveTimer.current);
     setHovered(true);
+    prefetchProject(project);
   };
   const leave = () => {
     window.clearTimeout(leaveTimer.current);
@@ -36,32 +38,26 @@ export function GridItem({ project, cellWidths, labelWidth, onAspect, playVideos
   };
   useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
 
-  const go = () => {
-    navigate(`/project?project=${encodeURIComponent(project.slug)}`);
-  };
+  const href = `/project/${encodeURIComponent(project.slug)}`;
+  const go = () => navigate(href);
 
   const visibleImages = project.images
     .map((img, i) => ({ img, i }))
     .filter(({ img }) => !img.hideInGrid);
 
   const info = (
-    <div
+    // A real link, so crawlers can follow it from the prerendered index too.
+    <Link
+      to={href}
       className={styles.infoButton}
       // Stable hook for the reveal's label slide (GridView.module.css).
       data-grid-label
       style={labelWidth ? { width: "max-content", maxWidth: labelWidth } : undefined}
-      role="link"
-      tabIndex={0}
-      onClick={go}
-      onKeyDown={(e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        // Space would otherwise also scroll the page.
-        e.preventDefault();
-        go();
-      }}
+      onFocus={() => prefetchProject(project)}
+      onTouchStart={() => prefetchProject(project)}
     >
       <InfoBlock title={project.title} type={project.type} />
-    </div>
+    </Link>
   );
 
   const renderCell = (

@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import { useProjects } from "../../hooks/useProjects";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { markIntroPlayed } from "../../utils/intro";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import { usePageMeta } from "../../hooks/usePageMeta";
 import { ScrollStrip } from "./ScrollStrip";
 import { ProjectPager } from "./ProjectPager";
 import { DetailMeta, metaHeight } from "./DetailMeta";
@@ -13,7 +14,7 @@ import { ProjectHint } from "./ProjectHint";
 import styles from "./DetailView.module.css";
 
 export function DetailView() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { projects } = useProjects();
   // Landing straight on a project still counts as entering the site, so the
@@ -21,11 +22,16 @@ export function DetailView() {
   useEffect(markIntroPlayed, []);
   useBodyScrollLock(true);
 
-  const projectSlug = searchParams.get("project") ?? projects[0]?.slug ?? null;
+  const projectSlug = slug ?? projects[0]?.slug ?? null;
   const activeIndex = projectSlug
     ? Math.max(projects.findIndex((project) => project.slug === projectSlug), 0)
     : 0;
   const active = projects[activeIndex] ?? projects[0];
+  usePageMeta(active?.title, active?.description);
+  // Switching projects swaps the URL in place, so the back button still
+  // leads out of the project page rather than through every project seen.
+  const setProject = (next: string) =>
+    navigate(`/project/${encodeURIComponent(next)}`, { replace: true });
   const isMobile = useIsMobile();
   const wheelDeltaRef = useRef(0);
   const lastTriggerRef = useRef(0);
@@ -77,13 +83,13 @@ export function DetailView() {
       const nextProject = projects[nextIndex];
 
       if (nextProject && nextProject.slug !== projectSlug) {
-        setSearchParams({ project: nextProject.slug }, { replace: true });
+        setProject(nextProject.slug);
       }
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
+  }, [activeIndex, projectSlug, projects, navigate, isMobile]);
 
   useEffect(() => {
     // Touch screens on this layout (tablets, a phone turned sideways) have no
@@ -118,7 +124,7 @@ export function DetailView() {
       const direction = dy < 0 ? 1 : -1;
       const nextProject = projects[(activeIndex + direction + projects.length) % projects.length];
       if (nextProject && nextProject.slug !== projectSlug) {
-        setSearchParams({ project: nextProject.slug }, { replace: true });
+        setProject(nextProject.slug);
       }
     };
 
@@ -128,13 +134,11 @@ export function DetailView() {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [activeIndex, projectSlug, projects, setSearchParams, isMobile]);
+  }, [activeIndex, projectSlug, projects, navigate, isMobile]);
 
   if (!active) return null;
 
-  const handleProjectSelect = (slug: string) => {
-    setSearchParams({ project: slug }, { replace: true });
-  };
+  const handleProjectSelect = (next: string) => setProject(next);
 
   const goToIndex = () => {
     // The router basename already supplies the deploy subpath.

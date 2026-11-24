@@ -1,21 +1,20 @@
-import matter from "gray-matter";
+import content from "virtual:content";
 import type { Project, ProjectImage } from "../types/project";
 import { slugFromPath } from "../utils/slug";
 import { clampImageSize } from "../utils/imageSize";
 import { dropboxDirect, isVideo, optimizedSrc } from "../utils/media";
 import { parseDescription } from "../utils/richText";
 
-const files = import.meta.glob("/content/projects/*.md", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
+// Frontmatter of every content/projects/*.md, parsed at build time by
+// vite/content.ts (so gray-matter stays out of the browser bundle). Keyed by
+// "/content/projects/<file>.md".
+const files = content.projects;
 
 // Vite serves everything under public/ from the base URL, so stored paths like
 // "public/images/x.jpg" must be prefixed with BASE_URL ("/images/x.jpg" locally,
 // "/Portfolio-website-Julia/images/x.jpg" on a GitHub Pages project subpath).
 // Relative paths break on the detail route because the current path is a shared
-// view (for example "/project?project=slug"), so the URL must resolve against
+// view (for example "/project/slug"), so the URL must resolve against
 // the app base instead of the route segment. BASE_URL always ends with a
 // trailing slash.
 function normalizeSrc(src: string): string {
@@ -128,9 +127,7 @@ function toImage(entry: unknown): ProjectImage | null {
   return null;
 }
 
-function toProject(path: string, raw: string): Project {
-  const { data } = matter(raw);
-  const fm = data as Record<string, unknown>;
+function toProject(path: string, fm: Record<string, unknown>): Project {
   const slug = slugFromPath(path);
   // The CMS stores the description as Markdown; only its links are kept.
   const description = parseDescription(String(fm.description ?? ""));
@@ -151,15 +148,9 @@ function toProject(path: string, raw: string): Project {
 // The site's project order comes from the single "Project order" list in the
 // CMS (content/order.md), where entries are dragged into place. Entries are
 // project file paths; they're matched by slug so a bare filename works too.
-// Globbed so a missing file just means no order. Filenames are NFC-normalised
+// A missing file (null here) just means no order. Filenames are NFC-normalised
 // first because macOS can store "ä" decomposed, which would change the slug.
-const orderFiles = import.meta.glob("/content/order.md", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
-const orderRaw = Object.values(orderFiles)[0];
-const orderList = orderRaw ? (matter(orderRaw).data as Record<string, unknown>).projects : undefined;
+const orderList = content.order?.projects;
 
 const orderKey = (path: string) => slugFromPath(path.normalize("NFC"));
 const position = new Map<string, number>();
@@ -172,7 +163,7 @@ const position = new Map<string, number>();
 // created project) follows, by year then title. Entries for deleted files are
 // simply never matched.
 export const projects: Project[] = Object.entries(files)
-  .map(([path, raw]) => ({ project: toProject(path, raw), rank: position.get(orderKey(path)) ?? Infinity }))
+  .map(([path, fm]) => ({ project: toProject(path, fm), rank: position.get(orderKey(path)) ?? Infinity }))
   .sort(
     (a, b) =>
       (a.rank === b.rank ? 0 : a.rank - b.rank) ||

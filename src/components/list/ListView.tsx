@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { animate, motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
+import { usePageMeta } from "../../hooks/usePageMeta";
+import { prefetchProject } from "../../utils/prefetch";
 import {
   listIntroPending,
   markIntroPlayed,
@@ -23,6 +25,7 @@ import styles from "./ListView.module.css";
 export function ListView() {
   const { projects } = useProjects();
   const navigate = useNavigate();
+  usePageMeta("List", `All projects: ${projects.map((p) => p.title).join(", ")}.`);
   // Like About, landing here counts as entering the site.
   useEffect(markIntroPlayed, []);
   // The row cascade plays on the first visit per page load; read in the
@@ -83,8 +86,10 @@ export function ListView() {
         {projects.map((project, i) => (
           <li key={project.slug}>
             <Link
-              to={`/project?project=${encodeURIComponent(project.slug)}`}
+              to={`/project/${encodeURIComponent(project.slug)}`}
               className={styles.row}
+              onPointerEnter={() => prefetchProject(project)}
+              onTouchStart={() => prefetchProject(project)}
               data-row
             >
               {/* Hidden until animate() picks them up, so they don't flash at

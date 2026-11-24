@@ -13,9 +13,7 @@
     "media": "node scripts/optimize-media.mjs"
   },
   "dependencies": {
-    "buffer": "^6.0.3",
     "framer-motion": "^12.43.0",
-    "gray-matter": "^4.0.3",
     "hyphen": "^1.10.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -25,6 +23,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "gray-matter": "^4.0.3",
     "sharp": "^0.35.5",
     "typescript": "^5.5.3",
     "vite": "^5.4.0"

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useProjects } from "../../hooks/useProjects";
+import { SITE_DESCRIPTION, usePageMeta } from "../../hooks/usePageMeta";
 import { introPending, markIntroPlayed } from "../../utils/intro";
 import { useRowReveal } from "../../hooks/useRowReveal";
 import { LOGO_KEY, useJustifiedRows } from "../../hooks/useJustifiedRows";
@@ -11,6 +12,7 @@ import styles from "./GridView.module.css";
 
 export function GridView() {
   const { projects } = useProjects();
+  usePageMeta(undefined, SITE_DESCRIPTION);
   const gridRef = useRef<HTMLElement>(null);
   // Logo + row reveal only when the visitor first enters the site (or
   // refreshes); coming back from a project just fades the grid in.

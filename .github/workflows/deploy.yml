@@ -67,9 +67,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      # SPA fallback so client-side (BrowserRouter) routes work on Pages
-      - name: Add SPA fallback
-        run: cp dist/index.html dist/404.html
+      # No SPA fallback step: the build (vite/content.ts) writes a real HTML
+      # file per page plus 404.html, sitemap.xml and robots.txt.
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -23,6 +23,9 @@
 }
 
 .infoButton {
+  /* A link (inline by default) that must size like the block it replaced:
+     its inline max-content width and label cap only apply to a block. */
+  display: block;
   cursor: pointer;
 }
 

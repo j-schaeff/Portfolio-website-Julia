@@ -1,5 +1,5 @@
-import matter from "gray-matter";
-import raw from "/content/about.md?raw";
+// content/about.md's frontmatter, parsed at build time (vite/content.ts).
+import content from "virtual:content";
 
 export interface AboutLink {
   label: string;
@@ -26,8 +26,7 @@ function toHref(url: string): string {
   return /^[^\s@:/]+@[^\s@/]+\.[^\s@/]+$/.test(url) ? `mailto:${url}` : url;
 }
 
-function toAbout(source: string): About {
-  const fm = matter(source).data as Record<string, unknown>;
+function toAbout(fm: Record<string, unknown>): About {
   const links = Array.isArray(fm.links) ? fm.links : [];
 
   return {
@@ -41,4 +40,4 @@ function toAbout(source: string): About {
   };
 }
 
-export const about: About = toAbout(raw);
+export const about: About = toAbout(content.about);

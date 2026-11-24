@@ -22,10 +22,10 @@ There is **no test suite and no linter configured**. The only automated check is
 
 ```
 src/
-  main.tsx                 entry point (imports polyfills first, then App)
-  polyfills.ts             defines global `Buffer` — gray-matter needs it at runtime
+  main.tsx                 entry point
   App.tsx                  providers: BrowserRouter → ProjectsProvider
-  AnimatedRoutes.tsx       routes: "/" → GridView, "/project?project=<slug>" → DetailView, "/about" → AboutView, "/list" → ListView
+  AnimatedRoutes.tsx       routes: "/" → GridView, "/project/<slug>" → DetailView, "/about" → AboutView, "/list" → ListView; old "/project?project=<slug>" links redirect
+  routes.ts                DetailView / AboutView / ListView as lazy chunks, preloaded when the browser is idle
   data/projects.ts         loads & parses all Markdown at build time (the data layer)
   data/about.ts            parses content/about.md (bio paragraphs + links)
   types/project.ts         Project / ProjectImage / Frontmatter / ImageSize types
@@ -38,10 +38,12 @@ src/
     useJustifiedRows.ts    picks the index grid's rows, gives each cell a width, and caps each label short of the next project's
     useRowReveal.ts        logo loading screen + row-by-row reveal on first load
     useFallbackSrc.ts      show a web-sized copy, falling back to the original if it fails
+    usePageMeta.ts         tab title + meta description per page during client-side navigation
   utils/
     imageSize.ts           clampImageSize() + size (1–5) → grid/strip heights
     slug.ts                filename → URL slug
     media.ts               isVideo() extension check, dropboxDirect() share-link rewrite, optimizedSrc()
+    prefetch.ts            prefetchProject(): on hover/touch, warm a project's page chunk + first strip images
     motion.ts              shared transition timings (grid fade, strip rise)
     intro.ts               once-per-page-load flags: logo + reveal intro, desktop scroll hint, list row cascade
     justify.ts             whole-paragraph line breaking (Knuth–Plass) + hyphenation for justified text
@@ -56,6 +58,7 @@ src/
     CornerNav.tsx          corner controls: List link top-left (index only; About is the grid's logo) + ThemeToggle top-right
     ThemeToggle.tsx        light/dark switch, saved to localStorage
   styles/                  index.css, variables.css (CSS custom properties)
+vite/content.ts            Vite plugin: `virtual:content` (Markdown parsed at build time) + prerendered pages, sitemap, robots, 404
 content/projects/*.md      project content (one file per project)
 scripts/assign-sizes.mjs   fills missing image sizes (run in the deploy workflow)
 scripts/optimize-media.mjs web-sized copies of public/images → public/optimized (gitignored)
@@ -68,8 +71,8 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 
 ## How the data layer works ([src/data/projects.ts](src/data/projects.ts))
 
-- All `content/projects/*.md` files are loaded at **build time** via Vite's `import.meta.glob` (eager, raw). Adding a Markdown file is enough to add a project — no registration step.
-- `gray-matter` parses the frontmatter into `Project` objects, sorted by their position in [content/order.md](content/order.md) — the "Project order" list in Pages CMS, a list of `reference` entries (project file paths) dragged into place. Entries are matched by slug (NFC-normalised, since macOS may store "ä" decomposed); projects not in the list follow, by `year` then `title`, and entries for deleted files are ignored. There is no per-project order field. (gray-matter needs a global `Buffer`; [src/polyfills.ts](src/polyfills.ts) supplies it and is imported first in `main.tsx`.)
+- All `content/projects/*.md` files are read at **build time** by [vite/content.ts](vite/content.ts), which parses their frontmatter with `gray-matter` in Node and hands it to the app as `virtual:content` (keyed by `/content/projects/<file>.md`). The browser never ships gray-matter. Adding a Markdown file is enough to add a project — no registration step; in dev, any change under `content/` reloads the page.
+- `toProject()` turns the frontmatter into `Project` objects, sorted by their position in [content/order.md](content/order.md) — the "Project order" list in Pages CMS, a list of `reference` entries (project file paths) dragged into place. Entries are matched by slug (NFC-normalised, since macOS may store "ä" decomposed); projects not in the list follow, by `year` then `title`, and entries for deleted files are ignored. There is no per-project order field.
 - `normalizeSrc()` prefixes stored paths like `public/images/x.jpg` with `import.meta.env.BASE_URL`, producing `/images/x.jpg` locally and `/Portfolio-website-Julia/images/x.jpg` on the GitHub Pages subpath. **Keep this** — relative paths break on the `/project` route, and a hardcoded `/` base breaks the Pages build. Absolute (`http(s)://`, `//`, `data:`) sources pass through untouched.
 - Uploaded videos go in an entry's `video` field, not `image`: the CMS `image` field type shows thumbnails but rejects video extensions. Precedence is `videoUrl` → `video` → `image`.
 - `videoUrl` on an image entry overrides the uploaded `image`: it lets large videos stream from external hosting (e.g. Dropbox) instead of being committed through the CMS. `dropboxDirect()` rewrites Dropbox share links to a playable form (`raw=1`); such entries are always treated as video.
@@ -78,6 +81,9 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 - **Web-sized copies:** the CMS uploads in `public/images/` are often several MB, so components never show them directly. `scripts/optimize-media.mjs` (run by `predev`/`prebuild`, needs `sharp` and `ffmpeg`) writes `<file>.thumb.webp` (600px tall, grid), `<file>.full.webp` (2400px long edge, detail strip), and for videos `<file>.thumb.mp4` (600px tall, silent, grid), `<file>.opt.mp4` (1280px, with sound, detail strip) + `<file>.poster.webp` into `public/optimized/`. Work is skipped by content hash (`.manifest.json`), and the deploy workflow installs ffmpeg and caches the folder (without ffmpeg every video falls back to its full-size upload). `toImage()` fills `ProjectImage.thumb`/`full`/`poster` (for videos `thumb` is `thumb.mp4`, `full` is `opt.mp4`) via `optimizedSrc()`; `src` stays the original, and `useFallbackSrc()` switches to it if a copy fails to load. External sources (`videoUrl`) and SVGs have no copies and pass through unchanged. If you change the file naming, update both the script and `optimizedSrc()`. The script also writes each copy's aspect ratio to `src/generated/media-aspects.json` (gitignored); `toImage()` sets it as `ProjectImage.aspect`, so the index lays out its rows before any image loads. Media without one (external `videoUrl`s) is measured on load instead.
 
 ## Key conventions & gotchas
+
+- **Prerendered pages / SEO:** after `vite build`, [vite/content.ts](vite/content.ts) writes `about.html`, `list.html` and `project/<slug>.html` next to `index.html` (GitHub Pages serves `/about` from `about.html` with a 200), each with its own title, description, canonical, Open Graph image, JSON-LD, a `modulepreload` for its route chunk, and a visually hidden crawlable copy of its text inside `#root` (React replaces it on mount). It also writes `sitemap.xml`, `robots.txt` and `404.html` (noindex SPA fallback). The origin comes from `SITE_URL` in [vite.config.ts](vite.config.ts). It reads the Markdown itself rather than `src/data/projects.ts`, so a new field that should reach search engines needs adding there too. Slugs come from `slugFromPath()`, so renaming a project file changes its URL.
+- **Routing:** project pages are `/project/<slug>`; switching projects replaces the URL in place. `<Routes>` is keyed `"/project"` for every project so DetailView stays mounted across switches — keep that, or the rise replays and the pager resets.
 
 - **Grid → detail transition:** the grid fades out quickly while the detail page (fixed over the viewport, so it's in place during the `mode="sync"` crossfade) plays a staggered rise: each strip image slides up from below, then the metadata fades in. Timings live in [src/utils/motion.ts](src/utils/motion.ts). The rise only plays on the page's first render, not on project switches. The logo loading screen + row-by-row reveal play once per page load (each image grows in, then its title and type slide in 24px from the left); the logo waits only for the media in the viewport and for those cells to reveal (cells below the fold reveal with the last visible one and finish loading afterwards). They play on first entry or refresh, tracked by [src/utils/intro.ts](src/utils/intro.ts); returning to the index from a project just fades the grid in.
 - **Image sizing:** width follows the image's natural aspect ratio; only height scales, via a size (1–5) → `imageHeight()`. On the index the size cascades per project (`gridImageHeight(rank)`): the first grid image is 5, each next one a step smaller down to 1, restarting for every project. The `size` field only drives the detail strip. Shared transition timings (the `[0.22, 1, 0.36, 1]` easing, `ZOOM_TRANSITION` at 0.6s, the rise) live once in [src/utils/motion.ts](src/utils/motion.ts). Every image stores an explicit `size` in its frontmatter. New images saved without one are filled by [scripts/assign-sizes.mjs](scripts/assign-sizes.mjs) (`npm run sizes`), which the deploy workflow runs and commits back to `main`: a slug-seeded mix of 2–5 where no two neighbours match. Existing 1–5 values are never touched, so after that they are adjusted by hand in the CMS. Until the fill lands, `clampImageSize()` renders a missing size as 3.
@@ -88,7 +94,7 @@ Styling is **CSS Modules** (`*.module.css`) plus shared CSS variables in [src/st
 
 ## Deployment
 
-Pushing to `main` deploys to **GitHub Pages** ([.github/workflows/](.github/workflows/)), served at the custom domain `juliaschaeffler.com` (set in the repo's Pages settings, DNS at GoDaddy). Because of the custom domain the build uses the default `/` base (see `base` in [vite.config.ts](vite.config.ts)); it copies `index.html` → `404.html` for the SPA fallback. If you change the `base` handling, keep it in sync with `normalizeSrc()`, which relies on `import.meta.env.BASE_URL`. Removing the custom domain would require `DEPLOY_BASE=/Portfolio-website-Julia/` again.
+Pushing to `main` deploys to **GitHub Pages** ([.github/workflows/](.github/workflows/)), served at the custom domain `juliaschaeffler.com` (set in the repo's Pages settings, DNS at GoDaddy). Because of the custom domain the build uses the default `/` base (see `base` in [vite.config.ts](vite.config.ts)); the build itself writes `404.html` for the SPA fallback (see Prerendered pages above). If you change the `base` handling, keep it in sync with `normalizeSrc()`, which relies on `import.meta.env.BASE_URL`. Removing the custom domain would require `DEPLOY_BASE=/Portfolio-website-Julia/` again.
 
 [netlify.toml](netlify.toml) remains from the earlier Netlify setup (`npm run build` → `dist`, SPA catch-all redirect), but Netlify no longer serves the domain — its free build credits ran out under the volume of CMS commits.
 

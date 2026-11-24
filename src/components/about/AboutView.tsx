@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { about } from "../../data/about";
 import { LogoMark } from "../grid/Logo";
 import { markIntroPlayed } from "../../utils/intro";
+import { usePageMeta } from "../../hooks/usePageMeta";
 import { GRID_EXIT_TRANSITION } from "../../utils/motion";
 import styles from "./AboutView.module.css";
 
@@ -21,6 +22,7 @@ function withNumber(text: string) {
 
 export function AboutView() {
   const navigate = useNavigate();
+  usePageMeta("About", about.columns[0]?.join(" "));
   // Like landing on a project, landing here counts as entering the site.
   useEffect(markIntroPlayed, []);
 
