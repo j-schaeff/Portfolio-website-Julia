@@ -137,6 +137,20 @@
   line-height: 1.35;
 }
 
+/* The title is a plain-looking button: it toggles the focused view. */
+.titleButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .description {
   margin: 0;
   font-size: 12px;

@@ -80,6 +80,26 @@ export function ProjectPager({
     anchorRef.current = { slug, index };
     setFocus((prev) => (prev ? null : { slug, index }));
   };
+  // Tapping the title toggles the focused view too, anchored on the image
+  // most in view (the one whose centre is nearest the screen's).
+  const toggleFocusFromTitle = (slug: string) => {
+    const strip = pageFor(slug)?.firstElementChild;
+    const items = strip?.firstElementChild?.children;
+    let index = 0;
+    if (strip instanceof HTMLElement && items) {
+      const mid = strip.scrollLeft + strip.clientWidth / 2;
+      let best = Infinity;
+      Array.from(items).forEach((el, i) => {
+        if (!(el instanceof HTMLElement)) return;
+        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid);
+        if (d < best) {
+          best = d;
+          index = i;
+        }
+      });
+    }
+    toggleFocus(slug, index);
+  };
 
   // Turned sideways the info is always showing, so a focused view closes.
   useEffect(() => {
@@ -443,7 +463,19 @@ export function ProjectPager({
                   animate={{ opacity: 1 }}
                   transition={{ ...ZOOM_TRANSITION, delay: 0.35 }}
                 >
-                  <h2 className={styles.title} data-contrast>{project.title}</h2>
+                  <h2 className={styles.title} data-contrast>
+                    {/* Tapping the title opens (or closes) the focused view,
+                        like tapping an image. */}
+                    <button
+                      type="button"
+                      className={styles.titleButton}
+                      onClick={copy ? undefined : () => toggleFocusFromTitle(project.slug)}
+                      aria-expanded={copy ? undefined : focused}
+                      tabIndex={copy ? -1 : undefined}
+                    >
+                      {project.title}
+                    </button>
+                  </h2>
                     {/* The focused view's info, right under the title. It grows
                         from no height, in step with the images, so the title
                         rises with it, and fades in a beat behind; closing runs
